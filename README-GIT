@@ -1,0 +1,1 @@
+Important : ne jamais mettre .env dans Git, parce qu’il va contenir des mots de passe/secrets.
