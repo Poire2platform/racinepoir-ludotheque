@@ -1,0 +1,84 @@
+Important : ne jamais mettre .env dans Git, parce qu’il va contenir des mots de passe/secrets.
+
+
+# _______  ___   _______ 
+#|       ||   | |       |
+#|    ___||   | |_     _|
+#|   | __ |   |   |   |  
+#|   ||  ||   |   |   |  
+#|   |_| ||   |   |   |  
+#|_______||___|   |___|  
+
+
+
+git config --global --list
+
+
+git config --global user.name "Maxime Pearson"
+git config --global user.email "maxpearsonplatform@gmail.com"
+
+
+
+Tu vas voir les fichiers nouveaux ou modifiés.
+
+4. Ajouter les fichiers au prochain commit
+git add .
+
+Le . veut dire : ajoute tout ce qui est nouveau/modifié, sauf ce qui est ignoré par .gitignore.
+
+5. Faire un commit
+git commit -m "Initial project structure"
+
+Un commit = un point de sauvegarde propre.
+
+6. Répéter ce cycle
+
+À chaque petit bloc terminé :
+
+git status
+git add .
+git commit -m "Message clair"
+
+Exemples de bons messages :
+
+git commit -m "Add project journal"
+git commit -m "Add Flask app skeleton"
+git commit -m "Configure PostgreSQL connection"
+git commit -m "Add user model and login route"
+
+
+#  .::         .::.::::::::.:::     .::.::         .::
+#   .::       .:: .::      .: .::   .:: .::       .:: 
+#    .::     .::  .::      .:: .::  .::  .::     .::  
+#     .::   .::   .::::::  .::  .:: .::   .::   .::   
+#      .:: .::    .::      .::   .: .::    .:: .::    
+#       .::::     .::      .::    .: ::     .::::     
+#        .::      .::::::::.::      .::      .::      
+
+
+##############################################
+À retenir
+##############################################
+À chaque fois que tu reviens
+ travailler sur le projet :
+----------------------------------------------
+
+
+cd ~/racinepoir-ludotheque
+source .venv/bin/activate
+
+---------------------------------------------
+#############################################
+
+
+En développement
+
+Sur ta machine :
+
+ton PC
+→ dossier projet
+→ .venv
+→ Flask en mode dev
+→ PostgreSQL local ou SQL01
+
+Le venv sert à coder/tester sans polluer ton système.
