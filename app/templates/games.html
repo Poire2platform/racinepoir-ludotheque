@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Jeux — RacinePoir</title>
+</head>
+<body>
+    <h1>Jeux</h1>
+
+    {% if games %}
+        <ul>
+            {% for game in games %}
+                <li>
+                    <strong>{{ game.title }}</strong>
+                    {% if game.language %}
+                        — {{ game.language }}
+                    {% endif %}
+                    {% if game.min_players and game.max_players %}
+                        — {{ game.min_players }} à {{ game.max_players }} joueurs
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Aucun jeu trouvé.</p>
+    {% endif %}
+
+    <p><a href="/">Retour accueil</a></p>
+</body>
+</html>
