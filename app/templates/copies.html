@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Copies — RacinePoir</title>
+</head>
+<body>
+    <h1>Copies physiques</h1>
+
+    {% if copies %}
+        <table border="1" cellpadding="6">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Jeu</th>
+                    <th>Propriétaire</th>
+                    <th>Détenteur actuel</th>
+                    <th>Location actuelle</th>
+                    <th>Condition</th>
+                    <th>Disponibilité</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for copy in copies %}
+                    <tr>
+                        <td>{{ copy.id }}</td>
+                        <td>{{ copy.game.title }}</td>
+                        <td>{{ copy.owner.display_name }}</td>
+                        <td>
+                            {% if copy.current_holder %}
+                                {{ copy.current_holder.display_name }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if copy.current_location %}
+                                {{ copy.current_location.name }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td>{{ copy.condition }}</td>
+                        <td>{{ copy.availability_status }}</td>
+                        <td>{{ copy.lifecycle_status }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Aucune copie trouvée.</p>
+    {% endif %}
+
+    <p><a href="/">Retour accueil</a></p>
+    <p><a href="/games">Voir les jeux</a></p>
+</body>
+</html>

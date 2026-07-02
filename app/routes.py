@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template
 
-from app.models import Game
+from app.models import Game, GameCopy
 
 main = Blueprint("main", __name__)
 
@@ -14,3 +14,9 @@ def index():
 def games():
     games = Game.query.order_by(Game.title.asc()).all()
     return render_template("games.html", games=games)
+
+
+@main.route("/copies")
+def copies():
+    copies = GameCopy.query.order_by(GameCopy.id.asc()).all()
+    return render_template("copies.html", copies=copies)
