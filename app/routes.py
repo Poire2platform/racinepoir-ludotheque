@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, request
-from app.models import Game, GameCopy, CopyEvent
+from app.models import Game, GameCopy, CopyEvent, Location
 
 main = Blueprint("main", __name__)
 
@@ -22,7 +22,6 @@ def copies():
 
 
 @main.route("/copies/<int:copy_id>")
-
 def copy_detail(copy_id):
     copy = GameCopy.query.get_or_404(copy_id)
 
@@ -33,7 +32,14 @@ def copy_detail(copy_id):
         .all()
     )
 
-    return render_template("copy_detail.html", copy=copy, events=events)
+    locations = Location.query.order_by(Location.name.asc()).all()
+
+    return render_template(
+        "copy_detail.html",
+        copy=copy,
+        events=events,
+        locations=locations,
+    )
 
 @main.route("/scan/<token>")
 def scan_copy(token):
