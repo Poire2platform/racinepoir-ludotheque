@@ -16,6 +16,7 @@
                     <th>Propriétaire</th>
                     <th>Détenteur actuel</th>
                     <th>Location actuelle</th>
+                    <th>Wanted location</th>
                     <th>Condition</th>
                     <th>Disponibilité</th>
                     <th>Status</th>
@@ -25,8 +26,15 @@
                 {% for copy in copies %}
                     <tr>
                         <td>{{ copy.id }}</td>
-                        <td>{{ copy.game.title }}</td>
+
+                        <td>
+                            <a href="/copies/{{ copy.id }}">
+                                {{ copy.game.title }}
+                            </a>
+                        </td>
+
                         <td>{{ copy.owner.display_name }}</td>
+
                         <td>
                             {% if copy.current_holder %}
                                 {{ copy.current_holder.display_name }}
@@ -34,6 +42,7 @@
                                 —
                             {% endif %}
                         </td>
+
                         <td>
                             {% if copy.current_location %}
                                 {{ copy.current_location.name }}
@@ -41,6 +50,15 @@
                                 —
                             {% endif %}
                         </td>
+
+                        <td>
+                            {% if copy.wanted_location %}
+                                {{ copy.wanted_location.name }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
                         <td>{{ copy.condition }}</td>
                         <td>{{ copy.availability_status }}</td>
                         <td>{{ copy.lifecycle_status }}</td>
