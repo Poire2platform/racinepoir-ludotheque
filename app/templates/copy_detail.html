@@ -47,29 +47,65 @@
         <p><strong>Notes :</strong> {{ copy.notes }}</p>
     {% endif %}
 
-<h2>Actions dev</h2>
+    <hr>
 
-<p>
-    <a href="/copies/{{ copy.id }}/mark-lost">
-        Marquer comme perdue
-    </a>
-</p>
+    <h2>Actions dev</h2>
 
-<p><strong>Déplacer vers :</strong></p>
+    <h3>Déplacer la copie</h3>
 
-<ul>
-    {% for location in locations %}
-        <li>
-            {% if copy.current_location and copy.current_location.id == location.id %}
-                {{ location.name }} — location actuelle
-            {% else %}
-                <a href="/copies/{{ copy.id }}/move/{{ location.id }}">
-                    {{ location.name }}
-                </a>
-            {% endif %}
-        </li>
-    {% endfor %}
-</ul>
+    <p><strong>Déplacer vers :</strong></p>
+
+    <ul>
+        {% for location in locations %}
+            <li>
+                {% if copy.current_location and copy.current_location.id == location.id %}
+                    {{ location.name }} — location actuelle
+                {% else %}
+                    <a href="/copies/{{ copy.id }}/move/{{ location.id }}">
+                        {{ location.name }}
+                    </a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h3>Wanted location</h3>
+
+    {% if copy.wanted_location %}
+        <p>
+            Actuellement wanted vers : {{ copy.wanted_location.name }}
+            —
+            <a href="/copies/{{ copy.id }}/wanted/clear">Effacer</a>
+        </p>
+    {% else %}
+        <p>Aucune wanted location.</p>
+    {% endif %}
+
+    <p><strong>Mettre wanted vers :</strong></p>
+
+    <ul>
+        {% for location in locations %}
+            <li>
+                {% if copy.wanted_location and copy.wanted_location.id == location.id %}
+                    {{ location.name }} — wanted actuelle
+                {% else %}
+                    <a href="/copies/{{ copy.id }}/wanted/{{ location.id }}">
+                        {{ location.name }}
+                    </a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h3>État</h3>
+
+    <p>
+        <a href="/copies/{{ copy.id }}/mark-lost">
+            Marquer comme perdue
+        </a>
+    </p>
+
+    <hr>
 
     <h2>Historique</h2>
 
@@ -89,7 +125,10 @@
         <p>Aucun événement trouvé.</p>
     {% endif %}
 
+    <hr>
+
     <p><a href="/copies">Retour aux copies</a></p>
     <p><a href="/games">Voir les jeux</a></p>
+    <p><a href="/">Accueil</a></p>
 </body>
 </html>

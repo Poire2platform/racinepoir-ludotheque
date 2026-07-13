@@ -93,3 +93,57 @@ def move_copy(copy_id, location_id):
     db.session.commit()
 
     return redirect(url_for("main.copy_detail", copy_id=copy.id))
+
+@main.route("/copies/<int:copy_id>/wanted/<int:location_id>")
+def set_wanted_location(copy_id, location_id):
+    copy = GameCopy.query.get_or_404(copy_id)
+    new_wanted_location = Location.query.get_or_404(location_id)
+
+    from app.extensions import db
+
+    copy.wanted_location = new_wanted_location
+
+    # Règle métier : si la copie est déjà à la location voulue, on efface wanted_location.
+    if copy.current_location_id == new_wanted_location.id:
+        copy.wanted_location_id = None
+        event_type = "wanted_location_cleared"
+        notes = "Wanted location effacée automatiquement car la copie est déjà à cet endroit."
+    else:
+        event_type = "wanted_location_set"
+        notes = f"Wanted location définie vers {new_wanted_location.name}."
+
+    event = CopyEvent(
+        game_copy=copy,
+        event_type=event_type,
+        actor_user_id=copy.owner_user_id,
+        to_location_id=new_wanted_location.id,
+        notes=notes,
+    )
+
+    db.session.add(event)
+    db.session.commit()
+
+    return redirect(url_for("main.copy_detail", copy_id=copy.id))
+
+
+@main.route("/copies/<int:copy_id>/wanted/clear")
+def clear_wanted_location(copy_id):
+    copy = GameCopy.query.get_or_404(copy_id)
+
+    from app.extensions import db
+
+    old_wanted_location = copy.wanted_location
+    copy.wanted_location = None
+
+    event = CopyEvent(
+        game_copy=copy,
+        event_type="wanted_location_cleared",
+        actor_user_id=copy.owner_user_id,
+        from_location_id=old_wanted_location.id if old_wanted_location else None,
+        notes="Wanted location effacée depuis l'interface dev.",
+    )
+
+    db.session.add(event)
+    db.session.commit()
+
+    return redirect(url_for("main.copy_detail", copy_id=copy.id))
