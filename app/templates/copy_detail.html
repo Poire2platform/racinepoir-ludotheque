@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Copie #{{ copy.id }} — RacinePoir</title>
+</head>
+<body>
+    <h1>Copie #{{ copy.id }}</h1>
+
+    <h2>{{ copy.game.title }}</h2>
+
+    <p><strong>Propriétaire :</strong> {{ copy.owner.display_name }}</p>
+
+    <p>
+        <strong>Détenteur actuel :</strong>
+        {% if copy.current_holder %}
+            {{ copy.current_holder.display_name }}
+        {% else %}
+            —
+        {% endif %}
+    </p>
+
+    <p>
+        <strong>Location actuelle :</strong>
+        {% if copy.current_location %}
+            {{ copy.current_location.name }}
+        {% else %}
+            —
+        {% endif %}
+    </p>
+
+    <p>
+        <strong>Wanted location :</strong>
+        {% if copy.wanted_location %}
+            {{ copy.wanted_location.name }}
+        {% else %}
+            —
+        {% endif %}
+    </p>
+
+    <p><strong>Condition :</strong> {{ copy.condition }}</p>
+    <p><strong>Disponibilité :</strong> {{ copy.availability_status }}</p>
+    <p><strong>Status :</strong> {{ copy.lifecycle_status }}</p>
+    <p><strong>QR token :</strong> {{ copy.qr_code_token }}</p>
+
+    {% if copy.notes %}
+        <p><strong>Notes :</strong> {{ copy.notes }}</p>
+    {% endif %}
+
+<h2>Actions dev</h2>
+
+<p>
+    <a href="/copies/{{ copy.id }}/mark-lost">
+        Marquer comme perdue
+    </a>
+</p>
+
+
+    <h2>Historique</h2>
+
+    {% if events %}
+        <ul>
+            {% for event in events %}
+                <li>
+                    <strong>{{ event.event_type }}</strong>
+                    — {{ event.created_at }}
+                    {% if event.notes %}
+                        — {{ event.notes }}
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Aucun événement trouvé.</p>
+    {% endif %}
+
+    <p><a href="/copies">Retour aux copies</a></p>
+    <p><a href="/games">Voir les jeux</a></p>
+</body>
+</html>

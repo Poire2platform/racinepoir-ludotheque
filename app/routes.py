@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for
+from flask import Blueprint, render_template, redirect, url_for, request
 from app.models import Game, GameCopy, CopyEvent
 
 main = Blueprint("main", __name__)
@@ -22,6 +22,7 @@ def copies():
 
 
 @main.route("/copies/<int:copy_id>")
+
 def copy_detail(copy_id):
     copy = GameCopy.query.get_or_404(copy_id)
 
@@ -37,4 +38,23 @@ def copy_detail(copy_id):
 @main.route("/scan/<token>")
 def scan_copy(token):
     copy = GameCopy.query.filter_by(qr_code_token=token).first_or_404()
+    return redirect(url_for("main.copy_detail", copy_id=copy.id))
+
+@main.route("/copies/<int:copy_id>/mark-lost")
+def mark_copy_lost(copy_id):
+    copy = GameCopy.query.get_or_404(copy_id)
+
+    copy.lifecycle_status = "lost"
+
+    event = CopyEvent(
+        game_copy=copy,
+        event_type="marked_lost",
+        actor_user_id=copy.owner_user_id,
+        notes="Copie marquée comme perdue depuis l'interface dev.",
+    )
+
+    from app.extensions import db
+    db.session.add(event)
+    db.session.commit()
+
     return redirect(url_for("main.copy_detail", copy_id=copy.id))
