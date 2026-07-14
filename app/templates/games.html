@@ -1,30 +1,48 @@
-<!doctype html>
-<html lang="fr">
-<head>
-    <meta charset="utf-8">
-    <title>Jeux — RacinePoir</title>
-</head>
-<body>
-    <h1>Jeux</h1>
+{% extends "base.html" %}
+
+{% block title %}Jeux — RacinePoir{% endblock %}
+
+{% block content %}
+    <h2>Jeux</h2>
 
     {% if games %}
-        <ul>
-            {% for game in games %}
-                <li>
-                    <strong>{{ game.title }}</strong>
-                    {% if game.language %}
-                        — {{ game.language }}
-                    {% endif %}
-                    {% if game.min_players and game.max_players %}
-                        — {{ game.min_players }} à {{ game.max_players }} joueurs
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
+        <table border="1" cellpadding="6">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Titre</th>
+                    <th>Édition</th>
+                    <th>Langue</th>
+                    <th>Joueurs</th>
+                    <th>Durée</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for game in games %}
+                    <tr>
+                        <td>{{ game.id }}</td>
+                        <td>{{ game.title }}</td>
+                        <td>{{ game.edition_name or "—" }}</td>
+                        <td>{{ game.language or "—" }}</td>
+                        <td>
+                            {% if game.min_players and game.max_players %}
+                                {{ game.min_players }}–{{ game.max_players }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if game.min_playtime and game.max_playtime %}
+                                {{ game.min_playtime }}–{{ game.max_playtime }} min
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     {% else %}
         <p>Aucun jeu trouvé.</p>
     {% endif %}
-
-    <p><a href="/">Retour accueil</a></p>
-</body>
-</html>
+{% endblock %}

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}RacinePoir{% endblock %}</title>
+</head>
+<body>
+    <header>
+        <h1>RacinePoir — Ludothèque</h1>
+
+        <nav>
+            <a href="/">Accueil</a> |
+            <a href="/games">Jeux</a> |
+            <a href="/copies">Copies</a>
+        </nav>
+
+        <hr>
+
+        {% if current_user.is_authenticated %}
+            <p>
+                Connecté comme :
+                <strong>{{ current_user.display_name }}</strong>
+                — username : <code>{{ current_user.username }}</code>
+                — rôle : <code>{{ current_user.role }}</code>
+                — <a href="/logout">Déconnexion</a>
+            </p>
+        {% else %}
+            <p>
+                Non connecté
+                — <a href="/login">Connexion</a>
+            </p>
+        {% endif %}
+
+        <hr>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

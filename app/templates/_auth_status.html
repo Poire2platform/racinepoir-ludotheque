@@ -1,0 +1,22 @@
+<hr>
+
+{% if current_user.is_authenticated %}
+    <p>
+        Connecté comme :
+        <strong>{{ current_user.display_name }}</strong>
+        —
+        username: <code>{{ current_user.username }}</code>
+        —
+        rôle: <code>{{ current_user.role }}</code>
+        —
+        <a href="/logout">Déconnexion</a>
+    </p>
+{% else %}
+    <p>
+        Non connecté
+        —
+        <a href="/login">Connexion</a>
+    </p>
+{% endif %}
+
+<hr>

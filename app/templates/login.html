@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Connexion — RacinePoir{% endblock %}
+
+{% block content %}
+    <h2>Connexion</h2>
+
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    <form method="post">
+        <p>
+            <label>Username</label><br>
+            <input type="text" name="username">
+        </p>
+
+        <p>
+            <label>Mot de passe</label><br>
+            <input type="password" name="password">
+        </p>
+
+        <button type="submit">Se connecter</button>
+    </form>
+{% endblock %}

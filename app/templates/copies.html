@@ -1,11 +1,9 @@
-<!doctype html>
-<html lang="fr">
-<head>
-    <meta charset="utf-8">
-    <title>Copies — RacinePoir</title>
-</head>
-<body>
-    <h1>Copies physiques</h1>
+{% extends "base.html" %}
+
+{% block title %}Copies — RacinePoir{% endblock %}
+
+{% block content %}
+    <h2>Copies physiques</h2>
 
     {% if copies %}
         <table border="1" cellpadding="6">
@@ -14,12 +12,12 @@
                     <th>ID</th>
                     <th>Jeu</th>
                     <th>Propriétaire</th>
-                    <th>Détenteur actuel</th>
                     <th>Location actuelle</th>
                     <th>Wanted location</th>
                     <th>Condition</th>
                     <th>Disponibilité</th>
                     <th>Status</th>
+                    <th>Scan</th>
                 </tr>
             </thead>
             <tbody>
@@ -34,14 +32,6 @@
                         </td>
 
                         <td>{{ copy.owner.display_name }}</td>
-
-                        <td>
-                            {% if copy.current_holder %}
-                                {{ copy.current_holder.display_name }}
-                            {% else %}
-                                —
-                            {% endif %}
-                        </td>
 
                         <td>
                             {% if copy.current_location %}
@@ -62,6 +52,10 @@
                         <td>{{ copy.condition }}</td>
                         <td>{{ copy.availability_status }}</td>
                         <td>{{ copy.lifecycle_status }}</td>
+
+                        <td>
+                            <a href="/scan/{{ copy.qr_code_token }}">Scanner</a>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -69,8 +63,4 @@
     {% else %}
         <p>Aucune copie trouvée.</p>
     {% endif %}
-
-    <p><a href="/">Retour accueil</a></p>
-    <p><a href="/games">Voir les jeux</a></p>
-</body>
-</html>
+{% endblock %}

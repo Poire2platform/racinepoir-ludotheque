@@ -1,24 +1,13 @@
-<!doctype html>
-<html lang="fr">
-<head>
-    <meta charset="utf-8">
-    <title>Copie #{{ copy.id }} — RacinePoir</title>
-</head>
-<body>
-    <h1>Copie #{{ copy.id }}</h1>
+{% extends "base.html" %}
 
-    <h2>{{ copy.game.title }}</h2>
+{% block title %}Copie #{{ copy.id }} — RacinePoir{% endblock %}
+
+{% block content %}
+    <h2>Copie #{{ copy.id }}</h2>
+
+    <h3>{{ copy.game.title }}</h3>
 
     <p><strong>Propriétaire :</strong> {{ copy.owner.display_name }}</p>
-
-    <p>
-        <strong>Détenteur actuel :</strong>
-        {% if copy.current_holder %}
-            {{ copy.current_holder.display_name }}
-        {% else %}
-            —
-        {% endif %}
-    </p>
 
     <p>
         <strong>Location actuelle :</strong>
@@ -46,6 +35,10 @@
     {% if copy.notes %}
         <p><strong>Notes :</strong> {{ copy.notes }}</p>
     {% endif %}
+
+    <p>
+        <a href="/scan/{{ copy.qr_code_token }}">Ouvrir la page de scan</a>
+    </p>
 
     <hr>
 
@@ -124,11 +117,4 @@
     {% else %}
         <p>Aucun événement trouvé.</p>
     {% endif %}
-
-    <hr>
-
-    <p><a href="/copies">Retour aux copies</a></p>
-    <p><a href="/games">Voir les jeux</a></p>
-    <p><a href="/">Accueil</a></p>
-</body>
-</html>
+{% endblock %}

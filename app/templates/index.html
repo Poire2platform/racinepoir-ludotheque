@@ -1,11 +1,14 @@
-<!doctype html>
-<html lang="fr">
-<head>
-    <meta charset="utf-8">
-    <title>RacinePoir — Ludothèque</title>
-</head>
-<body>
-    <h1>RacinePoir — Ludothèque distribuée</h1>
-    <p>Application Flask fonctionnelle.</p>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Accueil — RacinePoir{% endblock %}
+
+{% block content %}
+    <h2>Accueil</h2>
+
+    <p>Bienvenue dans RacinePoir — Ludothèque.</p>
+
+    <ul>
+        <li><a href="/games">Voir les jeux</a></li>
+        <li><a href="/copies">Voir les copies physiques</a></li>
+    </ul>
+{% endblock %}
