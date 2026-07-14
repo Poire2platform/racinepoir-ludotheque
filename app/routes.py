@@ -1,5 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, request
 from app.models import Game, GameCopy, CopyEvent, Location
+from flask_login import login_user, logout_user, current_user, login_required
+from werkzeug.security import check_password_hash
+from app.models import Game, GameCopy, CopyEvent, Location, User
 
 main = Blueprint("main", __name__)
 
@@ -41,10 +44,19 @@ def copy_detail(copy_id):
         locations=locations,
     )
 
+
+
 @main.route("/scan/<token>")
 def scan_copy(token):
     copy = GameCopy.query.filter_by(qr_code_token=token).first_or_404()
-    return redirect(url_for("main.copy_detail", copy_id=copy.id))
+    locations = Location.query.order_by(Location.name.asc()).all()
+
+    return render_template(
+        "scan_copy.html",
+        copy=copy,
+        locations=locations,
+    )
+
 
 @main.route("/copies/<int:copy_id>/mark-lost")
 def mark_copy_lost(copy_id):
@@ -147,3 +159,24 @@ def clear_wanted_location(copy_id):
     db.session.commit()
 
     return redirect(url_for("main.copy_detail", copy_id=copy.id))
+@main.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        user = User.query.filter_by(username=username).first()
+
+        if user and check_password_hash(user.password_hash, password):
+            login_user(user)
+            return redirect(url_for("main.index"))
+
+        return render_template("login.html", error="Login invalide.")
+
+    return render_template("login.html")
+
+
+@main.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for("main.index"))

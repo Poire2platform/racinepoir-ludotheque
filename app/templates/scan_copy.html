@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Scan — {{ copy.game.title }}</title>
+</head>
+<body>
+    <h1>Scan QR</h1>
+
+    <h2>{{ copy.game.title }}</h2>
+
+    <p><strong>Copie #{{ copy.id }}</strong></p>
+
+    <p>
+        <strong>Location actuelle :</strong>
+        {% if copy.current_location %}
+            {{ copy.current_location.name }}
+        {% else %}
+            —
+        {% endif %}
+    </p>
+
+    <p>
+        <strong>Wanted location :</strong>
+        {% if copy.wanted_location %}
+            {{ copy.wanted_location.name }}
+        {% else %}
+            —
+        {% endif %}
+    </p>
+
+    <hr>
+
+    <h2>Déplacer cette copie vers :</h2>
+
+    <ul>
+        {% for location in locations %}
+            <li>
+                {% if copy.current_location and copy.current_location.id == location.id %}
+                    {{ location.name }} — location actuelle
+                {% else %}
+                    <a href="/copies/{{ copy.id }}/move/{{ location.id }}">
+                        {{ location.name }}
+                    </a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <hr>
+
+    <p><a href="/copies/{{ copy.id }}">Voir la fiche complète</a></p>
+    <p><a href="/copies">Retour aux copies</a></p>
+</body>
+</html>
