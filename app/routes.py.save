@@ -105,6 +105,7 @@ def move_copy(copy_id, location_id):
         from_location_id=old_location.id if old_location else None,
         to_location_id=new_location.id,
         notes=f"Location changée vers {new_location.name} par {current_user.display_name}.",
+
     )
 
     db.session.add(event)

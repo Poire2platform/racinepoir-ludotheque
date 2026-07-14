@@ -3,14 +3,15 @@
 {% block title %}Scan — {{ copy.game.title }}{% endblock %}
 
 {% block content %}
-    <h2>Scan QR</h2>
+    <h2>J’ai cette copie</h2>
+
+    <p>Connecté comme : <strong>{{ current_user.display_name }}</strong></p>
 
     <h3>{{ copy.game.title }}</h3>
-
     <p><strong>Copie #{{ copy.id }}</strong></p>
 
     <p>
-        <strong>Location actuelle :</strong>
+        <strong>Détenteur actuel :</strong>
         {% if copy.current_location %}
             {{ copy.current_location.name }}
         {% else %}
@@ -19,7 +20,7 @@
     </p>
 
     <p>
-        <strong>Wanted location :</strong>
+        <strong>Demandé par / destination souhaitée :</strong>
         {% if copy.wanted_location %}
             {{ copy.wanted_location.name }}
         {% else %}
@@ -31,23 +32,22 @@
 
     {% if user_location %}
         <p>
-            Marquer cette copie comme étant à :
+            Confirmer que cette copie est maintenant entre les mains de :
             <strong>{{ user_location.name }}</strong>
         </p>
 
         <p>
             <a href="/scan/{{ copy.qr_code_token }}/confirm">
-                Confirmer le déplacement vers {{ user_location.name }}
+                Confirmer : j’ai cette copie
             </a>
         </p>
     {% else %}
         <p>
-            Aucun lieu principal n’est associé à ton utilisateur.
-            Impossible de déplacer la copie automatiquement.
+            Aucun détenteur n’est associé à ton utilisateur.
+            Impossible de confirmer automatiquement cette copie.
         </p>
     {% endif %}
 
     <hr>
-
     <p><a href="/copies/{{ copy.id }}">Voir la fiche complète</a></p>
 {% endblock %}

@@ -11,10 +11,10 @@
                 <tr>
                     <th>ID</th>
                     <th>Titre</th>
-                    <th>Édition</th>
                     <th>Langue</th>
                     <th>Joueurs</th>
                     <th>Durée</th>
+                    <th>Année</th>
                 </tr>
             </thead>
             <tbody>
@@ -22,7 +22,6 @@
                     <tr>
                         <td>{{ game.id }}</td>
                         <td>{{ game.title }}</td>
-                        <td>{{ game.edition_name or "—" }}</td>
                         <td>{{ game.language or "—" }}</td>
                         <td>
                             {% if game.min_players and game.max_players %}
@@ -38,6 +37,7 @@
                                 —
                             {% endif %}
                         </td>
+                        <td>{{ game.year_published or "—" }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

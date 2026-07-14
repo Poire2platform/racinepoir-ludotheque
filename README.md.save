@@ -1,0 +1,24 @@
+Next : installer les dépendances Python dans le venv.
+
+Dans ton projet :
+
+cd ~/racinepoir-ludotheque
+source .venv/bin/activate
+
+Tu devrais voir (.venv) au début de la ligne.
+
+Puis installe les paquets :
+
+pip install flask flask-login flask-sqlalchemy psycopg2-binary python-dotenv
+
+Ensuite crée le fichier des dépendances :
+
+pip freeze > requirements.txt
+
+Puis commit :
+
+git status
+git add requirements.txt
+git commit -m "Add Python dependencies"
+
+Après ça, on crée la première mini app Flask.

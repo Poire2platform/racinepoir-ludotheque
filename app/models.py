@@ -1,12 +1,13 @@
 from datetime import datetime, timezone
 from .extensions import db
+from flask_login import UserMixin
 
 
 def utcnow():
     return datetime.now(timezone.utc)
 
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)

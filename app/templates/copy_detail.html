@@ -4,13 +4,12 @@
 
 {% block content %}
     <h2>Copie #{{ copy.id }}</h2>
-
     <h3>{{ copy.game.title }}</h3>
 
     <p><strong>Propriétaire :</strong> {{ copy.owner.display_name }}</p>
 
     <p>
-        <strong>Location actuelle :</strong>
+        <strong>Détenteur actuel :</strong>
         {% if copy.current_location %}
             {{ copy.current_location.name }}
         {% else %}
@@ -19,7 +18,7 @@
     </p>
 
     <p>
-        <strong>Wanted location :</strong>
+        <strong>Demandé par / destination souhaitée :</strong>
         {% if copy.wanted_location %}
             {{ copy.wanted_location.name }}
         {% else %}
@@ -30,77 +29,59 @@
     <p><strong>Condition :</strong> {{ copy.condition }}</p>
     <p><strong>Disponibilité :</strong> {{ copy.availability_status }}</p>
     <p><strong>Status :</strong> {{ copy.lifecycle_status }}</p>
-    <p><strong>QR token :</strong> {{ copy.qr_code_token }}</p>
+    <p><strong>QR token :</strong> <code>{{ copy.qr_code_token }}</code></p>
 
     {% if copy.notes %}
         <p><strong>Notes :</strong> {{ copy.notes }}</p>
     {% endif %}
 
-    <p>
-        <a href="/scan/{{ copy.qr_code_token }}">Ouvrir la page de scan</a>
-    </p>
+    <hr>
+
+    <h3>J’ai cette copie</h3>
+
+    {% if current_user.is_authenticated %}
+        <p>Déclarer que cette copie est maintenant entre tes mains.</p>
+        <p><a href="/scan/{{ copy.qr_code_token }}">J’ai cette copie</a></p>
+    {% else %}
+        <p><a href="/login">Connecte-toi</a> pour déclarer que tu as cette copie.</p>
+    {% endif %}
 
     <hr>
 
-    <h2>Actions dev</h2>
-
-    <h3>Déplacer la copie</h3>
-
-    <p><strong>Déplacer vers :</strong></p>
-
-    <ul>
-        {% for location in locations %}
-            <li>
-                {% if copy.current_location and copy.current_location.id == location.id %}
-                    {{ location.name }} — location actuelle
-                {% else %}
-                    <a href="/copies/{{ copy.id }}/move/{{ location.id }}">
-                        {{ location.name }}
-                    </a>
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-
-    <h3>Wanted location</h3>
+    <h3>Demande / destination souhaitée</h3>
 
     {% if copy.wanted_location %}
         <p>
-            Actuellement wanted vers : {{ copy.wanted_location.name }}
+            Actuellement demandé par / vers : {{ copy.wanted_location.name }}
             —
             <a href="/copies/{{ copy.id }}/wanted/clear">Effacer</a>
         </p>
     {% else %}
-        <p>Aucune wanted location.</p>
+        <p>Aucune demande active.</p>
     {% endif %}
 
-    <p><strong>Mettre wanted vers :</strong></p>
+    <p><strong>Indiquer que cette copie est demandée par :</strong></p>
 
     <ul>
         {% for location in locations %}
             <li>
                 {% if copy.wanted_location and copy.wanted_location.id == location.id %}
-                    {{ location.name }} — wanted actuelle
+                    {{ location.name }} — demande actuelle
                 {% else %}
-                    <a href="/copies/{{ copy.id }}/wanted/{{ location.id }}">
-                        {{ location.name }}
-                    </a>
+                    <a href="/copies/{{ copy.id }}/wanted/{{ location.id }}">{{ location.name }}</a>
                 {% endif %}
             </li>
         {% endfor %}
     </ul>
 
-    <h3>État</h3>
+    <hr>
 
-    <p>
-        <a href="/copies/{{ copy.id }}/mark-lost">
-            Marquer comme perdue
-        </a>
-    </p>
+    <h3>État</h3>
+    <p><a href="/copies/{{ copy.id }}/mark-lost">Marquer comme perdue</a></p>
 
     <hr>
 
-    <h2>Historique</h2>
+    <h3>Historique</h3>
 
     {% if events %}
         <ul>

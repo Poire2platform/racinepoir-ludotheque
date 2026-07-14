@@ -1,0 +1,28 @@
+from datetime import datetime
+from . import db
+
+
+class User(db.Model):
+    __tablename__ = "users"
+
+    user_id = db.Column(db.Integer, primary_key=True)
+    display_name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(255), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.String(50), nullable=False, default="viewer")
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+
+class Game(db.Model):
+    __tablename__ = "games"
+
+    game_id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    min_players = db.Column(db.Integer)
+    max_players = db.Column(db.Integer)
+    playtime_min = db.Column(db.Integer)
+    playtime_max = db.Column(db.Integer)
+    complexity = db.Column(db.Float)
+    description = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
