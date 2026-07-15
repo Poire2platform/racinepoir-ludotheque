@@ -1,6 +1,8 @@
 from datetime import datetime, timezone
-from .extensions import db
+
 from flask_login import UserMixin
+
+from app.extensions import db
 
 
 def utcnow():
@@ -12,43 +14,57 @@ class User(UserMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    username = db.Column(db.String(80), nullable=False, unique=True, index=True)
-    email = db.Column(db.String(255), nullable=False, unique=True, index=True)
+    username = db.Column(db.String(80), unique=True, nullable=False, index=True)
+    email = db.Column(db.String(255), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(255), nullable=False)
 
     display_name = db.Column(db.String(120), nullable=False)
-    role = db.Column(db.String(30), nullable=False, default="member")
+    role = db.Column(db.String(50), nullable=False, default="member")
     is_active = db.Column(db.Boolean, nullable=False, default=True)
 
     created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utcnow)
     updated_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utcnow, onupdate=utcnow)
 
-    owned_copies = db.relationship(
-        "GameCopy",
-        foreign_keys="GameCopy.owner_user_id",
+    owned_boxes = db.relationship(
+        "Box",
+        foreign_keys="Box.owner_user_id",
         back_populates="owner",
     )
 
-    held_copies = db.relationship(
-        "GameCopy",
-        foreign_keys="GameCopy.current_holder_user_id",
+    held_boxes = db.relationship(
+        "Box",
+        foreign_keys="Box.current_holder_user_id",
         back_populates="current_holder",
     )
 
-    locations = db.relationship("Location", back_populates="owner")
+    wanted_boxes = db.relationship(
+        "Box",
+        foreign_keys="Box.wanted_by_user_id",
+        back_populates="wanted_by",
+    )
+
+    def __repr__(self):
+        return f"<User {self.username}>"
 
 
 class Game(db.Model):
+    """
+    Fiche de référence optionnelle.
+
+    Le noyau du système est Box. Game sert à enrichir une boîte avec des infos
+    générales sur le jeu : titre officiel, éditeur, durée, BGG ID, etc.
+    """
     __tablename__ = "games"
 
     id = db.Column(db.Integer, primary_key=True)
 
     title = db.Column(db.String(255), nullable=False, index=True)
     normalized_title = db.Column(db.String(255), nullable=True, index=True)
+
     edition_name = db.Column(db.String(255), nullable=True)
     language = db.Column(db.String(50), nullable=True)
-
     description = db.Column(db.Text, nullable=True)
+
     publisher = db.Column(db.String(255), nullable=True)
     year_published = db.Column(db.Integer, nullable=True)
 
@@ -57,60 +73,41 @@ class Game(db.Model):
     min_playtime = db.Column(db.Integer, nullable=True)
     max_playtime = db.Column(db.Integer, nullable=True)
     age_min = db.Column(db.Integer, nullable=True)
+
     complexity = db.Column(db.Float, nullable=True)
-
     bgg_id = db.Column(db.Integer, nullable=True, index=True)
-    cover_image_url = db.Column(db.Text, nullable=True)
+    cover_image_url = db.Column(db.String(500), nullable=True)
 
     created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utcnow)
     updated_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utcnow, onupdate=utcnow)
 
-    copies = db.relationship("GameCopy", back_populates="game")
+    boxes = db.relationship("Box", back_populates="game")
+
+    def __repr__(self):
+        return f"<Game {self.title}>"
 
 
-class Location(db.Model):
-    __tablename__ = "locations"
+class Box(db.Model):
+    """
+    Boîte physique réelle.
 
-    id = db.Column(db.Integer, primary_key=True)
-
-    name = db.Column(db.String(255), nullable=False)
-    parent_location_id = db.Column(db.Integer, db.ForeignKey("locations.id"), nullable=True)
-
-    description = db.Column(db.Text, nullable=True)
-    location_type = db.Column(db.String(50), nullable=False, default="unknown")
-
-    owner_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
-    is_private = db.Column(db.Boolean, nullable=False, default=False)
-
-    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utcnow)
-    updated_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utcnow, onupdate=utcnow)
-
-    owner = db.relationship("User", back_populates="locations")
-
-    parent = db.relationship(
-        "Location",
-        remote_side=[id],
-        back_populates="children",
-    )
-
-    children = db.relationship("Location", back_populates="parent")
-
-
-class GameCopy(db.Model):
-    __tablename__ = "game_copies"
+    C'est la table centrale du projet. Une boîte peut référencer une fiche Game,
+    mais elle peut aussi exister sans Game si on veut l'inventorier rapidement.
+    """
+    __tablename__ = "boxes"
 
     id = db.Column(db.Integer, primary_key=True)
 
-    game_id = db.Column(db.Integer, db.ForeignKey("games.id"), nullable=False)
+    display_name = db.Column(db.String(255), nullable=False, index=True)
+
+    game_id = db.Column(db.Integer, db.ForeignKey("games.id"), nullable=True)
+
     owner_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     current_holder_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    wanted_by_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
 
-    current_location_id = db.Column(db.Integer, db.ForeignKey("locations.id"), nullable=True)
-    wanted_location_id = db.Column(db.Integer, db.ForeignKey("locations.id"), nullable=True)
+    qr_code_token = db.Column(db.String(255), unique=True, nullable=False, index=True)
 
-    qr_code_token = db.Column(db.String(255), nullable=False, unique=True, index=True)
-
-    nickname = db.Column(db.String(255), nullable=True)
     condition = db.Column(db.String(50), nullable=False, default="unknown")
     availability_status = db.Column(db.String(50), nullable=False, default="available")
     lifecycle_status = db.Column(db.String(50), nullable=False, default="active")
@@ -118,65 +115,67 @@ class GameCopy(db.Model):
     missing_pieces_note = db.Column(db.Text, nullable=True)
     notes = db.Column(db.Text, nullable=True)
 
-    acquired_at = db.Column(db.Date, nullable=True)
+    acquired_at = db.Column(db.DateTime(timezone=True), nullable=True)
     archived_at = db.Column(db.DateTime(timezone=True), nullable=True)
 
     created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utcnow)
     updated_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utcnow, onupdate=utcnow)
 
-    game = db.relationship("Game", back_populates="copies")
+    game = db.relationship("Game", back_populates="boxes")
 
     owner = db.relationship(
         "User",
         foreign_keys=[owner_user_id],
-        back_populates="owned_copies",
+        back_populates="owned_boxes",
     )
 
     current_holder = db.relationship(
         "User",
         foreign_keys=[current_holder_user_id],
-        back_populates="held_copies",
+        back_populates="held_boxes",
     )
 
-    current_location = db.relationship(
-        "Location",
-        foreign_keys=[current_location_id],
+    wanted_by = db.relationship(
+        "User",
+        foreign_keys=[wanted_by_user_id],
+        back_populates="wanted_boxes",
     )
 
-    wanted_location = db.relationship(
-        "Location",
-        foreign_keys=[wanted_location_id],
+    events = db.relationship(
+        "BoxEvent",
+        back_populates="box",
+        cascade="all, delete-orphan",
+        order_by="BoxEvent.created_at.desc()",
     )
 
-    events = db.relationship("CopyEvent", back_populates="game_copy")
+    def __repr__(self):
+        return f"<Box {self.display_name}>"
 
 
-class CopyEvent(db.Model):
-    __tablename__ = "copy_events"
+class BoxEvent(db.Model):
+    __tablename__ = "box_events"
 
     id = db.Column(db.Integer, primary_key=True)
 
-    game_copy_id = db.Column(db.Integer, db.ForeignKey("game_copies.id"), nullable=False)
+    box_id = db.Column(db.Integer, db.ForeignKey("boxes.id"), nullable=False)
 
     event_type = db.Column(db.String(80), nullable=False, index=True)
 
     actor_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
-    from_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
-    to_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
 
-    from_location_id = db.Column(db.Integer, db.ForeignKey("locations.id"), nullable=True)
-    to_location_id = db.Column(db.Integer, db.ForeignKey("locations.id"), nullable=True)
+    from_holder_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    to_holder_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
 
     notes = db.Column(db.Text, nullable=True)
     metadata_json = db.Column(db.JSON, nullable=True)
 
     created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utcnow)
 
-    game_copy = db.relationship("GameCopy", back_populates="events")
+    box = db.relationship("Box", back_populates="events")
 
     actor = db.relationship("User", foreign_keys=[actor_user_id])
-    from_user = db.relationship("User", foreign_keys=[from_user_id])
-    to_user = db.relationship("User", foreign_keys=[to_user_id])
+    from_holder = db.relationship("User", foreign_keys=[from_holder_user_id])
+    to_holder = db.relationship("User", foreign_keys=[to_holder_user_id])
 
-    from_location = db.relationship("Location", foreign_keys=[from_location_id])
-    to_location = db.relationship("Location", foreign_keys=[to_location_id])
+    def __repr__(self):
+        return f"<BoxEvent {self.event_type} box={self.box_id}>"

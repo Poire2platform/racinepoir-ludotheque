@@ -7,12 +7,15 @@
 <body>
     <header>
         <h1>RacinePoir — Ludothèque</h1>
+
         <nav>
             <a href="/">Accueil</a> |
-            <a href="/games">Jeux</a> |
-            <a href="/copies">Copies</a>
+            <a href="/boxes">Boîtes</a> |
+            <a href="/games">Jeux de référence</a>
         </nav>
+
         <hr>
+
         {% if current_user.is_authenticated %}
             <p>
                 Connecté comme :
@@ -25,10 +28,16 @@
                 <a href="/logout">Déconnexion</a>
             </p>
         {% else %}
-            <p>Non connecté — <a href="/login">Connexion</a></p>
+            <p>
+                Non connecté
+                —
+                <a href="/login">Connexion</a>
+            </p>
         {% endif %}
+
         <hr>
     </header>
+
     <main>
         {% block content %}{% endblock %}
     </main>

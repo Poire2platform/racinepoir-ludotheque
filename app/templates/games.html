@@ -1,9 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}Jeux — RacinePoir{% endblock %}
+{% block title %}Jeux de référence — RacinePoir{% endblock %}
 
 {% block content %}
-    <h2>Jeux</h2>
+    <h2>Jeux de référence</h2>
+
+    <p>
+        Ces fiches servent à enrichir les boîtes avec des statistiques générales.
+        Elles ne sont pas le noyau opérationnel.
+    </p>
 
     {% if games %}
         <table border="1" cellpadding="6">
@@ -15,6 +20,7 @@
                     <th>Joueurs</th>
                     <th>Durée</th>
                     <th>Année</th>
+                    <th>Boîtes liées</th>
                 </tr>
             </thead>
             <tbody>
@@ -38,6 +44,7 @@
                             {% endif %}
                         </td>
                         <td>{{ game.year_published or "—" }}</td>
+                        <td>{{ game.boxes|length }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

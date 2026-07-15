@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Boîtes — RacinePoir{% endblock %}
+
+{% block content %}
+    <h2>Boîtes physiques</h2>
+
+    {% if boxes %}
+        <table border="1" cellpadding="6">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Boîte</th>
+                    <th>Jeu référencé</th>
+                    <th>Propriétaire</th>
+                    <th>Détenteur actuel</th>
+                    <th>Demandée par</th>
+                    <th>Condition</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for box in boxes %}
+                    <tr>
+                        <td>{{ box.id }}</td>
+
+                        <td>
+                            <a href="/boxes/{{ box.id }}">
+                                {{ box.display_name }}
+                            </a>
+                        </td>
+
+                        <td>
+                            {% if box.game %}
+                                {{ box.game.title }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <td>{{ box.owner.display_name }}</td>
+
+                        <td>
+                            {% if box.current_holder %}
+                                {{ box.current_holder.display_name }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if box.wanted_by %}
+                                {{ box.wanted_by.display_name }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <td>{{ box.condition }}</td>
+                        <td>{{ box.lifecycle_status }}</td>
+
+                        <td>
+                            {% if current_user.is_authenticated %}
+                                <a href="/scan/{{ box.qr_code_token }}">J’ai cette boîte</a>
+                            {% else %}
+                                <a href="/login">Connexion</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Aucune boîte trouvée.</p>
+    {% endif %}
+{% endblock %}
