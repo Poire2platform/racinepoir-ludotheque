@@ -1,127 +1,59 @@
 {% extends "base.html" %}
-
 {% block title %}Boîte #{{ box.id }} — RacinePoir{% endblock %}
-
 {% block content %}
-    <h2>Boîte #{{ box.id }}</h2>
-
-    <h3>{{ box.display_name }}</h3>
-
-    <p>
-        <strong>Jeu référencé :</strong>
-        {% if box.game %}
-            {{ box.game.title }}
-        {% else %}
-            —
-        {% endif %}
-    </p>
-
-    <p><strong>Propriétaire :</strong> {{ box.owner.display_name }}</p>
-
-    <p>
-        <strong>Détenteur actuel :</strong>
-        {% if box.current_holder %}
-            {{ box.current_holder.display_name }}
-        {% else %}
-            —
-        {% endif %}
-    </p>
-
-    <p>
-        <strong>Demandée par :</strong>
-        {% if box.wanted_by %}
-            {{ box.wanted_by.display_name }}
-        {% else %}
-            —
-        {% endif %}
-    </p>
-
-    <p><strong>Condition :</strong> {{ box.condition }}</p>
-    <p><strong>Disponibilité :</strong> {{ box.availability_status }}</p>
-    <p><strong>Status :</strong> {{ box.lifecycle_status }}</p>
-    <p><strong>QR token :</strong> <code>{{ box.qr_code_token }}</code></p>
-
-    {% if box.notes %}
-        <p><strong>Notes :</strong> {{ box.notes }}</p>
-    {% endif %}
-
-    <hr>
-
-    <h3>J’ai cette boîte</h3>
-
-    {% if current_user.is_authenticated %}
+<h2>Boîte #{{ box.id }}</h2>
+<h3>{{ box.display_name }}</h3>
+<p><strong>Jeu référencé :</strong> {% if box.game %}{{ box.game.title }}{% else %}—{% endif %}</p>
+<p><strong>Propriétaire :</strong> {{ box.owner.display_name }}</p>
+<p><strong>Détenteur actuel :</strong> {% if box.current_holder %}{{ box.current_holder.display_name }}{% else %}—{% endif %}</p>
+<p><strong>Condition :</strong> {{ box.condition }}</p>
+<p><strong>Disponibilité :</strong> {{ box.availability_status }}</p>
+<p><strong>Status :</strong> {{ box.lifecycle_status }}</p>
+<p><strong>QR token :</strong> <code>{{ box.qr_code_token }}</code></p>
+{% if box.notes %}<p><strong>Notes :</strong> {{ box.notes }}</p>{% endif %}
+<hr>
+<h3>J’ai cette boîte</h3>
+{% if current_user.is_authenticated %}
+    {% if box.current_holder and box.current_holder.id == current_user.id %}
+        <p>Tu as déjà cette boîte.</p>
+    {% else %}
         <p>Déclarer que cette boîte est maintenant entre tes mains.</p>
         <p><a href="/scan/{{ box.qr_code_token }}">J’ai cette boîte</a></p>
-    {% else %}
-        <p><a href="/login">Connecte-toi</a> pour déclarer que tu as cette boîte.</p>
     {% endif %}
-
-    <hr>
-
-    <h3>Demande</h3>
-
-    {% if box.wanted_by %}
-        <p>
-            Actuellement demandée par : {{ box.wanted_by.display_name }}
-            —
-            <a href="/boxes/{{ box.id }}/wanted/clear">Effacer</a>
-        </p>
+{% else %}
+    <p><a href="/login">Connecte-toi</a> pour déclarer que tu as cette boîte.</p>
+{% endif %}
+<hr>
+<h3>File d’attente</h3>
+{% if box.active_requests %}
+<ol>
+{% for request in box.active_requests %}
+<li>{{ request.requester.display_name }}{% if current_user.is_authenticated and request.requester.id == current_user.id %} — toi{% endif %}</li>
+{% endfor %}
+</ol>
+{% else %}<p>Aucune demande active.</p>{% endif %}
+{% if current_user.is_authenticated %}
+    {% set my_request = box.active_request_for_user(current_user) %}
+    {% if box.current_holder and box.current_holder.id == current_user.id %}
+        <p>Tu as déjà cette boîte, donc tu n’as pas besoin de la demander.</p>
+    {% elif my_request %}
+        <p>Tu es #{{ box.active_request_position_for_user(current_user) }} dans la file d’attente.</p>
+        <p><a href="/boxes/{{ box.id }}/request/clear">Annuler ma demande</a></p>
     {% else %}
-        <p>Aucune demande active.</p>
+        <p><a href="/boxes/{{ box.id }}/request">Je veux cette boîte</a></p>
     {% endif %}
-
-    <p><strong>Indiquer que cette boîte est demandée par :</strong></p>
-
-    <ul>
-        {% for user in users %}
-            <li>
-                {% if box.wanted_by and box.wanted_by.id == user.id %}
-                    {{ user.display_name }} — demande actuelle
-                {% else %}
-                    <a href="/boxes/{{ box.id }}/wanted/{{ user.id }}">
-                        {{ user.display_name }}
-                    </a>
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-
-    <hr>
-
-    <h3>État</h3>
-
-    <p>
-        <a href="/boxes/{{ box.id }}/mark-lost">
-            Marquer comme perdue
-        </a>
-    </p>
-
-    <hr>
-
-    <h3>Historique</h3>
-
-    {% if events %}
-        <ul>
-            {% for event in events %}
-                <li>
-                    <strong>{{ event.event_type }}</strong>
-                    — {{ event.created_at }}
-                    {% if event.actor %}
-                        — acteur : {{ event.actor.display_name }}
-                    {% endif %}
-                    {% if event.from_holder %}
-                        — de : {{ event.from_holder.display_name }}
-                    {% endif %}
-                    {% if event.to_holder %}
-                        — vers : {{ event.to_holder.display_name }}
-                    {% endif %}
-                    {% if event.notes %}
-                        — {{ event.notes }}
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>Aucun événement trouvé.</p>
-    {% endif %}
+{% else %}
+    <p><a href="/login">Connecte-toi</a> pour demander cette boîte.</p>
+{% endif %}
+<hr>
+<h3>État</h3><p><a href="/boxes/{{ box.id }}/mark-lost">Marquer comme perdue</a></p>
+<hr>
+<h3>Historique</h3>
+{% if events %}
+<ul>
+{% for event in events %}
+<li><strong>{{ event.event_type }}</strong> — {{ event.created_at }}{% if event.actor %} — acteur : {{ event.actor.display_name }}{% endif %}{% if event.from_holder %} — de : {{ event.from_holder.display_name }}{% endif %}{% if event.to_holder %} — vers : {{ event.to_holder.display_name }}{% endif %}{% if event.notes %} — {{ event.notes }}{% endif %}</li>
+{% endfor %}
+</ul>
+{% else %}<p>Aucun événement trouvé.</p>{% endif %}
 {% endblock %}

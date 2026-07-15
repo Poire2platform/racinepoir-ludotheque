@@ -1,8 +1,8 @@
-"""Create V1 schema
+"""Create box model
 
-Revision ID: 6f1789c10069
+Revision ID: 39bb4a527ce6
 Revises: 
-Create Date: 2026-07-01 20:33:44.105307
+Create Date: 2026-07-15 12:22:37.091670
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '6f1789c10069'
+revision = '39bb4a527ce6'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -34,7 +34,7 @@ def upgrade():
     sa.Column('age_min', sa.Integer(), nullable=True),
     sa.Column('complexity', sa.Float(), nullable=True),
     sa.Column('bgg_id', sa.Integer(), nullable=True),
-    sa.Column('cover_image_url', sa.Text(), nullable=True),
+    sa.Column('cover_image_url', sa.String(length=500), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
     sa.PrimaryKeyConstraint('id')
@@ -50,7 +50,7 @@ def upgrade():
     sa.Column('email', sa.String(length=255), nullable=False),
     sa.Column('password_hash', sa.String(length=255), nullable=False),
     sa.Column('display_name', sa.String(length=120), nullable=False),
-    sa.Column('role', sa.String(length=30), nullable=False),
+    sa.Column('role', sa.String(length=50), nullable=False),
     sa.Column('is_active', sa.Boolean(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
@@ -60,85 +60,66 @@ def upgrade():
         batch_op.create_index(batch_op.f('ix_users_email'), ['email'], unique=True)
         batch_op.create_index(batch_op.f('ix_users_username'), ['username'], unique=True)
 
-    op.create_table('locations',
+    op.create_table('boxes',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(length=255), nullable=False),
-    sa.Column('parent_location_id', sa.Integer(), nullable=True),
-    sa.Column('description', sa.Text(), nullable=True),
-    sa.Column('location_type', sa.String(length=50), nullable=False),
-    sa.Column('owner_user_id', sa.Integer(), nullable=True),
-    sa.Column('is_private', sa.Boolean(), nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
-    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
-    sa.ForeignKeyConstraint(['owner_user_id'], ['users.id'], ),
-    sa.ForeignKeyConstraint(['parent_location_id'], ['locations.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('game_copies',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('game_id', sa.Integer(), nullable=False),
+    sa.Column('display_name', sa.String(length=255), nullable=False),
+    sa.Column('game_id', sa.Integer(), nullable=True),
     sa.Column('owner_user_id', sa.Integer(), nullable=False),
     sa.Column('current_holder_user_id', sa.Integer(), nullable=True),
-    sa.Column('current_location_id', sa.Integer(), nullable=True),
-    sa.Column('wanted_location_id', sa.Integer(), nullable=True),
+    sa.Column('wanted_by_user_id', sa.Integer(), nullable=True),
     sa.Column('qr_code_token', sa.String(length=255), nullable=False),
-    sa.Column('nickname', sa.String(length=255), nullable=True),
     sa.Column('condition', sa.String(length=50), nullable=False),
     sa.Column('availability_status', sa.String(length=50), nullable=False),
     sa.Column('lifecycle_status', sa.String(length=50), nullable=False),
     sa.Column('missing_pieces_note', sa.Text(), nullable=True),
     sa.Column('notes', sa.Text(), nullable=True),
-    sa.Column('acquired_at', sa.Date(), nullable=True),
+    sa.Column('acquired_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('archived_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
     sa.ForeignKeyConstraint(['current_holder_user_id'], ['users.id'], ),
-    sa.ForeignKeyConstraint(['current_location_id'], ['locations.id'], ),
     sa.ForeignKeyConstraint(['game_id'], ['games.id'], ),
     sa.ForeignKeyConstraint(['owner_user_id'], ['users.id'], ),
-    sa.ForeignKeyConstraint(['wanted_location_id'], ['locations.id'], ),
+    sa.ForeignKeyConstraint(['wanted_by_user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    with op.batch_alter_table('game_copies', schema=None) as batch_op:
-        batch_op.create_index(batch_op.f('ix_game_copies_qr_code_token'), ['qr_code_token'], unique=True)
+    with op.batch_alter_table('boxes', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_boxes_display_name'), ['display_name'], unique=False)
+        batch_op.create_index(batch_op.f('ix_boxes_qr_code_token'), ['qr_code_token'], unique=True)
 
-    op.create_table('copy_events',
+    op.create_table('box_events',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('game_copy_id', sa.Integer(), nullable=False),
+    sa.Column('box_id', sa.Integer(), nullable=False),
     sa.Column('event_type', sa.String(length=80), nullable=False),
     sa.Column('actor_user_id', sa.Integer(), nullable=True),
-    sa.Column('from_user_id', sa.Integer(), nullable=True),
-    sa.Column('to_user_id', sa.Integer(), nullable=True),
-    sa.Column('from_location_id', sa.Integer(), nullable=True),
-    sa.Column('to_location_id', sa.Integer(), nullable=True),
+    sa.Column('from_holder_user_id', sa.Integer(), nullable=True),
+    sa.Column('to_holder_user_id', sa.Integer(), nullable=True),
     sa.Column('notes', sa.Text(), nullable=True),
     sa.Column('metadata_json', sa.JSON(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.ForeignKeyConstraint(['actor_user_id'], ['users.id'], ),
-    sa.ForeignKeyConstraint(['from_location_id'], ['locations.id'], ),
-    sa.ForeignKeyConstraint(['from_user_id'], ['users.id'], ),
-    sa.ForeignKeyConstraint(['game_copy_id'], ['game_copies.id'], ),
-    sa.ForeignKeyConstraint(['to_location_id'], ['locations.id'], ),
-    sa.ForeignKeyConstraint(['to_user_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['box_id'], ['boxes.id'], ),
+    sa.ForeignKeyConstraint(['from_holder_user_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['to_holder_user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    with op.batch_alter_table('copy_events', schema=None) as batch_op:
-        batch_op.create_index(batch_op.f('ix_copy_events_event_type'), ['event_type'], unique=False)
+    with op.batch_alter_table('box_events', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_box_events_event_type'), ['event_type'], unique=False)
 
     # ### end Alembic commands ###
 
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
-    with op.batch_alter_table('copy_events', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_copy_events_event_type'))
+    with op.batch_alter_table('box_events', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_box_events_event_type'))
 
-    op.drop_table('copy_events')
-    with op.batch_alter_table('game_copies', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_game_copies_qr_code_token'))
+    op.drop_table('box_events')
+    with op.batch_alter_table('boxes', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_boxes_qr_code_token'))
+        batch_op.drop_index(batch_op.f('ix_boxes_display_name'))
 
-    op.drop_table('game_copies')
-    op.drop_table('locations')
+    op.drop_table('boxes')
     with op.batch_alter_table('users', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_users_username'))
         batch_op.drop_index(batch_op.f('ix_users_email'))
