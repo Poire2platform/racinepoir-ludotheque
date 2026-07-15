@@ -1,8 +1,8 @@
-"""Create box model
+"""Create box waitlist model
 
-Revision ID: 39bb4a527ce6
+Revision ID: 6f4a524a0619
 Revises: 
-Create Date: 2026-07-15 12:22:37.091670
+Create Date: 2026-07-15 14:11:43.734976
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '39bb4a527ce6'
+revision = '6f4a524a0619'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -66,7 +66,6 @@ def upgrade():
     sa.Column('game_id', sa.Integer(), nullable=True),
     sa.Column('owner_user_id', sa.Integer(), nullable=False),
     sa.Column('current_holder_user_id', sa.Integer(), nullable=True),
-    sa.Column('wanted_by_user_id', sa.Integer(), nullable=True),
     sa.Column('qr_code_token', sa.String(length=255), nullable=False),
     sa.Column('condition', sa.String(length=50), nullable=False),
     sa.Column('availability_status', sa.String(length=50), nullable=False),
@@ -80,12 +79,29 @@ def upgrade():
     sa.ForeignKeyConstraint(['current_holder_user_id'], ['users.id'], ),
     sa.ForeignKeyConstraint(['game_id'], ['games.id'], ),
     sa.ForeignKeyConstraint(['owner_user_id'], ['users.id'], ),
-    sa.ForeignKeyConstraint(['wanted_by_user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('boxes', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_boxes_display_name'), ['display_name'], unique=False)
         batch_op.create_index(batch_op.f('ix_boxes_qr_code_token'), ['qr_code_token'], unique=True)
+
+    op.create_table('box_requests',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('box_id', sa.Integer(), nullable=False),
+    sa.Column('requester_user_id', sa.Integer(), nullable=False),
+    sa.Column('status', sa.String(length=50), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('fulfilled_at', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('cancelled_at', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('notes', sa.Text(), nullable=True),
+    sa.ForeignKeyConstraint(['box_id'], ['boxes.id'], ),
+    sa.ForeignKeyConstraint(['requester_user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    with op.batch_alter_table('box_requests', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_box_requests_box_id'), ['box_id'], unique=False)
+        batch_op.create_index(batch_op.f('ix_box_requests_requester_user_id'), ['requester_user_id'], unique=False)
+        batch_op.create_index(batch_op.f('ix_box_requests_status'), ['status'], unique=False)
 
     op.create_table('box_events',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -94,12 +110,14 @@ def upgrade():
     sa.Column('actor_user_id', sa.Integer(), nullable=True),
     sa.Column('from_holder_user_id', sa.Integer(), nullable=True),
     sa.Column('to_holder_user_id', sa.Integer(), nullable=True),
+    sa.Column('related_request_id', sa.Integer(), nullable=True),
     sa.Column('notes', sa.Text(), nullable=True),
     sa.Column('metadata_json', sa.JSON(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.ForeignKeyConstraint(['actor_user_id'], ['users.id'], ),
     sa.ForeignKeyConstraint(['box_id'], ['boxes.id'], ),
     sa.ForeignKeyConstraint(['from_holder_user_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['related_request_id'], ['box_requests.id'], ),
     sa.ForeignKeyConstraint(['to_holder_user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -115,6 +133,12 @@ def downgrade():
         batch_op.drop_index(batch_op.f('ix_box_events_event_type'))
 
     op.drop_table('box_events')
+    with op.batch_alter_table('box_requests', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_box_requests_status'))
+        batch_op.drop_index(batch_op.f('ix_box_requests_requester_user_id'))
+        batch_op.drop_index(batch_op.f('ix_box_requests_box_id'))
+
+    op.drop_table('box_requests')
     with op.batch_alter_table('boxes', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_boxes_qr_code_token'))
         batch_op.drop_index(batch_op.f('ix_boxes_display_name'))
