@@ -12,14 +12,7 @@
         {% for box in boxes %}
             <li>
                 <a href="/boxes/{{ box.id }}">{{ box.display_name }}</a>
-
-                {% if box.owner_user_id == current_user.id %}
-                    — <strong>À moi</strong>
-                {% endif %}
-
-                {% if box.active_requests %}
-                    — <strong>Demandée</strong>
-                {% endif %}
+			{% include "partials/box_badges.html" %}
             </li>
         {% endfor %}
     </ul>

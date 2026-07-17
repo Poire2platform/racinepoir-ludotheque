@@ -1,0 +1,16 @@
+{% if box.owner_user_id == current_user.id %}
+    <strong>[À moi]</strong>
+{% endif %}
+
+{% if box.current_holder_user_id == current_user.id %}
+    <strong>[Chez moi]</strong>
+{% endif %}
+
+{% if box.active_requests %}
+    <strong>[Demandée]</strong>
+{% endif %}
+
+{% set my_position = box.active_request_position_for_user(current_user) %}
+{% if my_position %}
+    <strong>[Tu attends #{{ my_position }}]</strong>
+{% endif %}
