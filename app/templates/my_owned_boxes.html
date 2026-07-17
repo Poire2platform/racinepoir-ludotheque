@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Mes boîtes — RacinePoir{% endblock %}
+
+{% block content %}
+<h2>Mes boîtes</h2>
+
+<p>Boîtes qui t’appartiennent, peu importe où elles sont.</p>
+
+{% if boxes %}
+    <ul>
+        {% for box in boxes %}
+            <li>
+                <a href="/boxes/{{ box.id }}">{{ box.display_name }}</a>
+
+                —
+                détenteur :
+                {% if box.current_holder %}
+                    {{ box.current_holder.display_name }}
+                {% else %}
+                    inconnu
+                {% endif %}
+
+                {% if box.current_holder_user_id == current_user.id %}
+                    — <strong>Chez moi</strong>
+                {% endif %}
+
+                {% if box.active_requests %}
+                    — <strong>Demandée</strong>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Tu n’as aucune boîte enregistrée.</p>
+{% endif %}
+{% endblock %}

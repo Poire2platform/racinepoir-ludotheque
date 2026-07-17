@@ -52,6 +52,31 @@ def games():
 def boxes():
     return render_template("boxes.html", boxes=Box.query.order_by(Box.id.asc()).all())
 
+@main.route("/me/held-boxes")
+@login_required
+def my_held_boxes():
+    boxes = Box.query.filter_by(
+        current_holder_user_id=current_user.id
+    ).order_by(Box.display_name.asc()).all()
+
+    return render_template(
+        "my_held_boxes.html",
+        boxes=boxes,
+    )
+
+
+@main.route("/me/owned-boxes")
+@login_required
+def my_owned_boxes():
+    boxes = Box.query.filter_by(
+        owner_user_id=current_user.id
+    ).order_by(Box.display_name.asc()).all()
+
+    return render_template(
+        "my_owned_boxes.html",
+        boxes=boxes,
+    )
+
 
 @main.route("/boxes/<int:box_id>")
 def box_detail(box_id):

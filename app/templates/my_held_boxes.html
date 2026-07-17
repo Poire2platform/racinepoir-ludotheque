@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Chez moi — RacinePoir{% endblock %}
+
+{% block content %}
+<h2>Chez moi</h2>
+
+<p>Boîtes actuellement entre tes mains.</p>
+
+{% if boxes %}
+    <ul>
+        {% for box in boxes %}
+            <li>
+                <a href="/boxes/{{ box.id }}">{{ box.display_name }}</a>
+
+                {% if box.owner_user_id == current_user.id %}
+                    — <strong>À moi</strong>
+                {% endif %}
+
+                {% if box.active_requests %}
+                    — <strong>Demandée</strong>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Aucune boîte chez toi.</p>
+{% endif %}
+{% endblock %}
