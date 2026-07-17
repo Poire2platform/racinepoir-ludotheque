@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Scan confirmé — {{ box.display_name }}{% endblock %}
+{% block content %}
+<h2>✅ Scan confirmé</h2>
+
+<p>
+    <strong>{{ box.display_name }}</strong>
+    est maintenant entre les mains de :
+    <strong>{{ current_user.display_name }}</strong>.
+</p>
+
+{% if old_holder %}
+    <p>Ancien détenteur : {{ old_holder.display_name }}</p>
+{% else %}
+    <p>Ancien détenteur : inconnu</p>
+{% endif %}
+
+{% if already_holder %}
+    <p>Tu étais déjà indiqué comme détenteur. Le scan a confirmé l’état actuel.</p>
+{% endif %}
+
+{% if fulfilled_request %}
+    <p>Ta demande dans la file d’attente a été marquée comme complétée.</p>
+{% endif %}
+
+<hr>
+
+<p><a href="/boxes/{{ box.id }}">Voir la boîte</a></p>
+<p>Tu peux maintenant scanner une autre boîte avec la caméra du téléphone.</p>
+{% endblock %}
