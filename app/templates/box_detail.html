@@ -17,8 +17,7 @@
     {% if box.current_holder and box.current_holder.id == current_user.id %}
         <p>Tu as déjà cette boîte.</p>
     {% else %}
-        <p>Déclarer que cette boîte est maintenant entre tes mains.</p>
-        <p><a href="/scan/{{ box.qr_code_token }}">J’ai cette boîte</a></p>
+        <p><a href="/scan/{{ box.qr_code_token }}">J’ai cette boîte maintenant</a></p>
     {% endif %}
 {% else %}
     <p><a href="/login">Connecte-toi</a> pour déclarer que tu as cette boîte.</p>
