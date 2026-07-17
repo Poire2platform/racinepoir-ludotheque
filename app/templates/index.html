@@ -1,8 +1,38 @@
 {% extends "base.html" %}
+
 {% block title %}Accueil — RacinePoir{% endblock %}
+
 {% block content %}
 <h2>Accueil</h2>
-<p>Prototype de ludothèque distribuée RacinePoir.</p>
-<p>Le noyau du système est la boîte physique. La fiche de jeu sert seulement de référence optionnelle.</p>
-<ul><li><a href="/boxes">Voir les boîtes</a></li><li><a href="/games">Voir les jeux de référence</a></li></ul>
+
+<p>Bienvenue, {{ current_user.display_name }}.</p>
+
+<div>
+    <h3>Chez moi</h3>
+    <p>{{ held_count }} boîte(s) actuellement entre tes mains.</p>
+    <p><a href="/me/held-boxes">Voir les boîtes chez moi</a></p>
+</div>
+
+<hr>
+
+<div>
+    <h3>Mes boîtes</h3>
+    <p>{{ owned_count }} boîte(s) t’appartiennent.</p>
+    <p><a href="/me/owned-boxes">Voir mes boîtes</a></p>
+</div>
+
+<hr>
+
+<div>
+    <h3>Mes demandes</h3>
+    <p>{{ requested_count }} demande(s) active(s).</p>
+    <p><a href="/boxes">Parcourir les boîtes</a></p>
+</div>
+
+<hr>
+
+<div>
+    <h3>Scanner</h3>
+    <p>Scanne un QR code de boîte avec la caméra de ton téléphone.</p>
+</div>
 {% endblock %}

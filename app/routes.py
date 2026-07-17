@@ -9,8 +9,27 @@ main = Blueprint("main", __name__)
 
 
 @main.route("/")
+@login_required
 def index():
-    return render_template("index.html")
+    held_count = Box.query.filter_by(
+        current_holder_user_id=current_user.id
+    ).count()
+
+    owned_count = Box.query.filter_by(
+        owner_user_id=current_user.id
+    ).count()
+
+    requested_count = BoxRequest.query.filter_by(
+        requester_user_id=current_user.id,
+        status="active"
+    ).count()
+
+    return render_template(
+        "index.html",
+        held_count=held_count,
+        owned_count=owned_count,
+        requested_count=requested_count,
+    )
 
 
 @main.route("/login", methods=["GET", "POST"])
