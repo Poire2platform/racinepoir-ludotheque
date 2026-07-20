@@ -12,6 +12,7 @@
 <p><strong>QR token :</strong> <code>{{ box.qr_code_token }}</code></p>
 {% if box.notes %}<p><strong>Notes :</strong> {{ box.notes }}</p>{% endif %}
 <hr>
+
 <h3>J’ai cette boîte</h3>
 {% if current_user.is_authenticated %}
     {% if box.current_holder and box.current_holder.id == current_user.id %}
