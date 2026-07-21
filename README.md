@@ -3,6 +3,10 @@ RacinePoir Ludothèque
 
 Private Flask app for managing a small shared board game library.
 
+Infrastructure note: the current development machine is not the production
+target. The planned WEB01 / SQL101 deployment is documented in
+[`docs/infra-plan.md`](docs/infra-plan.md).
+
 Core Concepts
 -------------
 
