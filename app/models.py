@@ -19,6 +19,7 @@ class User(UserMixin, db.Model):
     owned_boxes = db.relationship("Box", foreign_keys="Box.owner_user_id", back_populates="owner")
     held_boxes = db.relationship("Box", foreign_keys="Box.current_holder_user_id", back_populates="current_holder")
     box_requests = db.relationship("BoxRequest", foreign_keys="BoxRequest.requester_user_id", back_populates="requester")
+    player_profile = db.relationship("PlayerProfile", back_populates="linked_user", uselist=False)
 
 class Game(db.Model):
     __tablename__ = "games"
@@ -74,6 +75,7 @@ class Box(db.Model):
     current_holder = db.relationship("User", foreign_keys=[current_holder_user_id], back_populates="held_boxes")
     events = db.relationship("BoxEvent", back_populates="box", cascade="all, delete-orphan", order_by="BoxEvent.created_at.desc()")
     requests = db.relationship("BoxRequest", back_populates="box", cascade="all, delete-orphan", order_by="BoxRequest.created_at.asc()")
+    sessions = db.relationship("GameSession", back_populates="box")
 
     @property
     def active_requests(self):
@@ -129,3 +131,43 @@ class BoxEvent(db.Model):
     from_holder = db.relationship("User", foreign_keys=[from_holder_user_id])
     to_holder = db.relationship("User", foreign_keys=[to_holder_user_id])
     related_request = db.relationship("BoxRequest", foreign_keys=[related_request_id])
+
+class PlayerProfile(db.Model):
+    __tablename__ = "player_profiles"
+    id = db.Column(db.Integer, primary_key=True)
+    display_name = db.Column(db.String(120), nullable=False, index=True)
+    normalized_name = db.Column(db.String(120), nullable=False, index=True)
+    linked_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True, unique=True)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utcnow)
+    updated_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utcnow, onupdate=utcnow)
+    linked_user = db.relationship("User", back_populates="player_profile")
+    session_entries = db.relationship("GameSessionParticipant", back_populates="player_profile")
+
+class GameSession(db.Model):
+    __tablename__ = "game_sessions"
+    id = db.Column(db.Integer, primary_key=True)
+    game_id = db.Column(db.Integer, db.ForeignKey("games.id"), nullable=False, index=True)
+    box_id = db.Column(db.Integer, db.ForeignKey("boxes.id"), nullable=True, index=True)
+    played_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utcnow)
+    duration_minutes = db.Column(db.Integer, nullable=True)
+    notes = db.Column(db.Text, nullable=True)
+    created_by_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utcnow)
+    updated_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utcnow, onupdate=utcnow)
+    game = db.relationship("Game")
+    box = db.relationship("Box", back_populates="sessions")
+    created_by = db.relationship("User")
+    participants = db.relationship("GameSessionParticipant", back_populates="session", cascade="all, delete-orphan", order_by="GameSessionParticipant.id.asc()")
+
+class GameSessionParticipant(db.Model):
+    __tablename__ = "game_session_participants"
+    id = db.Column(db.Integer, primary_key=True)
+    session_id = db.Column(db.Integer, db.ForeignKey("game_sessions.id"), nullable=False, index=True)
+    player_profile_id = db.Column(db.Integer, db.ForeignKey("player_profiles.id"), nullable=False, index=True)
+    team_label = db.Column(db.String(80), nullable=True)
+    score = db.Column(db.Integer, nullable=True)
+    rank = db.Column(db.Integer, nullable=True)
+    is_winner = db.Column(db.Boolean, nullable=False, default=False)
+    notes = db.Column(db.Text, nullable=True)
+    session = db.relationship("GameSession", back_populates="participants")
+    player_profile = db.relationship("PlayerProfile", back_populates="session_entries")

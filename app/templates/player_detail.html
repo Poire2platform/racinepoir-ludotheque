@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}{{ player.display_name }} — RacinePoir{% endblock %}
+
+{% block content %}
+<h2>{{ player.display_name }}</h2>
+
+<p><strong>Compte lié :</strong> {% if player.linked_user %}{{ player.linked_user.username }}{% else %}—{% endif %}</p>
+<p><strong>Parties jouées :</strong> {{ entries|length }}</p>
+
+<hr>
+<h3>Jeux joués</h3>
+{% if game_counts %}
+    <ul>
+        {% for title, count in game_counts %}
+            <li>{{ title }} — {{ count }} partie(s)</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Aucune partie.</p>
+{% endif %}
+
+<hr>
+<h3>Meilleurs scores</h3>
+{% if high_scores %}
+    <ul>
+        {% for title, score in high_scores %}
+            <li>{{ title }} — {{ score }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Aucun score enregistré.</p>
+{% endif %}
+
+<hr>
+<h3>Partenaires fréquents</h3>
+{% if teammate_counts %}
+    <ul>
+        {% for name, count in teammate_counts %}
+            <li>{{ name }} — {{ count }} partie(s) ensemble</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Aucun partenaire fréquent.</p>
+{% endif %}
+
+<hr>
+<h3>Parties récentes</h3>
+{% if entries %}
+    <ul>
+        {% for entry in entries[:10] %}
+            <li>
+                <a href="/sessions/{{ entry.session.id }}">{{ entry.session.game.title }}</a>
+                — {% if entry.score is not none %}score : {{ entry.score }}{% else %}score : —{% endif %}
+                {% if entry.is_winner %} — gagnant{% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Aucune partie.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Nouvelle partie — RacinePoir{% endblock %}
+
+{% block content %}
+<h2>Nouvelle partie</h2>
+
+{% if error %}
+    <p><strong>{{ error }}</strong></p>
+{% endif %}
+
+<form method="post">
+    <p>
+        <label for="game_id">Jeu</label><br>
+        <select id="game_id" name="game_id" required>
+            <option value="">Choisir un jeu</option>
+            {% for game in games %}
+                <option value="{{ game.id }}" {% if form.get('game_id') == game.id|string %}selected{% endif %}>
+                    {{ game.title }}
+                </option>
+            {% endfor %}
+        </select>
+    </p>
+
+    <p>
+        <label for="box_id">Boîte utilisée</label><br>
+        <select id="box_id" name="box_id">
+            <option value="">Non précisée</option>
+            {% for game in games %}
+                {% for box in game.boxes %}
+                    <option value="{{ box.id }}" data-game-id="{{ game.id }}" {% if form.get('box_id') == box.id|string %}selected{% endif %}>
+                        {{ box.display_label }}
+                    </option>
+                {% endfor %}
+            {% endfor %}
+        </select>
+    </p>
+
+    <p>
+        <label for="duration_minutes">Durée en minutes</label><br>
+        <input id="duration_minutes" name="duration_minutes" type="number" min="0" value="{{ form.get('duration_minutes', '') }}">
+    </p>
+
+    <p>
+        <label for="notes">Notes de partie</label><br>
+        <textarea id="notes" name="notes" rows="3" cols="60">{{ form.get('notes', '') }}</textarea>
+    </p>
+
+    <hr>
+    <h3>Joueurs</h3>
+    <p>Choisis un utilisateur enregistré ou écris un nom invité.</p>
+
+    <table border="1" cellpadding="6">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Utilisateur</th>
+                <th>Nom invité</th>
+                <th>Équipe</th>
+                <th>Score</th>
+                <th>Rang</th>
+                <th>Gagnant</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for index in range(1, row_count + 1) %}
+                <tr>
+                    <td>{{ index }}</td>
+                    <td>
+                        <select name="participant_user_id_{{ index }}">
+                            <option value="">—</option>
+                            {% for user in users %}
+                                <option value="{{ user.id }}" {% if form.get('participant_user_id_' ~ index) == user.id|string %}selected{% endif %}>
+                                    {{ user.display_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td><input name="participant_guest_name_{{ index }}" value="{{ form.get('participant_guest_name_' ~ index, '') }}"></td>
+                    <td><input name="team_label_{{ index }}" value="{{ form.get('team_label_' ~ index, '') }}"></td>
+                    <td><input name="score_{{ index }}" type="number" value="{{ form.get('score_' ~ index, '') }}"></td>
+                    <td><input name="rank_{{ index }}" type="number" min="1" value="{{ form.get('rank_' ~ index, '') }}"></td>
+                    <td><input type="checkbox" name="is_winner_{{ index }}" value="yes" {% if form.get('is_winner_' ~ index) == 'yes' %}checked{% endif %}></td>
+                    <td><input name="participant_notes_{{ index }}" value="{{ form.get('participant_notes_' ~ index, '') }}"></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p>
+        <button type="submit">Enregistrer la partie</button>
+        <a href="/sessions">Annuler</a>
+    </p>
+</form>
+{% endblock %}

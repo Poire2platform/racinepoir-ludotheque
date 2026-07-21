@@ -27,6 +27,8 @@ Current Features
 - Lost/active lifecycle actions for owner/admin.
 - Reference game pages with linked boxes.
 - BoardGameGeek recognition/enrichment flow.
+- Play session logging with registered users or guest player profiles.
+- First player stats pages with played games, high scores, and frequent teammates.
 
 Development Setup
 -----------------

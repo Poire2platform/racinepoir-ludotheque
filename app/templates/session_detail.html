@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Partie #{{ session.id }} — RacinePoir{% endblock %}
+
+{% block content %}
+<h2>Partie #{{ session.id }}</h2>
+
+<p><strong>Jeu :</strong> <a href="/games/{{ session.game.id }}">{{ session.game.title }}</a></p>
+<p><strong>Boîte :</strong> {% if session.box %}<a href="/boxes/{{ session.box.id }}">{{ session.box.display_label }}</a>{% else %}—{% endif %}</p>
+<p><strong>Date :</strong> {{ session.played_at }}</p>
+<p><strong>Durée :</strong> {% if session.duration_minutes %}{{ session.duration_minutes }} min{% else %}—{% endif %}</p>
+<p><strong>Créée par :</strong> {{ session.created_by.display_name }}</p>
+{% if session.notes %}<p><strong>Notes :</strong> {{ session.notes }}</p>{% endif %}
+
+<hr>
+<h3>Joueurs</h3>
+{% if session.participants %}
+<table border="1" cellpadding="6">
+    <thead>
+        <tr>
+            <th>Joueur</th>
+            <th>Équipe</th>
+            <th>Score</th>
+            <th>Rang</th>
+            <th>Gagnant</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for participant in session.participants %}
+            <tr>
+                <td><a href="/players/{{ participant.player_profile.id }}">{{ participant.player_profile.display_name }}</a></td>
+                <td>{{ participant.team_label or "—" }}</td>
+                <td>{% if participant.score is not none %}{{ participant.score }}{% else %}—{% endif %}</td>
+                <td>{{ participant.rank or "—" }}</td>
+                <td>{% if participant.is_winner %}oui{% else %}—{% endif %}</td>
+                <td>{{ participant.notes or "—" }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+    <p>Aucun joueur enregistré.</p>
+{% endif %}
+{% endblock %}

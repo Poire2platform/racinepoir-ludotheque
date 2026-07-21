@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Joueurs — RacinePoir{% endblock %}
+
+{% block content %}
+<h2>Joueurs</h2>
+
+{% if players %}
+<table border="1" cellpadding="6">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Compte lié</th>
+            <th>Parties</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for player in players %}
+            <tr>
+                <td><a href="/players/{{ player.id }}">{{ player.display_name }}</a></td>
+                <td>{% if player.linked_user %}{{ player.linked_user.username }}{% else %}—{% endif %}</td>
+                <td>{{ player.session_entries|length }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+    <p>Aucun joueur trouvé. Les joueurs seront créés en enregistrant des parties.</p>
+{% endif %}
+{% endblock %}

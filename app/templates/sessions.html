@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Parties — RacinePoir{% endblock %}
+
+{% block content %}
+<h2>Parties</h2>
+
+<p><a href="/sessions/new">Ajouter une partie</a></p>
+
+{% if sessions %}
+<table border="1" cellpadding="6">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Jeu</th>
+            <th>Durée</th>
+            <th>Joueurs</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for session in sessions %}
+            <tr>
+                <td>{{ session.played_at }}</td>
+                <td><a href="/games/{{ session.game.id }}">{{ session.game.title }}</a></td>
+                <td>{% if session.duration_minutes %}{{ session.duration_minutes }} min{% else %}—{% endif %}</td>
+                <td>{{ session.participants|length }}</td>
+                <td><a href="/sessions/{{ session.id }}">Voir</a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+    <p>Aucune partie enregistrée.</p>
+{% endif %}
+{% endblock %}

@@ -1,4 +1,5 @@
 import secrets
+from collections import Counter
 from io import BytesIO
 
 from flask import Blueprint, render_template, redirect, url_for, request, send_file
@@ -7,13 +8,14 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.extensions import db
 from app.bgg import BggApiError, game_details, search_games
-from app.models import User, Game, Box, BoxEvent, BoxRequest, utcnow
+from app.models import User, Game, Box, BoxEvent, BoxRequest, GameSession, GameSessionParticipant, PlayerProfile, utcnow
 
 main = Blueprint("main", __name__)
 BOX_CONDITIONS = ("unknown", "good", "worn", "incomplete")
 NEW_GAME_VALUE = "__new__"
 MANUAL_GAME_VALUE = "__manual__"
 USER_ROLES = ("member", "admin")
+SESSION_PARTICIPANT_ROWS = 6
 
 
 def generate_box_token():
@@ -145,6 +147,41 @@ def apply_bgg_details(game, details):
 
     for box in game.boxes:
         box.display_name = game.title
+
+
+def normalized_name(name):
+    return " ".join(name.lower().strip().split())
+
+
+def player_profile_for_user(user):
+    if user.player_profile:
+        return user.player_profile
+
+    profile = PlayerProfile(
+        display_name=user.display_name,
+        normalized_name=normalized_name(user.display_name),
+        linked_user=user,
+    )
+    db.session.add(profile)
+    db.session.flush()
+    return profile
+
+
+def player_profile_for_guest(name):
+    display_name = " ".join(name.strip().split())
+    normalized = normalized_name(display_name)
+    profile = PlayerProfile.query.filter_by(
+        linked_user_id=None,
+        normalized_name=normalized,
+    ).first()
+
+    if profile:
+        return profile
+
+    profile = PlayerProfile(display_name=display_name, normalized_name=normalized)
+    db.session.add(profile)
+    db.session.flush()
+    return profile
 
 
 @main.route("/")
@@ -774,6 +811,145 @@ def mark_box_active(box_id):
 
     db.session.commit()
     return redirect(url_for("main.box_detail", box_id=box.id))
+
+
+@main.route("/sessions")
+@login_required
+def sessions():
+    sessions = GameSession.query.order_by(GameSession.played_at.desc()).all()
+    return render_template("sessions.html", sessions=sessions)
+
+
+@main.route("/sessions/new", methods=["GET", "POST"])
+@login_required
+def new_session():
+    games = Game.query.order_by(Game.title.asc()).all()
+    users = User.query.filter_by(is_active=True).order_by(User.display_name.asc()).all()
+
+    if request.method == "POST":
+        game_id = request.form.get("game_id")
+        box_id = request.form.get("box_id") or None
+        duration_minutes = request.form.get("duration_minutes") or None
+        notes = (request.form.get("notes") or "").strip() or None
+
+        game = Game.query.get(game_id) if game_id else None
+        if not game:
+            return render_template("session_form.html", error="Le jeu est obligatoire.", games=games, users=users, form=request.form, row_count=SESSION_PARTICIPANT_ROWS)
+
+        box = Box.query.get(box_id) if box_id else None
+        if box_id and (not box or box.game_id != game.id):
+            return render_template("session_form.html", error="La boîte choisie ne correspond pas au jeu.", games=games, users=users, form=request.form, row_count=SESSION_PARTICIPANT_ROWS)
+
+        try:
+            duration = int(duration_minutes) if duration_minutes else None
+        except ValueError:
+            return render_template("session_form.html", error="La durée doit être un nombre de minutes.", games=games, users=users, form=request.form, row_count=SESSION_PARTICIPANT_ROWS)
+
+        session = GameSession(
+            game=game,
+            box=box,
+            duration_minutes=duration,
+            notes=notes,
+            created_by=current_user,
+        )
+        db.session.add(session)
+        db.session.flush()
+
+        participant_count = 0
+        for index in range(1, SESSION_PARTICIPANT_ROWS + 1):
+            user_id = request.form.get(f"participant_user_id_{index}") or None
+            guest_name = (request.form.get(f"participant_guest_name_{index}") or "").strip()
+
+            if not user_id and not guest_name:
+                continue
+
+            if user_id:
+                participant_user = User.query.get(user_id)
+                if not participant_user:
+                    continue
+                profile = player_profile_for_user(participant_user)
+            else:
+                profile = player_profile_for_guest(guest_name)
+
+            score_raw = request.form.get(f"score_{index}") or None
+            rank_raw = request.form.get(f"rank_{index}") or None
+
+            try:
+                score = int(score_raw) if score_raw else None
+                rank = int(rank_raw) if rank_raw else None
+            except ValueError:
+                return render_template("session_form.html", error="Score et rang doivent être numériques.", games=games, users=users, form=request.form, row_count=SESSION_PARTICIPANT_ROWS)
+
+            db.session.add(GameSessionParticipant(
+                session=session,
+                player_profile=profile,
+                team_label=(request.form.get(f"team_label_{index}") or "").strip() or None,
+                score=score,
+                rank=rank,
+                is_winner=request.form.get(f"is_winner_{index}") == "yes",
+                notes=(request.form.get(f"participant_notes_{index}") or "").strip() or None,
+            ))
+            participant_count += 1
+
+        if participant_count == 0:
+            return render_template("session_form.html", error="Ajoute au moins un joueur.", games=games, users=users, form=request.form, row_count=SESSION_PARTICIPANT_ROWS)
+
+        db.session.commit()
+        return redirect(url_for("main.session_detail", session_id=session.id))
+
+    return render_template(
+        "session_form.html",
+        games=games,
+        users=users,
+        form={},
+        row_count=SESSION_PARTICIPANT_ROWS,
+    )
+
+
+@main.route("/sessions/<int:session_id>")
+@login_required
+def session_detail(session_id):
+    session = GameSession.query.get_or_404(session_id)
+    return render_template("session_detail.html", session=session)
+
+
+@main.route("/players")
+@login_required
+def players():
+    players = PlayerProfile.query.order_by(PlayerProfile.display_name.asc()).all()
+    return render_template("players.html", players=players)
+
+
+@main.route("/players/<int:player_id>")
+@login_required
+def player_detail(player_id):
+    player = PlayerProfile.query.get_or_404(player_id)
+    entries = GameSessionParticipant.query.filter_by(
+        player_profile_id=player.id,
+    ).order_by(GameSessionParticipant.id.desc()).all()
+
+    game_counts = Counter(entry.session.game.title for entry in entries)
+    high_scores = {}
+    teammate_counts = Counter()
+
+    for entry in entries:
+        if entry.score is not None:
+            current_high = high_scores.get(entry.session.game.title)
+            if current_high is None or entry.score > current_high:
+                high_scores[entry.session.game.title] = entry.score
+
+        for teammate in entry.session.participants:
+            if teammate.player_profile_id != player.id:
+                teammate_counts[teammate.player_profile.display_name] += 1
+
+    return render_template(
+        "player_detail.html",
+        player=player,
+        entries=entries,
+        game_counts=game_counts.most_common(),
+        high_scores=sorted(high_scores.items()),
+        teammate_counts=teammate_counts.most_common(),
+    )
 
 
 @main.route("/copies")
