@@ -182,6 +182,8 @@ Security notes already enforced by the app:
 - POST forms require a session CSRF token.
 - Logout and box state changes use POST instead of GET.
 - Visiting a scan URL shows a confirmation page before changing the holder.
+- Login and scan confirmation routes have simple in-memory rate limits for playtesting.
+- Login and scan security events are written through the `racinepoir.security` logger.
 - Session cookies are `HttpOnly`.
 - Basic browser security headers are sent on every response.
 - HSTS is sent when secure cookies are enabled, meaning production should already
@@ -189,8 +191,8 @@ Security notes already enforced by the app:
 
 Good next hardening steps:
 
-- Add rate limiting to login and scan confirmation routes.
-- Add structured app logs for important security events.
+- Move rate limiting to shared storage, such as Redis, if running multiple workers.
+- Add richer structured app logs for important security events.
 - Add an automated database backup script.
 - Add a `/healthz` endpoint for local monitoring.
 - Add a production service file, such as systemd, once the server path is known.

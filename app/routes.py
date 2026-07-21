@@ -9,6 +9,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from app.extensions import db
 from app.bgg import BggApiError, game_details, search_games
 from app.models import User, Game, Box, BoxEvent, BoxRequest, GameSession, GameSessionParticipant, PlayerProfile, utcnow
+from app.security import env_int, is_rate_limited, rate_limit_key, request_ip, security_event
 
 main = Blueprint("main", __name__)
 BOX_CONDITIONS = ("unknown", "good", "worn", "incomplete")
@@ -213,23 +214,46 @@ def login():
     next_page = request.args.get("next")
 
     if request.method == "POST":
-        username = request.form.get("username")
+        username = (request.form.get("username") or "").strip()
         password = request.form.get("password")
         next_page = request.form.get("next") or request.args.get("next")
+        limit = env_int("LOGIN_RATE_LIMIT_ATTEMPTS", 5)
+        window = env_int("LOGIN_RATE_LIMIT_WINDOW_SECONDS", 300)
+        limited, retry_after = is_rate_limited(
+            rate_limit_key("login", username or "empty"),
+            limit=limit,
+            window_seconds=window,
+        )
+
+        if limited:
+            security_event(
+                "login_rate_limited",
+                ip=request_ip(),
+                username=username or "empty",
+                retry_after_seconds=retry_after,
+            )
+            return render_template(
+                "login.html",
+                error=f"Trop d’essais. Réessaie dans environ {retry_after} secondes.",
+                next_page=next_page,
+            ), 429
 
         user = User.query.filter_by(username=username).first()
 
         if user and not user.is_active:
+            security_event("login_inactive_account", ip=request_ip(), username=username)
             return render_template("login.html", error="Compte désactivé.", next_page=next_page)
 
         if user and check_password_hash(user.password_hash, password):
             login_user(user, remember=True)
+            security_event("login_success", ip=request_ip(), username=username, user_id=user.id)
 
             if next_page and next_page.startswith("/"):
                 return redirect(next_page)
 
             return redirect(url_for("main.index"))
 
+        security_event("login_failed", ip=request_ip(), username=username or "empty")
         return render_template("login.html", error="Login invalide.", next_page=next_page)
 
     return render_template("login.html", next_page=next_page)
@@ -724,9 +748,33 @@ def scan_box(token):
 @login_required
 def confirm_scan_box(token):
     box = Box.query.filter_by(qr_code_token=token).first_or_404()
+    limit = env_int("SCAN_CONFIRM_RATE_LIMIT_ATTEMPTS", 20)
+    window = env_int("SCAN_CONFIRM_RATE_LIMIT_WINDOW_SECONDS", 300)
+    limited, retry_after = is_rate_limited(
+        rate_limit_key("scan_confirm", token),
+        limit=limit,
+        window_seconds=window,
+    )
+
+    if limited:
+        security_event(
+            "scan_confirm_rate_limited",
+            ip=request_ip(),
+            user_id=current_user.id,
+            box_id=box.id,
+            retry_after_seconds=retry_after,
+        )
+        return f"Trop de confirmations de scan. Réessaie dans environ {retry_after} secondes.", 429
 
     old_holder, fulfilled_request, already_holder = claim_box_for_current_user(box)
     db.session.commit()
+    security_event(
+        "scan_confirmed",
+        ip=request_ip(),
+        user_id=current_user.id,
+        box_id=box.id,
+        already_holder=already_holder,
+    )
 
     return render_template(
         "scan_result.html",

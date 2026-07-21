@@ -1,5 +1,6 @@
 import os
 import secrets
+import logging
 from flask import Flask, abort, request, session
 from dotenv import load_dotenv
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -22,6 +23,8 @@ def create_app():
     app.config["REMEMBER_COOKIE_HTTPONLY"] = True
     app.config["REMEMBER_COOKIE_SECURE"] = os.getenv("REMEMBER_COOKIE_SECURE", "false").lower() == "true"
     app.config["REMEMBER_COOKIE_SAMESITE"] = os.getenv("REMEMBER_COOKIE_SAMESITE", "Lax")
+
+    logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
 
     if os.getenv("TRUST_PROXY_HEADERS", "false").lower() == "true":
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)

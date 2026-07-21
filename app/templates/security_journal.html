@@ -134,6 +134,16 @@ Base de données privée</code></pre>
                 <td>La DB doit rester locale ou accessible seulement sur réseau privé.</td>
                 <td>Le public parle à l’app, pas au stockage brut.</td>
             </tr>
+            <tr>
+                <td>Ralentir l’attaque en ligne</td>
+                <td>Le login et la confirmation de scan ont des limites par fenêtre de temps.</td>
+                <td>Simon peut encore essayer, mais il ne peut plus marteler l’app à pleine vitesse.</td>
+            </tr>
+            <tr>
+                <td>Rendre les essais visibles</td>
+                <td>Les succès, échecs et limites de login/scan écrivent des logs de sécurité.</td>
+                <td>Une attaque utilement détectée est moins silencieuse et plus facile à comprendre.</td>
+            </tr>
         </tbody>
     </table>
     <div class="security-stat">
@@ -156,6 +166,12 @@ Base de données privée</code></pre>
             Sur une page login, un délai de <strong>5 secondes</strong> entre les
             essais limite un attaquant à environ <strong>720 tentatives par heure</strong>
             pour une cible. Sans délai, un script peut tenter beaucoup plus vite.
+        </p>
+        <p>
+            Dans cette version, la limite playtest est de
+            <strong>5 essais par 5 minutes</strong> pour un couple IP + username :
+            Simon descend donc vers environ <strong>60 essais par heure</strong>
+            pour la même cible.
         </p>
         <p>
             Attention : ça protège surtout contre l’attaque <em>en ligne</em>.
@@ -207,7 +223,7 @@ Base de données privée</code></pre>
 <section>
     <h3>Prochaines couches prévues</h3>
     <ol>
-        <li>Rate limiting sur login et confirmation de scan.</li>
+        <li>Passer le rate limiting en stockage partagé, comme Redis, si on roule plusieurs workers.</li>
         <li>Logs structurés pour les événements sensibles.</li>
         <li>Endpoint local de santé, par exemple <code>/healthz</code>.</li>
         <li>Script de backup de la base de données.</li>
