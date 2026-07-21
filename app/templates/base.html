@@ -2,8 +2,102 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{% block title %}RacinePoir{% endblock %}</title>
 <style>
+* {
+    box-sizing: border-box;
+}
+
+html {
+    min-height: 100%;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    padding: 18px;
+    background: #1f2426;
+    color: #edf1ef;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+a {
+    color: #9fd7ff;
+}
+
+a:visited {
+    color: #c8b8ff;
+}
+
+header,
+main {
+    width: min(1120px, 100%);
+    margin: 0 auto 14px;
+    padding: 16px;
+    background: #2b3133;
+    border: 4px double #687477;
+}
+
+main {
+    min-height: calc(100vh - 190px);
+}
+
+nav,
+form,
+table,
+section,
+div,
+ul,
+ol {
+    border: 3px double #526064;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.035);
+}
+
+nav {
+    margin-bottom: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow-wrap: anywhere;
+}
+
+th,
+td {
+    border: 1px solid #59676b;
+    padding: 8px;
+    vertical-align: top;
+}
+
+input,
+select,
+textarea,
+button {
+    max-width: 100%;
+    color: #111;
+    font: inherit;
+}
+
+button,
+input[type="submit"] {
+    cursor: pointer;
+}
+
+code {
+    color: #ffe7a3;
+}
+
+hr {
+    border: 0;
+    border-top: 3px double #687477;
+    margin: 16px 0;
+}
+
 body.anika-love {
     background-color: #fff4f7;
     background-image: repeating-linear-gradient(
@@ -33,6 +127,27 @@ body.anika-love::before {
     left: 12px;
     bottom: 12px;
     z-index: 20;
+    border: 3px double #ffd1df;
+    background: #3a2c33;
+    color: #fff4f7;
+    padding: 8px 12px;
+}
+
+@media (max-width: 720px) {
+    body {
+        padding: 8px;
+        font-size: 15px;
+    }
+
+    header,
+    main {
+        padding: 10px;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+    }
 }
 </style>
 </head>
