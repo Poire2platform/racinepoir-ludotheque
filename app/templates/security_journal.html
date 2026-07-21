@@ -144,6 +144,11 @@ Base de données privée</code></pre>
                 <td>Les succès, échecs et limites de login/scan écrivent des logs de sécurité.</td>
                 <td>Une attaque utilement détectée est moins silencieuse et plus facile à comprendre.</td>
             </tr>
+            <tr>
+                <td>Surveiller l’état minimal</td>
+                <td><code>/healthz</code> vérifie que l’app répond et que la DB accepte une requête simple.</td>
+                <td>Un serveur sérieux doit pouvoir dire rapidement “je suis vivant” sans exposer de données privées.</td>
+            </tr>
         </tbody>
     </table>
     <div class="security-stat">
@@ -225,7 +230,6 @@ Base de données privée</code></pre>
     <ol>
         <li>Passer le rate limiting en stockage partagé, comme Redis, si on roule plusieurs workers.</li>
         <li>Logs structurés pour les événements sensibles.</li>
-        <li>Endpoint local de santé, par exemple <code>/healthz</code>.</li>
         <li>Script de backup de la base de données.</li>
         <li>Guide de déploiement serveur avec service systemd et reverse proxy.</li>
     </ol>
@@ -233,8 +237,9 @@ Base de données privée</code></pre>
         <h4>Stat Simon : prochaines améliorations</h4>
         <p>
             Le rate limiting rend l’attaque login lente. Les logs rendent Simon
-            visible. Les backups réduisent l’impact d’un incident. Le service
-            systemd et le reverse proxy rendent le déploiement plus répétable.
+            visible. Le health check rend les pannes visibles. Les backups
+            réduisent l’impact d’un incident. Le service systemd et le reverse
+            proxy rendent le déploiement plus répétable.
         </p>
         <p>
             <strong>But :</strong> ne pas seulement empêcher l’attaque, mais aussi

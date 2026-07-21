@@ -184,6 +184,7 @@ Security notes already enforced by the app:
 - Visiting a scan URL shows a confirmation page before changing the holder.
 - Login and scan confirmation routes have simple in-memory rate limits for playtesting.
 - Login and scan security events are written through the `racinepoir.security` logger.
+- `/healthz` returns a small JSON health check and verifies database connectivity.
 - Session cookies are `HttpOnly`.
 - Basic browser security headers are sent on every response.
 - HSTS is sent when secure cookies are enabled, meaning production should already
@@ -194,7 +195,6 @@ Good next hardening steps:
 - Move rate limiting to shared storage, such as Redis, if running multiple workers.
 - Add richer structured app logs for important security events.
 - Add an automated database backup script.
-- Add a `/healthz` endpoint for local monitoring.
 - Add a production service file, such as systemd, once the server path is known.
 
 QR Labels

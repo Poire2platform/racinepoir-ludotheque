@@ -2,8 +2,9 @@ import secrets
 from collections import Counter
 from io import BytesIO
 
-from flask import Blueprint, render_template, redirect, url_for, request, send_file
+from flask import Blueprint, jsonify, render_template, redirect, url_for, request, send_file
 from flask_login import login_user, logout_user, current_user, login_required
+from sqlalchemy import text
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.extensions import db
@@ -207,6 +208,25 @@ def index():
         owned_count=owned_count,
         requested_count=requested_count,
     )
+
+
+@main.route("/healthz")
+def healthz():
+    try:
+        db.session.execute(text("SELECT 1"))
+    except Exception:
+        security_event("health_check_failed", ip=request_ip())
+        return jsonify({
+            "status": "error",
+            "database": "unavailable",
+            "checked_at": utcnow().isoformat(),
+        }), 503
+
+    return jsonify({
+        "status": "ok",
+        "database": "ok",
+        "checked_at": utcnow().isoformat(),
+    })
 
 
 @main.route("/login", methods=["GET", "POST"])
