@@ -235,7 +235,7 @@ def login():
     return render_template("login.html", next_page=next_page)
 
 
-@main.route("/logout")
+@main.route("/logout", methods=["POST"])
 def logout():
     logout_user()
     return redirect(url_for("main.index"))
@@ -712,6 +712,13 @@ def claim_box_for_current_user(box):
 @login_required
 def scan_box(token):
     box = Box.query.filter_by(qr_code_token=token).first_or_404()
+    return render_template("scan_confirm.html", box=box)
+
+
+@main.route("/scan/<token>/confirm", methods=["POST"])
+@login_required
+def confirm_scan_box(token):
+    box = Box.query.filter_by(qr_code_token=token).first_or_404()
 
     old_holder, fulfilled_request, already_holder = claim_box_for_current_user(box)
     db.session.commit()
@@ -725,13 +732,7 @@ def scan_box(token):
     )
 
 
-@main.route("/scan/<token>/confirm")
-@login_required
-def confirm_scan_box(token):
-    return redirect(url_for("main.scan_box", token=token))
-
-
-@main.route("/boxes/<int:box_id>/request")
+@main.route("/boxes/<int:box_id>/request", methods=["POST"])
 @login_required
 def request_box(box_id):
     box = Box.query.get_or_404(box_id)
@@ -766,7 +767,7 @@ def request_box(box_id):
     return redirect(url_for("main.box_detail", box_id=box.id))
 
 
-@main.route("/boxes/<int:box_id>/request/clear")
+@main.route("/boxes/<int:box_id>/request/clear", methods=["POST"])
 @login_required
 def clear_box_request(box_id):
     box = Box.query.get_or_404(box_id)
@@ -800,7 +801,7 @@ def clear_box_request(box_id):
     return redirect(url_for("main.box_detail", box_id=box.id))
 
 
-@main.route("/boxes/<int:box_id>/mark-lost")
+@main.route("/boxes/<int:box_id>/mark-lost", methods=["POST"])
 @login_required
 def mark_box_lost(box_id):
     box = Box.query.get_or_404(box_id)
@@ -821,7 +822,7 @@ def mark_box_lost(box_id):
     return redirect(url_for("main.box_detail", box_id=box.id))
 
 
-@main.route("/boxes/<int:box_id>/mark-active")
+@main.route("/boxes/<int:box_id>/mark-active", methods=["POST"])
 @login_required
 def mark_box_active(box_id):
     box = Box.query.get_or_404(box_id)

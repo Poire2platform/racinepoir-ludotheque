@@ -20,6 +20,7 @@
 {% if users %}
 <h3>Changer le détenteur</h3>
 <form method="post" action="/boxes/{{ box.id }}/transfer">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
     <p>
         <label for="current_holder_user_id">Nouveau détenteur</label><br>
         <select id="current_holder_user_id" name="current_holder_user_id">
@@ -40,7 +41,7 @@
     {% if box.current_holder and box.current_holder.id == current_user.id %}
         <p>Tu as déjà cette boîte.</p>
     {% else %}
-        <p><a href="/scan/{{ box.qr_code_token }}">J’ai cette boîte maintenant</a></p>
+        <p><a href="/scan/{{ box.qr_code_token }}">Scanner / confirmer que j’ai cette boîte</a></p>
     {% endif %}
 {% else %}
     <p><a href="/login">Connecte-toi</a> pour déclarer que tu as cette boîte.</p>
@@ -60,9 +61,15 @@
         <p>Tu as déjà cette boîte, donc tu n’as pas besoin de la demander.</p>
     {% elif my_request %}
         <p>Tu es #{{ box.active_request_position_for_user(current_user) }} dans la file d’attente.</p>
-        <p><a href="/boxes/{{ box.id }}/request/clear">Annuler ma demande</a></p>
+        <form method="post" action="/boxes/{{ box.id }}/request/clear">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <button type="submit">Annuler ma demande</button>
+        </form>
     {% else %}
-        <p><a href="/boxes/{{ box.id }}/request">Je veux cette boîte</a></p>
+        <form method="post" action="/boxes/{{ box.id }}/request">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <button type="submit">Je veux cette boîte</button>
+        </form>
     {% endif %}
 {% else %}
     <p><a href="/login">Connecte-toi</a> pour demander cette boîte.</p>
@@ -71,9 +78,15 @@
 <h3>État</h3>
 {% if current_user.is_authenticated and (current_user.role == "admin" or box.owner_user_id == current_user.id) %}
     {% if box.lifecycle_status == "lost" %}
-        <p><a href="/boxes/{{ box.id }}/mark-active">Remettre active</a></p>
+        <form method="post" action="/boxes/{{ box.id }}/mark-active">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <button type="submit">Remettre active</button>
+        </form>
     {% else %}
-        <p><a href="/boxes/{{ box.id }}/mark-lost">Marquer comme perdue</a></p>
+        <form method="post" action="/boxes/{{ box.id }}/mark-lost">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <button type="submit">Marquer comme perdue</button>
+        </form>
     {% endif %}
 {% else %}
     <p>Aucune action disponible.</p>

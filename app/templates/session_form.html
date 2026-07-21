@@ -10,6 +10,7 @@
 {% endif %}
 
 <form method="post">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
     <p>
         <label for="game_id">Jeu</label><br>
         <select id="game_id" name="game_id" required>

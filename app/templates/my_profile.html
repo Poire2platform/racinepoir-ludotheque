@@ -13,6 +13,7 @@
 <p>Rôle : <code>{{ current_user.role }}</code></p>
 
 <form method="post">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
     <p>
         <label for="display_name">Nom affiché</label><br>
         <input id="display_name" name="display_name" required value="{{ form.get('display_name', '') }}">

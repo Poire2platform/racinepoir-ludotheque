@@ -8,9 +8,11 @@
         username: <code>{{ current_user.username }}</code>
         —
         rôle: <code>{{ current_user.role }}</code>
-        —
-        <a href="/logout">Déconnexion</a>
     </p>
+    <form method="post" action="/logout">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <button type="submit">Déconnexion</button>
+    </form>
 {% else %}
     <p>
         Non connecté

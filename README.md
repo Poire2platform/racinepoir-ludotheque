@@ -138,6 +138,63 @@ Deployment notes:
 - If WHC only provides MySQL instead of PostgreSQL, add a MySQL driver and use a
   MySQL `DATABASE_URL` before running migrations.
 
+Self-Hosted Server Deploy
+-------------------------
+
+This is the preferred path if the Ludothèque runs on the dedicated home/server
+machine and WHC only hosts a public landing page.
+
+Recommended public shape:
+
+```text
+Internet
+  -> Cloudflare / DNS
+  -> reverse proxy on the server
+  -> Flask app
+  -> local/private database
+```
+
+Minimum server checklist:
+
+- Expose only HTTP/HTTPS publicly.
+- Keep SSH restricted by firewall, VPN, allowlist, or key-only access.
+- Keep the database private; do not expose PostgreSQL/MySQL to the public Internet.
+- Put Caddy, Nginx, or another reverse proxy in front of Flask.
+- Terminate HTTPS at the reverse proxy.
+- Redirect plain HTTP to HTTPS.
+- Run the Flask app as a non-root service user.
+- Keep real secrets in environment variables or a private `.env` file.
+- Run `flask db upgrade` during deploys.
+- Back up the database before migrations and on a regular schedule.
+
+Production environment flags when HTTPS is active:
+
+```env
+SESSION_COOKIE_SECURE=true
+REMEMBER_COOKIE_SECURE=true
+SESSION_COOKIE_SAMESITE=Lax
+REMEMBER_COOKIE_SAMESITE=Lax
+TRUST_PROXY_HEADERS=true
+```
+
+Security notes already enforced by the app:
+
+- POST forms require a session CSRF token.
+- Logout and box state changes use POST instead of GET.
+- Visiting a scan URL shows a confirmation page before changing the holder.
+- Session cookies are `HttpOnly`.
+- Basic browser security headers are sent on every response.
+- HSTS is sent when secure cookies are enabled, meaning production should already
+  be served through HTTPS before turning those flags on.
+
+Good next hardening steps:
+
+- Add rate limiting to login and scan confirmation routes.
+- Add structured app logs for important security events.
+- Add an automated database backup script.
+- Add a `/healthz` endpoint for local monitoring.
+- Add a production service file, such as systemd, once the server path is known.
+
 QR Labels
 ---------
 

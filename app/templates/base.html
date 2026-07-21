@@ -163,7 +163,16 @@ body.anika-love::before {
 <a href="/me/held-boxes">Chez moi</a> |
 <a href="/me/owned-boxes">Mes boîtes</a> |<hr>
 {% if current_user.is_authenticated %}
-<p>Connecté comme : <strong>{{ current_user.display_name }}</strong> — username: <code>{{ current_user.username }}</code> — rôle: <code>{{ current_user.role }}</code> — <a href="/me/profile">Profil</a> — <a href="/logout">Déconnexion</a></p>
+<p>
+    Connecté comme : <strong>{{ current_user.display_name }}</strong>
+    — username: <code>{{ current_user.username }}</code>
+    — rôle: <code>{{ current_user.role }}</code>
+    — <a href="/me/profile">Profil</a>
+</p>
+<form method="post" action="/logout">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+    <button type="submit">Déconnexion</button>
+</form>
 {% else %}
 <p>Non connecté — <a href="/login">Connexion</a></p>
 {% endif %}
