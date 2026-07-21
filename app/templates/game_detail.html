@@ -37,6 +37,43 @@
 {% endif %}
 
 <hr>
+<h3>Statistiques de parties</h3>
+<p><strong>Parties enregistrées :</strong> {{ play_count }}</p>
+<p><strong>Durée moyenne :</strong> {% if average_duration %}{{ average_duration }} min{% else %}—{% endif %}</p>
+<p><strong>Meilleur score :</strong> {% if high_score is not none %}{{ high_score }}{% else %}—{% endif %}</p>
+
+{% if player_counts %}
+    <h4>Joueurs fréquents</h4>
+    <ul>
+        {% for name, count in player_counts %}
+            <li>{{ name }} — {{ count }} partie(s)</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+{% if winner_counts %}
+    <h4>Gagnants</h4>
+    <ul>
+        {% for name, count in winner_counts %}
+            <li>{{ name }} — {{ count }} victoire(s)</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+{% if sessions %}
+    <h4>Parties récentes</h4>
+    <ul>
+        {% for session in sessions[:5] %}
+            <li>
+                <a href="/sessions/{{ session.id }}">Partie #{{ session.id }}</a>
+                — {{ session.played_at }}
+                — {{ session.participants|length }} joueur(s)
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<hr>
 <h3>Boîtes liées</h3>
 {% if boxes %}
     <ul>

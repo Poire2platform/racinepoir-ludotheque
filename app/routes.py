@@ -394,7 +394,36 @@ def games():
 def game_detail(game_id):
     game = Game.query.get_or_404(game_id)
     boxes = Box.query.filter_by(game_id=game.id).order_by(Box.id.asc()).all()
-    return render_template("game_detail.html", game=game, boxes=boxes)
+    sessions = GameSession.query.filter_by(game_id=game.id).order_by(GameSession.played_at.desc()).all()
+    durations = [session.duration_minutes for session in sessions if session.duration_minutes]
+    scores = [
+        participant.score
+        for session in sessions
+        for participant in session.participants
+        if participant.score is not None
+    ]
+    player_counts = Counter()
+    winner_counts = Counter()
+
+    for session in sessions:
+        for participant in session.participants:
+            player_counts[participant.player_profile.display_name] += 1
+            if participant.is_winner:
+                winner_counts[participant.player_profile.display_name] += 1
+
+    average_duration = round(sum(durations) / len(durations)) if durations else None
+
+    return render_template(
+        "game_detail.html",
+        game=game,
+        boxes=boxes,
+        sessions=sessions,
+        play_count=len(sessions),
+        average_duration=average_duration,
+        high_score=max(scores) if scores else None,
+        player_counts=player_counts.most_common(),
+        winner_counts=winner_counts.most_common(),
+    )
 
 
 @main.route("/games/<int:game_id>/bgg", methods=["GET", "POST"])
