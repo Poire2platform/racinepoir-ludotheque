@@ -85,6 +85,59 @@ anouk / anouk123
 frere / frere123
 ```
 
+WHC / cPanel Staging Deploy
+---------------------------
+
+Assumption: the hosting account supports a Python app through cPanel / Passenger,
+with environment variables and a database available.
+
+Suggested staging URL:
+
+```text
+https://testmax.yoannpearson.com/
+```
+
+Suggested cPanel setup:
+
+1. Create a Python application in cPanel.
+2. Use the project folder as the application root.
+3. Use `passenger_wsgi.py` as the startup file.
+4. Install dependencies from `requirements.txt`.
+5. Configure the environment variables:
+
+```env
+DATABASE_URL=postgresql://...
+SECRET_KEY=...
+BGG_API_TOKEN=...
+```
+
+`BGG_API_TOKEN` is optional. Without it, the app still works, but BoardGameGeek
+lookup/enrichment actions will show a configuration message.
+
+After dependencies and environment variables are set:
+
+```bash
+flask db upgrade
+```
+
+Optional staging data:
+
+```bash
+PYTHONPATH=. python scripts/seed_dev.py
+```
+
+Do not run the seed script on a real production database unless you intentionally
+want to reset/demo-fill the data.
+
+Deployment notes:
+
+- Keep `.env` and real secrets out of Git.
+- Use HTTPS for the public/staging URL before printing real QR labels.
+- QR labels should be generated from the final stable hostname, because the QR
+  code stores the scan URL.
+- If WHC only provides MySQL instead of PostgreSQL, add a MySQL driver and use a
+  MySQL `DATABASE_URL` before running migrations.
+
 QR Labels
 ---------
 
