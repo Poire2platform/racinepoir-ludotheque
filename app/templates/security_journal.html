@@ -12,6 +12,29 @@
 </p>
 
 <section>
+    <h3>Notre personnage test : Simon le hacker</h3>
+    <p>
+        Pour rendre les choix plus concrets, on imagine <strong>Simon</strong> :
+        curieux, patient, avec un bon laptop, quelques scripts trouvés en ligne,
+        et assez de méthode pour tester les erreurs classiques. Simon n’est pas
+        une agence gouvernementale, mais il est plus sérieux qu’un bot au hasard.
+    </p>
+    <div class="security-stat">
+        <h4>Profil de menace utilisé pour les exemples</h4>
+        <ul>
+            <li><strong>Bot opportuniste :</strong> scanne Internet et essaie les portes évidentes.</li>
+            <li><strong>Simon :</strong> lit les pages, teste les formulaires, essaie des mots de passe probables.</li>
+            <li><strong>Simon + fuite de hash :</strong> scénario plus grave où il aurait obtenu la base ou des hashes.</li>
+        </ul>
+        <p>
+            Les chiffres ci-dessous sont des ordres de grandeur pédagogiques. Ils
+            servent à comparer les défenses entre elles, pas à garantir un temps
+            exact de résistance.
+        </p>
+    </div>
+</section>
+
+<section>
     <h3>Intention générale</h3>
     <p>
         Le but n’est pas de prétendre qu’un petit projet est invincible. Le but
@@ -19,6 +42,20 @@
         changements d’état accidentels, garder les secrets hors du code, et
         rendre les opérations importantes vérifiables.
     </p>
+    <div class="security-stat">
+        <h4>Effet sur Simon</h4>
+        <p>
+            Sans stratégie de défense, Simon cherche “la faille oubliée”. Avec
+            une défense en couches, il doit réussir plusieurs choses à la fois :
+            trouver une surface exposée, contourner l’auth, éviter les logs, puis
+            atteindre des données utiles.
+        </p>
+        <p>
+            <strong>Impact :</strong> on transforme une erreur unique en parcours
+            à obstacles. Ce n’est pas x1000 garanti, mais c’est souvent la
+            différence entre “script automatique” et “attaque manuelle coûteuse”.
+        </p>
+    </div>
 </section>
 
 <section>
@@ -37,6 +74,18 @@ Base de données privée</code></pre>
         arrive par HTTPS, puis le proxy transmet seulement les requêtes utiles à
         l’application.
     </p>
+    <div class="security-stat">
+        <h4>Stat Simon : surface exposée</h4>
+        <p>
+            Si la DB est publique, Simon peut attaquer directement le stockage.
+            Si elle est privée, il doit passer par l’application et ses contrôles.
+        </p>
+        <p>
+            <strong>Comparaison :</strong> public = plusieurs portes visibles.
+            privé = une porte principale surveillée. Le meilleur port fermé est
+            celui qui n’existe pas sur Internet.
+        </p>
+    </div>
 </section>
 
 <section>
@@ -87,6 +136,34 @@ Base de données privée</code></pre>
             </tr>
         </tbody>
     </table>
+    <div class="security-stat">
+        <h4>Stat Simon : GET vs POST + CSRF</h4>
+        <p>
+            Avant, une simple visite de lien pouvait suffire à modifier l’état.
+            Maintenant, Simon doit produire une vraie requête POST avec le jeton
+            CSRF de la session de la victime.
+        </p>
+        <p>
+            <strong>Impact :</strong> les attaques “envoie-lui un lien” tombent
+            presque à zéro pour ces actions. Simon doit maintenant voler ou
+            contrôler une session active, ce qui est une classe d’attaque plus
+            difficile.
+        </p>
+    </div>
+    <div class="security-stat">
+        <h4>Stat Simon : mots de passe et délai</h4>
+        <p>
+            Sur une page login, un délai de <strong>5 secondes</strong> entre les
+            essais limite un attaquant à environ <strong>720 tentatives par heure</strong>
+            pour une cible. Sans délai, un script peut tenter beaucoup plus vite.
+        </p>
+        <p>
+            Attention : ça protège surtout contre l’attaque <em>en ligne</em>.
+            Si Simon vole les hashes, le délai du formulaire ne compte plus :
+            il faut alors compter sur le hashage robuste, les mots de passe longs,
+            et le fait que la DB ne soit pas exposée.
+        </p>
+    </div>
 </section>
 
 <section>
@@ -112,6 +189,19 @@ Base de données privée</code></pre>
         on ne doit pas compter dessus comme pilier principal. C’est une haie, pas
         un mur.
     </p>
+    <div class="security-stat">
+        <h4>Stat Simon : ports changés</h4>
+        <p>
+            Changer SSH de 22 vers un autre port peut éliminer une bonne partie
+            des bots paresseux qui essaient seulement les valeurs par défaut.
+            Simon, lui, peut scanner tous les ports ouverts.
+        </p>
+        <p>
+            <strong>Impact :</strong> bon anti-bruit, faible défense réelle.
+            Meilleur combo : SSH non public ou allowlist/VPN + clé SSH + fail2ban
+            ou rate limiting.
+        </p>
+    </div>
 </section>
 
 <section>
@@ -123,5 +213,17 @@ Base de données privée</code></pre>
         <li>Script de backup de la base de données.</li>
         <li>Guide de déploiement serveur avec service systemd et reverse proxy.</li>
     </ol>
+    <div class="security-stat">
+        <h4>Stat Simon : prochaines améliorations</h4>
+        <p>
+            Le rate limiting rend l’attaque login lente. Les logs rendent Simon
+            visible. Les backups réduisent l’impact d’un incident. Le service
+            systemd et le reverse proxy rendent le déploiement plus répétable.
+        </p>
+        <p>
+            <strong>But :</strong> ne pas seulement empêcher l’attaque, mais aussi
+            détecter, comprendre et récupérer si quelque chose arrive.
+        </p>
+    </div>
 </section>
 {% endblock %}
