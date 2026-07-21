@@ -72,6 +72,7 @@ Development Data
 Seed the dev data from the project root:
 
 ```bash
+flask db upgrade
 PYTHONPATH=. python scripts/seed_dev.py
 ```
 
