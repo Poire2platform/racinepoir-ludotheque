@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Scan confirmé — {{ box.display_name }}{% endblock %}
+{% block title %}Scan confirmé — {{ box.display_label }}{% endblock %}
 {% block content %}
 <h2>✅ Scan confirmé</h2>
 
 <p>
-    <strong>{{ box.display_name }}</strong>
+    <strong>{{ box.display_label }}</strong>
     est maintenant entre les mains de :
     <strong>{{ current_user.display_name }}</strong>.
 </p>

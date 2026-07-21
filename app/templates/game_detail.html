@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}{{ game.title }} — RacinePoir{% endblock %}
+
+{% block content %}
+<h2>{{ game.title }}</h2>
+{% if game.is_bgg_recognized %}
+    <p><strong>[Reconnu BoardGameGeek]</strong></p>
+{% else %}
+    <p><strong>[Non reconnu BoardGameGeek]</strong></p>
+{% endif %}
+{% if current_user.is_authenticated %}
+    <p><a href="/games/{{ game.id }}/bgg">Retenter la reconnaissance BoardGameGeek</a></p>
+{% endif %}
+
+{% if game.cover_image_url %}
+    <p><img src="{{ game.cover_image_url }}" alt="Couverture de {{ game.title }}" style="max-width: 220px;"></p>
+{% endif %}
+
+<p><strong>Langue :</strong> {{ game.language or "—" }}</p>
+<p><strong>Édition :</strong> {{ game.edition_name or "—" }}</p>
+<p><strong>Éditeur :</strong> {{ game.publisher or "—" }}</p>
+<p><strong>Année :</strong> {{ game.year_published or "—" }}</p>
+<p><strong>Joueurs :</strong> {% if game.min_players and game.max_players %}{{ game.min_players }}–{{ game.max_players }}{% else %}—{% endif %}</p>
+<p><strong>Durée :</strong> {% if game.min_playtime and game.max_playtime %}{{ game.min_playtime }}–{{ game.max_playtime }} min{% else %}—{% endif %}</p>
+<p><strong>Âge minimum :</strong> {% if game.age_min %}{{ game.age_min }}+{% else %}—{% endif %}</p>
+<p><strong>Complexité BGG :</strong> {% if game.complexity %}{{ "%.2f"|format(game.complexity) }} / 5{% else %}—{% endif %}</p>
+
+{% if game.bgg_id %}
+    <p><strong>BoardGameGeek :</strong> <a href="{{ game.bgg_url }}">Consulter la page BGG #{{ game.bgg_id }}</a></p>
+{% endif %}
+
+{% if game.description %}
+    <hr>
+    <h3>Description</h3>
+    <p>{{ game.description }}</p>
+{% endif %}
+
+<hr>
+<h3>Boîtes liées</h3>
+{% if boxes %}
+    <ul>
+        {% for box in boxes %}
+            <li>
+                <a href="/boxes/{{ box.id }}">{{ box.display_label }}</a>
+                — propriétaire : {{ box.owner.display_name }}
+                — détenteur : {% if box.current_holder %}{{ box.current_holder.display_name }}{% else %}—{% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Aucune boîte liée.</p>
+{% endif %}
+{% endblock %}

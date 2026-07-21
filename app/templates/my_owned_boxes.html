@@ -6,12 +6,13 @@
 <h2>Mes boîtes</h2>
 
 <p>Boîtes qui t’appartiennent, peu importe où elles sont.</p>
+<p><a href="/boxes/new">Ajouter une boîte</a></p>
 
 {% if boxes %}
     <ul>
         {% for box in boxes %}
             <li>
-                <a href="/boxes/{{ box.id }}">{{ box.display_name }}</a>
+                <a href="/boxes/{{ box.id }}">{{ box.display_label }}</a>
 
                 —
                 détenteur :
@@ -28,6 +29,10 @@
                 {% if box.active_requests %}
                     — <strong>Demandée</strong>
                 {% endif %}
+
+                — <a href="/boxes/{{ box.id }}/edit">Modifier</a>
+                — <a href="/boxes/{{ box.id }}/label">Étiquette</a>
+                — <a href="/boxes/{{ box.id }}">Détenteur</a>
             </li>
         {% endfor %}
     </ul>

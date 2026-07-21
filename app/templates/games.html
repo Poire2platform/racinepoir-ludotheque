@@ -5,11 +5,13 @@
 <p>Ces fiches servent à enrichir les boîtes avec des statistiques générales. Elles ne sont pas le noyau opérationnel.</p>
 {% if games %}
 <table border="1" cellpadding="6">
-<thead><tr><th>ID</th><th>Titre</th><th>Langue</th><th>Joueurs</th><th>Durée</th><th>Année</th><th>Boîtes liées</th></tr></thead>
+<thead><tr><th>ID</th><th>Titre</th><th>BGG</th><th>Langue</th><th>Joueurs</th><th>Durée</th><th>Année</th><th>Boîtes liées</th></tr></thead>
 <tbody>
 {% for game in games %}
 <tr>
-<td>{{ game.id }}</td><td>{{ game.title }}</td><td>{{ game.language or "—" }}</td>
+<td>{{ game.id }}</td><td><a href="/games/{{ game.id }}">{{ game.title }}</a></td>
+<td>{% if game.is_bgg_recognized %}<a href="{{ game.bgg_url }}">Reconnu</a>{% else %}—{% endif %}</td>
+<td>{{ game.language or "—" }}</td>
 <td>{% if game.min_players and game.max_players %}{{ game.min_players }}–{{ game.max_players }}{% else %}—{% endif %}</td>
 <td>{% if game.min_playtime and game.max_playtime %}{{ game.min_playtime }}–{{ game.max_playtime }} min{% else %}—{% endif %}</td>
 <td>{{ game.year_published or "—" }}</td><td>{{ game.boxes|length }}</td>

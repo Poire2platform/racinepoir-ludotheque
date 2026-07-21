@@ -11,7 +11,7 @@
     <ul>
         {% for box in boxes %}
             <li>
-                <a href="/boxes/{{ box.id }}">{{ box.display_name }}</a>
+                <a href="/boxes/{{ box.id }}">{{ box.display_label }}</a>
 			{% include "partials/box_badges.html" %}
             </li>
         {% endfor %}

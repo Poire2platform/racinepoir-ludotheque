@@ -2,8 +2,8 @@
 {% block title %}Boîte #{{ box.id }} — RacinePoir{% endblock %}
 {% block content %}
 <h2>Boîte #{{ box.id }}</h2>
-<h3>{{ box.display_name }}</h3>
-<p><strong>Jeu référencé :</strong> {% if box.game %}{{ box.game.title }}{% else %}—{% endif %}</p>
+<h3>{{ box.display_label }}</h3>
+<p><strong>Jeu référencé :</strong> {% if box.game %}<a href="/games/{{ box.game.id }}">{{ box.game.title }}</a>{% if box.game.is_bgg_recognized %} <strong>[BGG]</strong>{% endif %}{% else %}—{% endif %}</p>
 <p><strong>Propriétaire :</strong> {{ box.owner.display_name }}</p>
 <p><strong>Détenteur actuel :</strong> {% if box.current_holder %}{{ box.current_holder.display_name }}{% else %}—{% endif %}</p>
 <p><strong>Condition :</strong> {{ box.condition }}</p>
@@ -11,7 +11,29 @@
 <p><strong>Status :</strong> {{ box.lifecycle_status }}</p>
 <p><strong>QR token :</strong> <code>{{ box.qr_code_token }}</code></p>
 {% if box.notes %}<p><strong>Notes :</strong> {{ box.notes }}</p>{% endif %}
+{% if current_user.is_authenticated and (current_user.role == "admin" or box.owner_user_id == current_user.id) %}
+<p><a href="/boxes/{{ box.id }}/edit">Modifier cette boîte</a></p>
+<p><a href="/boxes/{{ box.id }}/label">Imprimer l’étiquette</a></p>
+{% endif %}
 <hr>
+
+{% if users %}
+<h3>Changer le détenteur</h3>
+<form method="post" action="/boxes/{{ box.id }}/transfer">
+    <p>
+        <label for="current_holder_user_id">Nouveau détenteur</label><br>
+        <select id="current_holder_user_id" name="current_holder_user_id">
+            {% for user in users %}
+                <option value="{{ user.id }}" {% if box.current_holder_user_id == user.id %}selected{% endif %}>
+                    {{ user.display_name }}
+                </option>
+            {% endfor %}
+        </select>
+    </p>
+    <p><button type="submit">Changer le détenteur</button></p>
+</form>
+<hr>
+{% endif %}
 
 <h3>J’ai cette boîte</h3>
 {% if current_user.is_authenticated %}
@@ -46,7 +68,16 @@
     <p><a href="/login">Connecte-toi</a> pour demander cette boîte.</p>
 {% endif %}
 <hr>
-<h3>État</h3><p><a href="/boxes/{{ box.id }}/mark-lost">Marquer comme perdue</a></p>
+<h3>État</h3>
+{% if current_user.is_authenticated and (current_user.role == "admin" or box.owner_user_id == current_user.id) %}
+    {% if box.lifecycle_status == "lost" %}
+        <p><a href="/boxes/{{ box.id }}/mark-active">Remettre active</a></p>
+    {% else %}
+        <p><a href="/boxes/{{ box.id }}/mark-lost">Marquer comme perdue</a></p>
+    {% endif %}
+{% else %}
+    <p>Aucune action disponible.</p>
+{% endif %}
 <hr>
 <h3>Historique</h3>
 {% if events %}

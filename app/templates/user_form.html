@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}{% if mode == "edit" %}Modifier utilisateur{% else %}Nouvel utilisateur{% endif %} — RacinePoir{% endblock %}
+
+{% block content %}
+<h2>{% if mode == "edit" %}Modifier utilisateur{% else %}Nouvel utilisateur{% endif %}</h2>
+
+{% if error %}
+    <p><strong>{{ error }}</strong></p>
+{% endif %}
+
+<form method="post">
+    <p>
+        <label for="display_name">Nom affiché</label><br>
+        <input id="display_name" name="display_name" required value="{{ form.get('display_name', '') }}">
+    </p>
+
+    <p>
+        <label for="username">Username</label><br>
+        <input id="username" name="username" required value="{{ form.get('username', '') }}">
+    </p>
+
+    <p>
+        <label for="email">Email</label><br>
+        <input id="email" name="email" type="email" required value="{{ form.get('email', '') }}">
+    </p>
+
+    <p>
+        <label for="password">{% if mode == "edit" %}Nouveau mot de passe{% else %}Mot de passe temporaire{% endif %}</label><br>
+        <input id="password" name="password" type="password" {% if mode != "edit" %}required{% endif %}>
+    </p>
+
+    <p>
+        <label for="role">Rôle</label><br>
+        <select id="role" name="role">
+            {% for role in roles %}
+                <option value="{{ role }}" {% if form.get('role', 'member') == role %}selected{% endif %}>
+                    {{ role }}
+                </option>
+            {% endfor %}
+        </select>
+    </p>
+
+    <p>
+        <label>
+            <input type="checkbox" name="is_active" value="yes" {% if form.get('is_active') == 'yes' %}checked{% endif %}>
+            Actif
+        </label>
+    </p>
+
+    <p>
+        <button type="submit">{% if mode == "edit" %}Enregistrer{% else %}Créer l’utilisateur{% endif %}</button>
+        <a href="/users">Annuler</a>
+    </p>
+</form>
+{% endblock %}

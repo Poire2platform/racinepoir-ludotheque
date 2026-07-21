@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Utilisateurs — RacinePoir{% endblock %}
+
+{% block content %}
+<h2>Utilisateurs</h2>
+
+<p><a href="/users/new">Ajouter un utilisateur</a></p>
+
+{% if users %}
+<table border="1" cellpadding="6">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Rôle</th>
+            <th>Actif</th>
+            <th>Boîtes possédées</th>
+            <th>Boîtes détenues</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+            <tr>
+                <td>{{ user.display_name }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.role }}</td>
+                <td>{% if user.is_active %}oui{% else %}non{% endif %}</td>
+                <td>{{ user.owned_boxes|length }}</td>
+                <td>{{ user.held_boxes|length }}</td>
+                <td><a href="/users/{{ user.id }}/edit">Modifier</a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+    <p>Aucun utilisateur trouvé.</p>
+{% endif %}
+{% endblock %}

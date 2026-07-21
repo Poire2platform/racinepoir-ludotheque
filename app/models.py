@@ -42,6 +42,16 @@ class Game(db.Model):
     updated_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utcnow, onupdate=utcnow)
     boxes = db.relationship("Box", back_populates="game")
 
+    @property
+    def is_bgg_recognized(self):
+        return self.bgg_id is not None
+
+    @property
+    def bgg_url(self):
+        if not self.bgg_id:
+            return None
+        return f"https://boardgamegeek.com/boardgame/{self.bgg_id}"
+
 class Box(db.Model):
     __tablename__ = "boxes"
     id = db.Column(db.Integer, primary_key=True)
@@ -82,6 +92,12 @@ class Box(db.Model):
             if r.requester_user_id == user.id:
                 return index
         return None
+
+    @property
+    def display_label(self):
+        if self.game:
+            return f"{self.game.title} - boîte #{self.id}"
+        return f"Boîte #{self.id}"
 
 class BoxRequest(db.Model):
     __tablename__ = "box_requests"

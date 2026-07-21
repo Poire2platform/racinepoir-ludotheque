@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Mon profil — RacinePoir{% endblock %}
+
+{% block content %}
+<h2>Mon profil</h2>
+
+{% if error %}
+    <p><strong>{{ error }}</strong></p>
+{% endif %}
+
+<p>Username : <code>{{ current_user.username }}</code></p>
+<p>Rôle : <code>{{ current_user.role }}</code></p>
+
+<form method="post">
+    <p>
+        <label for="display_name">Nom affiché</label><br>
+        <input id="display_name" name="display_name" required value="{{ form.get('display_name', '') }}">
+    </p>
+
+    <p>
+        <label for="email">Email</label><br>
+        <input id="email" name="email" type="email" required value="{{ form.get('email', '') }}">
+    </p>
+
+    <hr>
+
+    <h3>Changer mon mot de passe</h3>
+    <p>Laisse ces champs vides si tu ne veux pas changer ton mot de passe.</p>
+
+    <p>
+        <label for="current_password">Mot de passe actuel</label><br>
+        <input id="current_password" name="current_password" type="password">
+    </p>
+
+    <p>
+        <label for="new_password">Nouveau mot de passe</label><br>
+        <input id="new_password" name="new_password" type="password">
+    </p>
+
+    <p><button type="submit">Enregistrer</button></p>
+</form>
+{% endblock %}

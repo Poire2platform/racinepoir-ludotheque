@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Étiquette — {{ box.display_label }}{% endblock %}
+
+{% block content %}
+<style>
+@media print {
+    header,
+    .print-actions {
+        display: none;
+    }
+}
+
+.box-label {
+    border: 1px solid #222;
+    padding: 18px;
+    width: 320px;
+}
+
+.box-label h2,
+.box-label p {
+    margin: 0 0 10px;
+}
+
+.box-label img {
+    display: block;
+    height: 220px;
+    width: 220px;
+    margin: 12px 0;
+}
+</style>
+
+<div class="print-actions">
+    <p><a href="/boxes/{{ box.id }}">Retour à la boîte</a></p>
+    <p><button onclick="window.print()">Imprimer</button></p>
+</div>
+
+<section class="box-label">
+    <h2>RacinePoir</h2>
+    <p><strong>{{ box.display_label }}</strong></p>
+    <p>Propriétaire : {{ box.owner.display_name }}</p>
+    <img src="/boxes/{{ box.id }}/qr.png" alt="QR code pour {{ box.display_label }}">
+    <p>Scanner / réclamer :</p>
+    <p><code>{{ scan_url }}</code></p>
+    <p>Token : <code>{{ box.qr_code_token }}</code></p>
+</section>
+{% endblock %}

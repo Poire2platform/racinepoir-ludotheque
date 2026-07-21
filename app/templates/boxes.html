@@ -2,6 +2,9 @@
 {% block title %}Boîtes — RacinePoir{% endblock %}
 {% block content %}
 <h2>Boîtes physiques</h2>
+{% if current_user.is_authenticated %}
+<p><a href="/boxes/new">Ajouter une boîte</a></p>
+{% endif %}
 {% if boxes %}
 <table border="1" cellpadding="6">
 <thead><tr><th>ID</th><th>Boîte</th><th>Jeu référencé</th><th>Propriétaire</th><th>Détenteur actuel</th><th>File d’attente</th><th>Condition</th><th>Status</th><th>Action</th></tr></thead>
@@ -9,7 +12,7 @@
 {% for box in boxes %}
 <tr>
 <td>{{ box.id }}</td>
-<td><a href="/boxes/{{ box.id }}">{{ box.display_name }}</a></td>
+<td><a href="/boxes/{{ box.id }}">{{ box.display_label }}</a></td>
 <td>{% if box.game %}{{ box.game.title }}{% else %}—{% endif %}</td>
 <td>{{ box.owner.display_name }}</td>
 <td>{% if box.current_holder %}{{ box.current_holder.display_name }}{% else %}—{% endif %}</td>

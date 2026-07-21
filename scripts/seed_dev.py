@@ -23,11 +23,12 @@ def create_game(title, language="FR", publisher=None, year_published=None, min_p
     db.session.flush()
     return game
 
-def create_box(display_name, owner, current_holder, qr_code_token, game=None, condition="good", availability_status="available", lifecycle_status="active", notes=None):
-    box = Box(display_name=display_name, game_id=game.id if game else None, owner_user_id=owner.id, current_holder_user_id=current_holder.id if current_holder else None, qr_code_token=qr_code_token, condition=condition, availability_status=availability_status, lifecycle_status=lifecycle_status, notes=notes)
+def create_box(owner, qr_code_token, game, current_holder=None, condition="good", availability_status="available", lifecycle_status="active", notes=None):
+    current_holder = current_holder or owner
+    box = Box(display_name=game.title, game_id=game.id, owner_user_id=owner.id, current_holder_user_id=current_holder.id, qr_code_token=qr_code_token, condition=condition, availability_status=availability_status, lifecycle_status=lifecycle_status, notes=notes)
     db.session.add(box)
     db.session.flush()
-    db.session.add(BoxEvent(box_id=box.id, event_type="created", actor_user_id=owner.id, to_holder_user_id=current_holder.id if current_holder else None, notes=f"Boîte créée. Détenteur initial : {current_holder.display_name if current_holder else 'inconnu'}."))
+    db.session.add(BoxEvent(box_id=box.id, event_type="created", actor_user_id=owner.id, to_holder_user_id=current_holder.id, notes=f"Boîte créée. Détenteur initial : {current_holder.display_name}."))
     return box
 
 def create_request(box, requester):
@@ -49,17 +50,18 @@ def seed():
     terraform = create_game("Terraforming Mars", "EN", "FryxGames", 2016, 1, 5, 120, 180, 3.3)
     ticket = create_game("Ticket to Ride Europe", "FR", "Days of Wonder", 2005, 2, 5, 45, 90, 1.9)
 
-    catan_box = create_box("Catan — boîte de Max", max_user, anouk_user, "dev-catan-box-001", catan, notes="Appartient à Max, présentement entre les mains d’Anouk.")
+    catan_box = create_box(max_user, "dev-catan-box-001", catan, current_holder=anouk_user, notes="Appartient à Max, présentement entre les mains d’Anouk.")
     create_request(catan_box, max_user)
     create_request(catan_box, frere_user)
 
-    azul_box = create_box("Azul — boîte d’Anouk", anouk_user, max_user, "dev-azul-box-001", azul, notes="Appartient à Anouk, présentement entre les mains de Max.")
+    azul_box = create_box(anouk_user, "dev-azul-box-001", azul, current_holder=max_user, notes="Appartient à Anouk, présentement entre les mains de Max.")
     create_request(azul_box, anouk_user)
 
-    create_box("Terraforming Mars — boîte du frère", frere_user, frere_user, "dev-terraform-box-001", terraform, condition="worn", notes="Appartient au frère, déjà entre ses mains.")
-    create_box("Ticket to Ride Europe — boîte communautaire", admin, None, "dev-ticket-box-001", ticket, condition="unknown", notes="Détenteur courant inconnu ou communautaire.")
+    create_box(frere_user, "dev-terraform-box-001", terraform, condition="worn", notes="Appartient au frère, déjà entre ses mains.")
+    create_box(admin, "dev-ticket-box-001", ticket, condition="unknown", notes="Boîte communautaire administrée par Admin.")
 
-    risk_box = create_box("Vieille boîte de Risk non cataloguée", max_user, frere_user, "dev-risk-box-uncatalogued-001", None, condition="unknown", notes="Exemple de boîte sans fiche Game liée.")
+    risk = create_game("Risk", "FR")
+    risk_box = create_box(max_user, "dev-risk-box-uncatalogued-001", risk, current_holder=frere_user, condition="unknown", notes="Vieille boîte de Risk.")
     create_request(risk_box, max_user)
 
     db.session.commit()
