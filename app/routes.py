@@ -390,6 +390,11 @@ def games():
     return render_template("games.html", games=Game.query.order_by(Game.title.asc()).all())
 
 
+@main.route("/security")
+def security_journal():
+    return render_template("security_journal.html")
+
+
 @main.route("/games/<int:game_id>")
 def game_detail(game_id):
     game = Game.query.get_or_404(game_id)

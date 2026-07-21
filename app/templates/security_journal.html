@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Journal sécurité — RacinePoir{% endblock %}
+
+{% block content %}
+<h2>Journal de principe sécurité</h2>
+
+<p>
+    Cette page sert de trace lisible des décisions de sécurité de la Ludothèque :
+    ce qu’on protège, pourquoi on le fait, et comment les choix sont appliqués
+    dans l’application ou dans l’infrastructure.
+</p>
+
+<section>
+    <h3>Intention générale</h3>
+    <p>
+        Le but n’est pas de prétendre qu’un petit projet est invincible. Le but
+        est de construire proprement : limiter ce qui est exposé, éviter les
+        changements d’état accidentels, garder les secrets hors du code, et
+        rendre les opérations importantes vérifiables.
+    </p>
+</section>
+
+<section>
+    <h3>Schéma cible</h3>
+    <pre><code>Internet
+  ↓
+DNS / Cloudflare
+  ↓
+Reverse proxy HTTPS
+  ↓
+Application Flask
+  ↓
+Base de données privée</code></pre>
+    <p>
+        Le navigateur ne parle jamais directement à la base de données. Le public
+        arrive par HTTPS, puis le proxy transmet seulement les requêtes utiles à
+        l’application.
+    </p>
+</section>
+
+<section>
+    <h3>Décisions appliquées</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Principe</th>
+                <th>Application</th>
+                <th>Pourquoi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Une visite ne doit pas modifier les données</td>
+                <td>Les actions importantes utilisent POST au lieu de GET.</td>
+                <td>Un lien, un robot, un aperçu de navigateur ou un QR scanné ne devrait pas changer la DB par accident.</td>
+            </tr>
+            <tr>
+                <td>Confirmation avant mutation</td>
+                <td>Le scan QR affiche une page de confirmation avant de changer le détenteur.</td>
+                <td>Le scan devient une intention explicite, pas juste une visite d’URL.</td>
+            </tr>
+            <tr>
+                <td>Protection des formulaires</td>
+                <td>Chaque POST exige un jeton CSRF stocké dans la session.</td>
+                <td>Un autre site ne devrait pas pouvoir pousser ton navigateur connecté à faire une action.</td>
+            </tr>
+            <tr>
+                <td>Sessions plus sûres</td>
+                <td>Cookies HttpOnly, SameSite, et flags Secure activables en production HTTPS.</td>
+                <td>Réduire les risques de vol ou d’utilisation abusive des cookies de session.</td>
+            </tr>
+            <tr>
+                <td>Secrets hors du code</td>
+                <td>Configuration par variables d’environnement et fichier .env non commité.</td>
+                <td>Le dépôt peut servir de portfolio sans exposer les clés réelles.</td>
+            </tr>
+            <tr>
+                <td>Défense côté navigateur</td>
+                <td>Headers comme nosniff, frame policy, referrer policy et permissions policy.</td>
+                <td>Donner moins de surface aux abus classiques du navigateur.</td>
+            </tr>
+            <tr>
+                <td>Base de données privée</td>
+                <td>La DB doit rester locale ou accessible seulement sur réseau privé.</td>
+                <td>Le public parle à l’app, pas au stockage brut.</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+<section>
+    <h3>À propos des ports</h3>
+    <p>
+        Changer les ports par défaut peut réduire le bruit dans les logs, surtout
+        pour SSH. Par exemple, un SSH qui n’écoute pas sur 22 recevra souvent
+        moins de tentatives automatisées.
+    </p>
+    <p>
+        Par contre, ce n’est pas une vraie protection forte : un scan sérieux
+        peut retrouver les services ouverts. Pour la sécurité réelle, on préfère :
+    </p>
+    <ul>
+        <li>n’exposer publiquement que 80/443;</li>
+        <li>restreindre SSH par clé, firewall, VPN ou allowlist;</li>
+        <li>garder la DB fermée à Internet;</li>
+        <li>mettre du rate limiting sur login et scan;</li>
+        <li>surveiller les logs et garder des backups.</li>
+    </ul>
+    <p>
+        Donc oui, changer certains ports peut aider comme mesure anti-bruit, mais
+        on ne doit pas compter dessus comme pilier principal. C’est une haie, pas
+        un mur.
+    </p>
+</section>
+
+<section>
+    <h3>Prochaines couches prévues</h3>
+    <ol>
+        <li>Rate limiting sur login et confirmation de scan.</li>
+        <li>Logs structurés pour les événements sensibles.</li>
+        <li>Endpoint local de santé, par exemple <code>/healthz</code>.</li>
+        <li>Script de backup de la base de données.</li>
+        <li>Guide de déploiement serveur avec service systemd et reverse proxy.</li>
+    </ol>
+</section>
+{% endblock %}
