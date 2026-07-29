@@ -105,10 +105,10 @@ STAB-08
 | STAB-03 | `DONE` | Vérifier la compilation Python | `compileall` retourne `0` |
 | STAB-04 | `DONE` | Reconstruire les tables PostgreSQL | 8 tables applicatives + Alembic |
 | STAB-05 | `DONE` | Vérifier Alembic | `9a1f4e5d8c20 (head)` |
-| STAB-06 | `VERIFY` | Recréer le compte `admin` de Maxime | Compte actif; mot de passe courant à confirmer |
+| STAB-06 | `DONE` | Recréer le compte `admin` de Maxime | Compte actif et connexion validée |
 | STAB-07 | `DONE` | Configurer le token BGG hors dépôt | Recherche BGG ne réclame plus le token |
 | STAB-08 | `DONE` | Exécuter et vérifier le seed non destructif | Deux exécutions stables; compte `admin` inchangé |
-| STAB-09 | `VERIFY` | Effectuer un test de fumée complet | Navigation validée; connexion réelle à confirmer |
+| STAB-09 | `DONE` | Effectuer un test de fumée complet | Login, fiches et navigation validés sans traceback |
 | STAB-10 | `DONE` | Vérifier l’ajout manuel d’une boîte sans dépendre de BGG | Test automatisé réussi sans appel BGG |
 | STAB-11 | `NEXT` | Vérifier les routes POST sensibles | Aucun changement d’état important par simple GET |
 | STAB-12 | `NEXT` | Committer le checkpoint stable | Branche propre, commit nommé et `logthis` |
@@ -117,8 +117,7 @@ STAB-08
 Ordre recommandé :
 
 ```text
-Confirmer le mot de passe `admin`
-→ STAB-11
+STAB-11
 → STAB-12
 ```
 

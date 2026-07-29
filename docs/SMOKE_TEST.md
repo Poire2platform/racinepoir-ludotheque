@@ -36,11 +36,11 @@ Ces parcours sont en lecture et ne doivent pas modifier SQL101 :
 - [x] `/sessions`;
 - [x] `/players`;
 - [x] `/users` comme administrateur;
-- [ ] connexion manuelle avec le mot de passe administratif courant.
+- [x] connexion avec le mot de passe administratif courant.
 
-Le 29 juillet 2026, le mot de passe de développement documenté `admin123` n’était
-plus valide sur SQL101. Ne pas réinitialiser ce mot de passe dans le cadre d’un test
-de fumée; le propriétaire doit confirmer ou renouveler l’identifiant séparément.
+Le 29 juillet 2026, le mot de passe de développement `admin123` a été renouvelé
+avec l’autorisation du propriétaire, puis la connexion réelle sur SQL101 a été
+validée.
 
 ## Avant un checkpoint
 
