@@ -58,7 +58,7 @@ Règles :
 | Token BGG | Configuré hors dépôt |
 | Anciennes données | Non récupérées |
 | Données de démonstration | Seed non destructif exécuté deux fois et vérifié |
-| Tests automatisés actifs | 9 tests `pytest` réussis sur SQLite isolée |
+| Tests automatisés actifs | 10 tests `pytest` réussis sur SQLite isolée |
 
 ---
 
@@ -72,7 +72,7 @@ Règles :
 | REPO-02 | `DONE` | Résoudre les marqueurs de conflit du README | Aucun marqueur de conflit restant |
 | REPO-03 | `DONE` | Vérifier la branche de réparation | Branche `repair/manual-stabilization-2026-07-29` confirmée |
 | REPO-04 | `DONE` | Configurer les dépendances de test | `pytest` installé via `requirements-dev.txt` |
-| REPO-05 | `DONE` | Récupérer ou recréer les premiers tests critiques | 9 tests relus, adaptés et réussis |
+| REPO-05 | `DONE` | Récupérer ou recréer les premiers tests critiques | 10 tests relus, adaptés et réussis |
 | REPO-06 | `DONE` | Créer un checkpoint d’hygiène ciblé | Diff vérifié et commit sans `git add -A` aveugle |
 
 Constats du 29 juillet 2026 :
@@ -105,10 +105,10 @@ STAB-08
 | STAB-03 | `DONE` | Vérifier la compilation Python | `compileall` retourne `0` |
 | STAB-04 | `DONE` | Reconstruire les tables PostgreSQL | 8 tables applicatives + Alembic |
 | STAB-05 | `DONE` | Vérifier Alembic | `9a1f4e5d8c20 (head)` |
-| STAB-06 | `DONE` | Recréer le compte `admin` de Maxime | Compte admin actif validé |
+| STAB-06 | `VERIFY` | Recréer le compte `admin` de Maxime | Compte actif; mot de passe courant à confirmer |
 | STAB-07 | `DONE` | Configurer le token BGG hors dépôt | Recherche BGG ne réclame plus le token |
 | STAB-08 | `DONE` | Exécuter et vérifier le seed non destructif | Deux exécutions stables; compte `admin` inchangé |
-| STAB-09 | `NEXT` | Effectuer un test de fumée complet | Login, jeux, boîtes, détails et navigation sans traceback |
+| STAB-09 | `VERIFY` | Effectuer un test de fumée complet | Navigation validée; connexion réelle à confirmer |
 | STAB-10 | `DONE` | Vérifier l’ajout manuel d’une boîte sans dépendre de BGG | Test automatisé réussi sans appel BGG |
 | STAB-11 | `NEXT` | Vérifier les routes POST sensibles | Aucun changement d’état important par simple GET |
 | STAB-12 | `NEXT` | Committer le checkpoint stable | Branche propre, commit nommé et `logthis` |
@@ -117,7 +117,7 @@ STAB-08
 Ordre recommandé :
 
 ```text
-STAB-09
+Confirmer le mot de passe `admin`
 → STAB-11
 → STAB-12
 ```
@@ -157,8 +157,8 @@ STAB-09
 
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
-| QA-01 | `NEXT` | Créer une checklist de test manuel | Parcours reproductibles |
-| QA-02 | `VERIFY` | Ajouter des tests automatisés critiques | 9 tests réussis; couverture critique à compléter |
+| QA-01 | `DONE` | Créer une checklist de test manuel | `docs/SMOKE_TEST.md` |
+| QA-02 | `VERIFY` | Ajouter des tests automatisés critiques | 10 tests réussis; couverture critique à compléter |
 | QA-03 | `NEXT` | Vérifier les migrations sur une DB vide | `db upgrade` fonctionne de zéro |
 | QA-04 | `NEXT` | Tester un redémarrage de l’application | Aucun état temporaire nécessaire |
 | QA-05 | `NEXT` | Vérifier les erreurs utilisateur | Pas de traceback visible |

@@ -162,3 +162,33 @@ def test_scan_changes_holder_and_fulfills_request(
         assert refreshed_box.current_holder_user_id == requester.id
         assert refreshed_request.status == "fulfilled"
         assert refreshed_request.fulfilled_at is not None
+
+
+def test_authenticated_navigation_smoke(
+    client,
+    make_user,
+    make_box,
+    login_as,
+):
+    admin = make_user("admin", role="admin")
+    box = make_box(admin, token="smoke-box")
+    login_as(admin)
+
+    paths = (
+        "/",
+        "/games",
+        f"/games/{box.game_id}",
+        "/boxes",
+        f"/boxes/{box.id}",
+        "/me/held-boxes",
+        "/me/owned-boxes",
+        "/sessions",
+        "/players",
+        "/users",
+        "/scan/smoke-box",
+        "/healthz",
+    )
+
+    for path in paths:
+        response = client.get(path)
+        assert response.status_code == 200, path
