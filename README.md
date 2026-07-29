@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 RacinePoir Ludothèque
 =====================
 
@@ -65,11 +64,21 @@ SECRET_KEY=...
 Optional, for BoardGameGeek enrichment:
 
 ```env
+BGG_API_TOKEN_FILE=/home/pmax/.config/racinepoir/bgg_token
+```
+
+The file referenced by `BGG_API_TOKEN_FILE` should contain only the token text, one line, and be restricted to the app owner (for example `chmod 600`; owner `pmax`).
+
+The app still supports the legacy environment variable:
+
+```env
 BGG_API_TOKEN=...
 ```
 
+If both are present, `BGG_API_TOKEN_FILE` is used first.
+
 BGG API access currently requires registering an application/token with BoardGameGeek.
-Without `BGG_API_TOKEN`, the app still works, but BGG lookup actions show a configuration message.
+Without a configured token or token file, the app still works, but BGG lookup actions show a configuration message.
 
 Development Data
 ----------------
@@ -216,12 +225,20 @@ For printed QR labels, use a stable hostname/base URL when running the app. A QR
 Checks
 ------
 
+Install the development-only test dependencies:
+
+```bash
+python -m pip install -r requirements-dev.txt
+```
+
+Run the automated tests:
+
+```bash
+python -m pytest
+```
+
 Quick syntax check:
 
 ```bash
-cd app
-python3 -m compileall .
+python -m compileall app tests scripts
 ```
-=======
-# racinepoir-ludotheque
->>>>>>> 295e4dbb376eb7214a63674a591eb99bb9b029d9

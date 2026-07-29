@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from urllib.parse import urlencode
 from urllib.error import HTTPError, URLError
 from urllib.request import Request
@@ -12,11 +13,39 @@ BGG_API_BASE = "https://boardgamegeek.com/xmlapi2"
 class BggApiError(Exception):
     pass
 
+def _load_bgg_token():
+    token_file = os.getenv("BGG_API_TOKEN_FILE")
+
+    if token_file:
+        path = Path(token_file).expanduser()
+
+        try:
+            token = path.read_text(encoding="utf-8").strip()
+        except OSError as exc:
+            raise BggApiError(
+                f"Impossible de lire le fichier du token BGG : {path}"
+            ) from exc
+
+        if not token:
+            raise BggApiError(
+                f"Le fichier du token BGG est vide : {path}"
+            )
+
+        return token
+
+    # Compatibilité temporaire avec l’ancienne configuration.
+    token = os.getenv("BGG_API_TOKEN", "").strip()
+
+    if token:
+        return token
+
+    raise BggApiError(
+        "Configure BGG_API_TOKEN_FILE pour utiliser BoardGameGeek."
+    )
+
 
 def _fetch_xml(path, params):
-    token = os.getenv("BGG_API_TOKEN")
-    if not token:
-        raise BggApiError("Configure BGG_API_TOKEN pour chercher dans BoardGameGeek.")
+    token = _load_bgg_token()
 
     url = f"{BGG_API_BASE}/{path}?{urlencode(params)}"
     request = Request(

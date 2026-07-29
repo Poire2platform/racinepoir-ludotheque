@@ -4,9 +4,7 @@
 **Rôle du document :** tableau de suivi opérationnel du projet.  
 **Dernière mise à jour :** 29 juillet 2026  
 **Sources complémentaires :**
-- `docs/PRODUCT_DECISIONS.md`
-- `docs/DEPLOYMENT_PLAN.md`
-- `AGENTS.md`
+- `docs/infra-plan.md`
 - code et migrations de la branche active
 
 ---
@@ -60,10 +58,43 @@ Règles :
 | Token BGG | Configuré hors dépôt |
 | Anciennes données | Non récupérées |
 | Données de démonstration | À confirmer |
+| Tests automatisés actifs | 8 tests `pytest` réussis sur SQLite isolée |
 
 ---
 
 # 3. Board principal
+
+## PHASE -1 — Hygiène du dépôt
+
+| ID | Statut | Tâche | Critère d’acceptation |
+|---|---|---|---|
+| REPO-01 | `DONE` | Inventorier la branche et les changements locaux | Branche et provenance des fichiers documentées |
+| REPO-02 | `DONE` | Résoudre les marqueurs de conflit du README | Aucun marqueur de conflit restant |
+| REPO-03 | `DONE` | Vérifier la branche de réparation | Branche `repair/manual-stabilization-2026-07-29` confirmée |
+| REPO-04 | `DONE` | Configurer les dépendances de test | `pytest` installé via `requirements-dev.txt` |
+| REPO-05 | `DONE` | Récupérer ou recréer les premiers tests critiques | 8 tests relus, adaptés et réussis |
+| REPO-06 | `DONE` | Créer un checkpoint d’hygiène ciblé | Diff vérifié et commit sans `git add -A` aveugle |
+
+Constats du 29 juillet 2026 :
+
+- les changements locaux concernent le token BGG et le seed non destructif;
+- le seed a été inspecté statiquement, mais n’a pas encore été exécuté;
+- `tests/test_public_signup.py` existe dans `rescue/unstable-2026-07-22` et doit être
+  relu avant toute récupération sélective; ses scénarios utiles ont été recréés
+  proprement plutôt que de restaurer le fichier tel quel;
+- la branche de sauvetage complète ne doit pas être fusionnée;
+- les tests utilisent SQLite en mémoire et ne touchent pas SQL101;
+- les avertissements Flask-Login et SQLAlchemy sur des API dépréciées sont une
+  dette technique non bloquante;
+- le déploiement demeure en pause jusqu’au checkpoint stable.
+
+Ordre recommandé :
+
+```text
+STAB-08
+```
+
+---
 
 ## PHASE 0 — Stabilisation immédiate
 
@@ -76,9 +107,9 @@ Règles :
 | STAB-05 | `DONE` | Vérifier Alembic | `9a1f4e5d8c20 (head)` |
 | STAB-06 | `DONE` | Recréer le compte admin `max` | Login et mot de passe validés |
 | STAB-07 | `DONE` | Configurer le token BGG hors dépôt | Recherche BGG ne réclame plus le token |
-| STAB-08 | `NEXT` | Vérifier ou exécuter le seed non destructif | Users, jeux et boîtes de test présents sans supprimer `max` |
+| STAB-08 | `VERIFY` | Exécuter et vérifier le seed non destructif | Users, jeux et boîtes de test présents sans supprimer ou rétrograder `max` |
 | STAB-09 | `NEXT` | Effectuer un test de fumée complet | Login, jeux, boîtes, détails et navigation sans traceback |
-| STAB-10 | `NEXT` | Corriger l’ajout manuel d’une boîte sans dépendre de BGG | Une boîte peut être créée sans recherche BGG |
+| STAB-10 | `DONE` | Vérifier l’ajout manuel d’une boîte sans dépendre de BGG | Test automatisé réussi sans appel BGG |
 | STAB-11 | `NEXT` | Vérifier les routes POST sensibles | Aucun changement d’état important par simple GET |
 | STAB-12 | `NEXT` | Committer le checkpoint stable | Branche propre, commit nommé et `logthis` |
 | STAB-13 | `LATER` | Examiner la branche de sauvetage | Récupérer seulement les changements utiles |
@@ -88,7 +119,6 @@ Ordre recommandé :
 ```text
 STAB-08
 → STAB-09
-→ STAB-10
 → STAB-11
 → STAB-12
 ```
@@ -116,9 +146,9 @@ STAB-08
 | MVP-15 | `VERIFY` | Vue “Chez moi” | Filtre par détenteur |
 | MVP-16 | `VERIFY` | Vue “Mes boîtes” | Filtre par propriétaire |
 | MVP-17 | `NEXT` | Recherche et filtres | Titre, propriétaire, détenteur, statut |
-| MVP-18 | `NEXT` | Permissions applicatives | Admin et membre séparés |
+| MVP-18 | `VERIFY` | Permissions applicatives | Séparation admin/membre testée; autres permissions à couvrir |
 | MVP-19 | `NEXT` | Gestion des utilisateurs | Création, activation, rôle |
-| MVP-20 | `VERIFY` | `/healthz` | `200` si app/DB OK, `503` sinon |
+| MVP-20 | `VERIFY` | `/healthz` | Cas app/DB disponibles testé; cas DB indisponible à couvrir |
 | MVP-21 | `VERIFY` | Rate limiting | Protection sans casser les tests |
 | MVP-22 | `LATER` | Statistiques de parties | Non bloquant |
 
@@ -129,7 +159,7 @@ STAB-08
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
 | QA-01 | `NEXT` | Créer une checklist de test manuel | Parcours reproductibles |
-| QA-02 | `NEXT` | Ajouter des tests automatisés critiques | Login, scan, demande, permissions |
+| QA-02 | `VERIFY` | Ajouter des tests automatisés critiques | 8 tests réussis; couverture critique à compléter |
 | QA-03 | `NEXT` | Vérifier les migrations sur une DB vide | `db upgrade` fonctionne de zéro |
 | QA-04 | `NEXT` | Tester un redémarrage de l’application | Aucun état temporaire nécessaire |
 | QA-05 | `NEXT` | Vérifier les erreurs utilisateur | Pas de traceback visible |
@@ -140,6 +170,10 @@ STAB-08
 ---
 
 ## PHASE 3 — Préparer WEB01
+
+Cette phase commence seulement après `DB-01` à `DB-05`. Le code et les fichiers de
+configuration sont préparés côté développement; leur installation sur WEB01 relève
+de l’administration système.
 
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
@@ -163,6 +197,9 @@ STAB-08
 
 ## PHASE 4 — Base de production
 
+Malgré sa numérotation, la préparation `DB-01` à `DB-05` précède le déploiement
+applicatif `WEB-08` à `WEB-11`.
+
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
 | DB-01 | `BLOCKED` | Choisir DB actuelle ou DB prod séparée | Décision écrite |
@@ -180,6 +217,16 @@ Recommandation :
 DB : racinepoir_ludotheque_prod
 Rôle : racinepoir_prod
 Source autorisée : 192.168.18.38/32
+```
+
+Ordre de passage vers WEB01 :
+
+```text
+DB-01 → DB-05
+→ WEB-08 → WEB-10
+→ WEB-11 / DB-06
+→ DB-07
+→ DB-08
 ```
 
 ---
@@ -276,17 +323,34 @@ Décider avant publication s’il faut ajouter :
 
 # 5. Prochain sprint recommandé
 
-## Sprint Stabilisation
+## Sprint Hygiène et stabilisation
 
-### Carte 1 — Données de démonstration
+### Carte 1 — Infrastructure de test (`DONE`)
 
 ```text
-Vérifier si seed_sample_data.py a été exécuté.
-Confirmer que max reste admin.
-Confirmer que le seed est non destructif.
+Créer requirements-dev.txt.
+Installer pytest dans le venv de développement.
+Revoir le test récupérable dans la branche de sauvetage.
+Ajouter les premiers tests critiques.
 ```
 
-### Carte 2 — Test de fumée
+### Carte 2 — Checkpoint d’hygiène (`DONE`)
+
+```text
+Vérifier chaque fichier modifié.
+Exclure les caches et artefacts.
+Créer un commit précis sans git add -A aveugle.
+```
+
+### Carte 3 — Données de démonstration
+
+```text
+Exécuter seed_sample_data.py sur la base de développement seulement.
+Confirmer que max reste admin.
+Confirmer qu’une seconde exécution ne crée pas de doublons.
+```
+
+### Carte 4 — Test de fumée
 
 ```text
 /login
@@ -304,34 +368,55 @@ Mes boîtes
 /healthz
 ```
 
-### Carte 3 — Ajout manuel sans BGG
+### Carte 5 — Ajout manuel sans BGG
 
 ```text
-BGG enrichit un jeu, mais ne bloque jamais la création manuelle.
+Vérifier que BGG enrichit un jeu, mais ne bloque jamais la création manuelle.
 ```
 
-### Carte 4 — Checkpoint Git
+### Carte 6 — Checkpoint stable
 
 ```bash
 git status
-git add -A
-git commit -m "Stabilize database recovery and development setup"
+# Ajouter explicitement seulement les fichiers vérifiés.
+git add <fichiers-vérifiés>
+git commit -m "Stabilize development application"
 logthis "Ludothèque: schéma DB reconstruit et environnement de développement stabilisé"
 ```
 
-### Carte 5 — Revenir au déploiement
+### Carte 7 — Revenir au déploiement
 
 ```text
-WEB-01
-→ WEB-05
-→ DB-01
-→ WEB-09
-→ WEB-15
+DB-01 → DB-05
+→ WEB-01 → WEB-10
+→ WEB-11 / DB-06
+→ WEB-12 → WEB-15
 ```
 
 ---
 
-# 6. Définition de “première version web prête”
+# 6. Matrice de responsabilités
+
+| Domaine | Responsable principal |
+|---|---|
+| Produit et décisions finales | Maxime |
+| Code applicatif | Codex, sous validation de Maxime |
+| Revue technique et planification | ChatGPT Projet |
+| Proxmox et WEB01 | Maxime |
+| PostgreSQL et SQL101 | Maxime |
+| DNS interne et public | Maxime |
+| UX/UI visuel | Designer et Maxime |
+| Déclenchement du déploiement | Maxime |
+| Réception des alertes | Maxime |
+| Rollback | Maxime, selon la procédure documentée |
+
+Pour les éléments partagés comme systemd, Caddy, les migrations et les sauvegardes,
+Codex prépare les fichiers, commandes et validations. Maxime autorise et exécute les
+changements sur l’infrastructure.
+
+---
+
+# 7. Définition de “première version web prête”
 
 - [ ] branche stable et propre;
 - [ ] migrations reproductibles;
@@ -350,7 +435,7 @@ WEB-01
 
 ---
 
-# 7. Commandes de suivi
+# 8. Commandes de suivi
 
 Afficher les tâches `NEXT` :
 
