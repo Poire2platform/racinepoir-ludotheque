@@ -1,0 +1,373 @@
+# PROJECT_BOARD.md
+## RacinePoir — Ludothèque distribuée
+
+**Rôle du document :** tableau de suivi opérationnel du projet.  
+**Dernière mise à jour :** 29 juillet 2026  
+**Sources complémentaires :**
+- `docs/PRODUCT_DECISIONS.md`
+- `docs/DEPLOYMENT_PLAN.md`
+- `AGENTS.md`
+- code et migrations de la branche active
+
+---
+
+# 1. Règles d’utilisation
+
+| Statut | Signification |
+|---|---|
+| `DONE` | Terminé et vérifié |
+| `VERIFY` | Présent ou probable, mais doit être testé |
+| `NEXT` | Prochaine tâche à faire |
+| `BLOCKED` | Bloqué par une décision ou un prérequis |
+| `LATER` | Non requis pour la première mise en ligne |
+| `CANCELLED` | Abandonné volontairement |
+
+Règles :
+
+1. Ne travailler que sur une carte `NEXT` à la fois.
+2. Après chaque carte : tester, noter le résultat, committer et ajouter une entrée `logthis`.
+3. Ne jamais déployer un changement non testé sur `pmax-host`.
+4. Ne jamais utiliser `rescue/unstable-2026-07-22` comme branche de production.
+5. Ne jamais exécuter un seed destructif sur une base contenant des données utiles.
+6. Ne pas modifier l’infrastructure et le code dans la même étape sans checkpoint.
+
+---
+
+# 2. Situation actuelle
+
+## Infrastructure
+
+| Élément | État |
+|---|---|
+| Proxmox `Poire1` — `192.168.18.100` | Fonctionnel |
+| Développement `pmax-host` — `192.168.18.18` | Fonctionnel |
+| PostgreSQL `SQL101` — `192.168.18.30` | Fonctionnel |
+| DNS `poire1-dns` — `192.168.18.34` | Fonctionnel |
+| Portal — `http://poire1-portal.home.arpa/` | Fonctionnel |
+| WEB01 `poire1-ludoweb` — `192.168.18.38` | Créée; SSH et DNS fonctionnels |
+| Domaine public prévu | `ludotheque.filsdepoire.ca` |
+| Publication Internet | Non configurée |
+
+## Récupération
+
+| Élément | État |
+|---|---|
+| Branche de sauvegarde Codex | `rescue/unstable-2026-07-22` |
+| Branche de réparation | `repair/manual-stabilization-2026-07-29` |
+| Schéma PostgreSQL | Reconstruit |
+| Migration courante | `9a1f4e5d8c20` |
+| Compte `max` | Recréé, admin |
+| Token BGG | Configuré hors dépôt |
+| Anciennes données | Non récupérées |
+| Données de démonstration | À confirmer |
+
+---
+
+# 3. Board principal
+
+## PHASE 0 — Stabilisation immédiate
+
+| ID | Statut | Tâche | Critère d’acceptation |
+|---|---|---|---|
+| STAB-01 | `DONE` | Isoler les changements instables dans une branche de sauvetage | Branche de sauvetage présente |
+| STAB-02 | `DONE` | Créer une branche de réparation manuelle | Branche de réparation présente |
+| STAB-03 | `DONE` | Vérifier la compilation Python | `compileall` retourne `0` |
+| STAB-04 | `DONE` | Reconstruire les tables PostgreSQL | 8 tables applicatives + Alembic |
+| STAB-05 | `DONE` | Vérifier Alembic | `9a1f4e5d8c20 (head)` |
+| STAB-06 | `DONE` | Recréer le compte admin `max` | Login et mot de passe validés |
+| STAB-07 | `DONE` | Configurer le token BGG hors dépôt | Recherche BGG ne réclame plus le token |
+| STAB-08 | `NEXT` | Vérifier ou exécuter le seed non destructif | Users, jeux et boîtes de test présents sans supprimer `max` |
+| STAB-09 | `NEXT` | Effectuer un test de fumée complet | Login, jeux, boîtes, détails et navigation sans traceback |
+| STAB-10 | `NEXT` | Corriger l’ajout manuel d’une boîte sans dépendre de BGG | Une boîte peut être créée sans recherche BGG |
+| STAB-11 | `NEXT` | Vérifier les routes POST sensibles | Aucun changement d’état important par simple GET |
+| STAB-12 | `NEXT` | Committer le checkpoint stable | Branche propre, commit nommé et `logthis` |
+| STAB-13 | `LATER` | Examiner la branche de sauvetage | Récupérer seulement les changements utiles |
+
+Ordre recommandé :
+
+```text
+STAB-08
+→ STAB-09
+→ STAB-10
+→ STAB-11
+→ STAB-12
+```
+
+---
+
+## PHASE 1 — MVP fonctionnel
+
+| ID | Statut | Tâche | Critère d’acceptation |
+|---|---|---|---|
+| MVP-01 | `VERIFY` | Login/logout | Session stable |
+| MVP-02 | `VERIFY` | Catalogue des jeux | Liste et fiche fonctionnelles |
+| MVP-03 | `VERIFY` | Ajouter un jeu manuellement | Fonctionne sans BGG |
+| MVP-04 | `VERIFY` | Enrichissement BGG | Recherche et import contrôlés |
+| MVP-05 | `VERIFY` | Liste des boîtes | Affichage sans erreur |
+| MVP-06 | `NEXT` | Ajouter une boîte | Jeu facultatif, propriétaire et détenteur valides |
+| MVP-07 | `NEXT` | Modifier une boîte | Validation correcte |
+| MVP-08 | `VERIFY` | Détail d’une boîte | Propriétaire, détenteur, statut, historique |
+| MVP-09 | `VERIFY` | Génération et affichage du QR | Token stable et URL correcte |
+| MVP-10 | `VERIFY` | Scan direct | Change le détenteur et crée un événement |
+| MVP-11 | `VERIFY` | Retour au scan après login | Paramètre `next` fonctionnel |
+| MVP-12 | `VERIFY` | File d’attente | Création, position et affichage |
+| MVP-13 | `VERIFY` | Annulation d’une demande | Retirée de la file active |
+| MVP-14 | `VERIFY` | Fulfillment au scan | Demande complétée |
+| MVP-15 | `VERIFY` | Vue “Chez moi” | Filtre par détenteur |
+| MVP-16 | `VERIFY` | Vue “Mes boîtes” | Filtre par propriétaire |
+| MVP-17 | `NEXT` | Recherche et filtres | Titre, propriétaire, détenteur, statut |
+| MVP-18 | `NEXT` | Permissions applicatives | Admin et membre séparés |
+| MVP-19 | `NEXT` | Gestion des utilisateurs | Création, activation, rôle |
+| MVP-20 | `VERIFY` | `/healthz` | `200` si app/DB OK, `503` sinon |
+| MVP-21 | `VERIFY` | Rate limiting | Protection sans casser les tests |
+| MVP-22 | `LATER` | Statistiques de parties | Non bloquant |
+
+---
+
+## PHASE 2 — Qualité avant déploiement
+
+| ID | Statut | Tâche | Critère d’acceptation |
+|---|---|---|---|
+| QA-01 | `NEXT` | Créer une checklist de test manuel | Parcours reproductibles |
+| QA-02 | `NEXT` | Ajouter des tests automatisés critiques | Login, scan, demande, permissions |
+| QA-03 | `NEXT` | Vérifier les migrations sur une DB vide | `db upgrade` fonctionne de zéro |
+| QA-04 | `NEXT` | Tester un redémarrage de l’application | Aucun état temporaire nécessaire |
+| QA-05 | `NEXT` | Vérifier les erreurs utilisateur | Pas de traceback visible |
+| QA-06 | `NEXT` | Vérifier les secrets Git | Aucun secret dans le repo ou l’historique |
+| QA-07 | `NEXT` | Vérifier `requirements.txt` | Venv recréable |
+| QA-08 | `NEXT` | Préparer un tag de déploiement | Commit stable identifié |
+
+---
+
+## PHASE 3 — Préparer WEB01
+
+| ID | Statut | Tâche | Critère d’acceptation |
+|---|---|---|---|
+| WEB-01 | `VERIFY` | Confirmer le VMID de WEB01 | `qm list` |
+| WEB-02 | `NEXT` | Activer le démarrage automatique | `onboot: 1` |
+| WEB-03 | `NEXT` | Prendre un snapshot propre | Snapshot visible |
+| WEB-04 | `NEXT` | Installer les paquets système | Git, Python, venv, libpq, client PostgreSQL |
+| WEB-05 | `NEXT` | Tester WEB01 → SQL101 | `pg_isready` et `psql` |
+| WEB-06 | `NEXT` | Créer l’utilisateur système `racinepoir` | Service sans root |
+| WEB-07 | `NEXT` | Créer `/srv/racinepoir/app` | Permissions correctes |
+| WEB-08 | `NEXT` | Créer `/etc/racinepoir/app.env` | Secrets hors dépôt |
+| WEB-09 | `NEXT` | Déployer le code | Clone Git ou rsync contrôlé |
+| WEB-10 | `NEXT` | Créer le venv de production | Imports réussis |
+| WEB-11 | `NEXT` | Appliquer les migrations | DB à jour |
+| WEB-12 | `NEXT` | Tester Gunicorn manuellement | Répond sur `127.0.0.1:8000` |
+| WEB-13 | `NEXT` | Créer le service systemd | Démarrage automatique |
+| WEB-14 | `NEXT` | Installer et configurer Caddy | Reverse proxy local |
+| WEB-15 | `NEXT` | Tester depuis le LAN | URL locale répond |
+
+---
+
+## PHASE 4 — Base de production
+
+| ID | Statut | Tâche | Critère d’acceptation |
+|---|---|---|---|
+| DB-01 | `BLOCKED` | Choisir DB actuelle ou DB prod séparée | Décision écrite |
+| DB-02 | `NEXT` | Créer le rôle production | Non superuser |
+| DB-03 | `NEXT` | Créer la base production | Propriétaire correct |
+| DB-04 | `NEXT` | Restreindre `pg_hba.conf` | WEB01 seulement |
+| DB-05 | `NEXT` | Tester TLS PostgreSQL | Connexion chiffrée |
+| DB-06 | `NEXT` | Appliquer les migrations | Schéma complet |
+| DB-07 | `NEXT` | Créer le premier admin prod | Mot de passe non journalisé |
+| DB-08 | `NEXT` | Créer le premier dump prod | Fichier vérifié |
+
+Recommandation :
+
+```text
+DB : racinepoir_ludotheque_prod
+Rôle : racinepoir_prod
+Source autorisée : 192.168.18.38/32
+```
+
+---
+
+## PHASE 5 — Mise en ligne publique
+
+| ID | Statut | Tâche | Critère d’acceptation |
+|---|---|---|---|
+| PUB-01 | `BLOCKED` | Choisir la méthode d’exposition | Tunnel ou redirection |
+| PUB-02 | `NEXT` | Configurer le DNS public | Domaine résolu |
+| PUB-03 | `NEXT` | Configurer HTTPS | Certificat valide |
+| PUB-04 | `NEXT` | Configurer les cookies production | Secure, HttpOnly, SameSite |
+| PUB-05 | `NEXT` | Configurer l’URL publique | `APP_BASE_URL` correcte |
+| PUB-06 | `NEXT` | Préparer les QR définitifs | URL publique, tokens stables |
+| PUB-07 | `NEXT` | Tester hors Wi-Fi | Accès LTE/5G |
+| PUB-08 | `NEXT` | Vérifier les ports exposés | Pas de 5432 ni 8000 publics |
+| PUB-09 | `NEXT` | Test de sécurité minimal | Auth, permissions, erreurs |
+| PUB-10 | `NEXT` | Publier la première version | Tag et journal de déploiement |
+
+---
+
+## PHASE 6 — Sauvegardes et exploitation
+
+| ID | Statut | Tâche | Critère d’acceptation |
+|---|---|---|---|
+| OPS-01 | `NEXT` | Script `pg_dump` automatisé | Dump quotidien |
+| OPS-02 | `NEXT` | Stockage hors SQL101 | Deuxième emplacement |
+| OPS-03 | `NEXT` | Politique de rétention | Quotidien/hebdo/mensuel |
+| OPS-04 | `NEXT` | Test de restauration | DB temporaire validée |
+| OPS-05 | `NEXT` | Monitoring `/healthz` | Alerte en cas de panne |
+| OPS-06 | `NEXT` | Monitoring espace disque | WEB01 et SQL101 |
+| OPS-07 | `NEXT` | Monitoring certificat TLS | Alerte avant expiration |
+| OPS-08 | `NEXT` | Procédure de mise à jour | Déploiement reproductible |
+| OPS-09 | `NEXT` | Procédure de rollback | Code, DB et VM |
+| OPS-10 | `NEXT` | Vérifier les logs | App, Caddy, PostgreSQL, `logthis` |
+
+---
+
+## PHASE 7 — UX/UI et portfolio
+
+| ID | Statut | Tâche | Critère d’acceptation |
+|---|---|---|---|
+| UX-01 | `NEXT` | Mettre à jour le mandat UX/UI | Box, file, scan direct |
+| UX-02 | `NEXT` | Inventorier les écrans actuels | Liste complète |
+| UX-03 | `NEXT` | Améliorer la navigation mobile | Parcours scan simple |
+| UX-04 | `NEXT` | Harmoniser badges et statuts | Cohérence visuelle |
+| UX-05 | `NEXT` | États vides et erreurs | Compréhensibles |
+| UX-06 | `NEXT` | Accessibilité de base | Contraste, focus, labels |
+| UX-07 | `LATER` | Mode liste / miniatures | Après MVP stable |
+| UX-08 | `LATER` | Page Communauté | Après déploiement |
+| UX-09 | `LATER` | Scanner caméra intégré | Après HTTPS |
+| UX-10 | `LATER` | Design final portfolio | Après validation fonctionnelle |
+
+---
+
+# 4. Décisions ouvertes
+
+## D-01 — Base de production
+
+```text
+A. Réutiliser racinepoir_ludotheque
+B. Créer racinepoir_ludotheque_prod
+```
+
+**Recommandation : B.**
+
+## D-02 — Exposition publique
+
+```text
+A. Redirection 80/443
+B. Cloudflare Tunnel
+C. Accès privé seulement
+```
+
+## D-03 — Scan direct
+
+Décider avant publication s’il faut ajouter :
+
+```text
+- annuler le dernier transfert;
+- confirmation optionnelle;
+- historique visible immédiatement.
+```
+
+## D-04 — Données initiales
+
+```text
+- données réelles;
+- données de démonstration;
+- aucune donnée préchargée.
+```
+
+---
+
+# 5. Prochain sprint recommandé
+
+## Sprint Stabilisation
+
+### Carte 1 — Données de démonstration
+
+```text
+Vérifier si seed_sample_data.py a été exécuté.
+Confirmer que max reste admin.
+Confirmer que le seed est non destructif.
+```
+
+### Carte 2 — Test de fumée
+
+```text
+/login
+/games
+/boxes
+fiche jeu
+fiche boîte
+ajout jeu
+ajout boîte
+scan
+demande
+annulation
+Chez moi
+Mes boîtes
+/healthz
+```
+
+### Carte 3 — Ajout manuel sans BGG
+
+```text
+BGG enrichit un jeu, mais ne bloque jamais la création manuelle.
+```
+
+### Carte 4 — Checkpoint Git
+
+```bash
+git status
+git add -A
+git commit -m "Stabilize database recovery and development setup"
+logthis "Ludothèque: schéma DB reconstruit et environnement de développement stabilisé"
+```
+
+### Carte 5 — Revenir au déploiement
+
+```text
+WEB-01
+→ WEB-05
+→ DB-01
+→ WEB-09
+→ WEB-15
+```
+
+---
+
+# 6. Définition de “première version web prête”
+
+- [ ] branche stable et propre;
+- [ ] migrations reproductibles;
+- [ ] admin créable sans seed destructif;
+- [ ] login, jeux, boîtes, scan et demandes fonctionnent;
+- [ ] ajout manuel indépendant de BGG;
+- [ ] application sur WEB01 avec Gunicorn/systemd;
+- [ ] Caddy fonctionne;
+- [ ] base prod décidée;
+- [ ] HTTPS public;
+- [ ] QR avec domaine public;
+- [ ] backup créé;
+- [ ] restauration testée;
+- [ ] redémarrage complet validé;
+- [ ] test externe hors Wi-Fi.
+
+---
+
+# 7. Commandes de suivi
+
+Afficher les tâches `NEXT` :
+
+```bash
+grep -n '`NEXT`' docs/PROJECT_BOARD.md
+```
+
+Afficher les tâches bloquées :
+
+```bash
+grep -n '`BLOCKED`' docs/PROJECT_BOARD.md
+```
+
+Commit :
+
+```bash
+git add docs/PROJECT_BOARD.md
+git commit -m "Add project execution board"
+logthis "Ludothèque: ajout du tableau de suivi du projet"
+```
