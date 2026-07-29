@@ -1,8 +1,9 @@
 import secrets
 from collections import Counter
+from datetime import date
 from io import BytesIO
 
-from flask import Blueprint, jsonify, render_template, redirect, url_for, request, send_file
+from flask import Blueprint, current_app, jsonify, render_template, redirect, url_for, request, send_file
 from flask_login import login_user, logout_user, current_user, login_required
 from sqlalchemy import text
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -38,6 +39,25 @@ def admin_required():
     if not current_user.is_authenticated or current_user.role != "admin":
         return "Action refusée : admin requis.", 403
     return None
+
+
+def current_registration_invite():
+    today = date.today().strftime("%Y-%m-%d")
+    code = current_app.config.get("REGISTRATION_INVITE_CODE")
+    invite_day = current_app.config.get("REGISTRATION_INVITE_DAY")
+
+    if invite_day != today or not code:
+        return None, None
+
+    return code, invite_day
+
+
+def generate_registration_invite():
+    today = date.today().strftime("%Y-%m-%d")
+    code = f"RACINEPOIR-{today}-{secrets.token_hex(3).upper()}"
+    current_app.config["REGISTRATION_INVITE_CODE"] = code
+    current_app.config["REGISTRATION_INVITE_DAY"] = today
+    return code, today
 
 
 def user_form_data(user):
@@ -81,11 +101,16 @@ def resolve_box_game(form):
         if not bgg_choice:
             try:
                 matches = search_games(title)
-            except BggApiError as exc:
-                return None, str(exc), None
+            except BggApiError:
+                matches = []
 
             if matches:
                 return None, None, matches
+
+            # If BGG is unavailable or returns no matches, fall back to manual creation.
+            game = Game(title=title, normalized_title=title.lower())
+            db.session.add(game)
+            return game, None, None
 
         if bgg_choice and bgg_choice != MANUAL_GAME_VALUE:
             existing_game = Game.query.filter_by(bgg_id=bgg_choice).first()
@@ -279,6 +304,82 @@ def login():
     return render_template("login.html", next_page=next_page)
 
 
+@main.route("/register", methods=["GET", "POST"])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for("main.index"))
+
+    invite_code, _ = current_registration_invite()
+    invite_enabled = current_app.config.get("REGISTRATION_INVITE_ENABLED", False)
+
+    if request.method == "POST":
+        username = (request.form.get("username") or "").strip()
+        email = (request.form.get("email") or "").strip()
+        display_name = (request.form.get("display_name") or "").strip()
+        password = request.form.get("password") or ""
+        confirm_password = request.form.get("confirm_password") or ""
+        temporary_password = (request.form.get("temporary_password") or "").strip()
+
+        if not username or not display_name or not password:
+            return render_template(
+                "register.html",
+                register_error="Le username, le nom affiché et le mot de passe sont obligatoires.",
+                invite_enabled=invite_enabled,
+            )
+
+        if not invite_enabled:
+            return render_template(
+                "register.html",
+                register_error="L'inscription est désactivée pour le moment.",
+                invite_enabled=invite_enabled,
+            )
+
+        if not invite_code or temporary_password != invite_code:
+            return render_template(
+                "register.html",
+                register_error="Le mot de passe temporaire d’invitation est invalide ou absent.",
+                invite_enabled=invite_enabled,
+            )
+
+        if password != confirm_password:
+            return render_template(
+                "register.html",
+                register_error="Les mots de passe ne correspondent pas.",
+                invite_enabled=invite_enabled,
+            )
+
+        if User.query.filter_by(username=username).first():
+            return render_template(
+                "register.html",
+                register_error="Ce username existe déjà.",
+                invite_enabled=invite_enabled,
+            )
+
+        if email and User.query.filter_by(email=email).first():
+            return render_template(
+                "register.html",
+                register_error="Cet email est déjà utilisé.",
+                invite_enabled=invite_enabled,
+            )
+
+        user = User(
+            username=username,
+            email=email,
+            display_name=display_name,
+            password_hash=generate_password_hash(password),
+            role="member",
+            is_active=True,
+        )
+        db.session.add(user)
+        db.session.commit()
+
+        login_user(user, remember=True)
+        security_event("register_success", ip=request_ip(), username=username, user_id=user.id)
+        return redirect(url_for("main.index"))
+
+    return render_template("register.html", invite_enabled=invite_enabled)
+
+
 @main.route("/logout", methods=["POST"])
 def logout():
     logout_user()
@@ -434,9 +535,42 @@ def games():
     return render_template("games.html", games=Game.query.order_by(Game.title.asc()).all())
 
 
-@main.route("/security")
+@main.route("/security", methods=["GET", "POST"])
 def security_journal():
-    return render_template("security_journal.html")
+    invite_code, invite_day = current_registration_invite()
+    invite_enabled = current_app.config.get("REGISTRATION_INVITE_ENABLED", False)
+    message = None
+
+    if request.method == "POST":
+        if not current_user.is_authenticated or current_user.role != "admin":
+            return "Action refusée : admin requis.", 403
+
+        action = request.form.get("action")
+        if action == "generate_invite":
+            invite_code, invite_day = generate_registration_invite()
+            current_app.config["REGISTRATION_INVITE_ENABLED"] = True
+            invite_enabled = True
+            message = f"Code d’invitation généré : {invite_code}"
+        elif action == "disable_invite":
+            current_app.config["REGISTRATION_INVITE_ENABLED"] = False
+            invite_enabled = False
+            invite_code = None
+            invite_day = None
+            message = "Inscription par invitation désactivée."
+        elif action == "enable_invite":
+            current_app.config["REGISTRATION_INVITE_ENABLED"] = True
+            invite_enabled = True
+            if not invite_code:
+                invite_code, invite_day = generate_registration_invite()
+            message = "Inscription par invitation activée."
+
+    return render_template(
+        "security_journal.html",
+        invite_enabled=invite_enabled,
+        invite_code=invite_code,
+        invite_day=invite_day,
+        message=message,
+    )
 
 
 @main.route("/games/<int:game_id>")

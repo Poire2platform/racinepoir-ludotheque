@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Inscription — RacinePoir{% endblock %}
+
+{% block content %}
+<h2>Inscription</h2>
+
+{% if register_error %}
+    <p style="color: red;"><strong>{{ register_error }}</strong></p>
+{% endif %}
+
+{% if not invite_enabled %}
+    <p>L'inscription par invitation est actuellement désactivée. Seul un administrateur peut la réactiver depuis la page <a href="/security">Sécurité</a>.</p>
+{% else %}
+    <form method="post">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+        <p>
+            <label for="username">Username</label><br>
+            <input id="username" name="username" required value="{{ request.form.get('username', '') }}">
+        </p>
+
+        <p>
+            <label for="email">Email</label><br>
+            <input id="email" name="email" type="email" value="{{ request.form.get('email', '') }}">
+        </p>
+
+        <p>
+            <label for="display_name">Nom affiché</label><br>
+            <input id="display_name" name="display_name" required value="{{ request.form.get('display_name', '') }}">
+        </p>
+
+        <p>
+            <label for="password">Mot de passe</label><br>
+            <input id="password" name="password" type="password" required>
+        </p>
+
+        <p>
+            <label for="confirm_password">Confirmation du mot de passe</label><br>
+            <input id="confirm_password" name="confirm_password" type="password" required>
+        </p>
+
+        <p>
+            <label for="temporary_password">Mot de passe temporaire d'invitation</label><br>
+            <input id="temporary_password" name="temporary_password" type="text" required value="{{ request.form.get('temporary_password', '') }}">
+        </p>
+
+        <p>
+            <button type="submit">S'inscrire</button>
+            <a href="/login">Retour à la connexion</a>
+        </p>
+    </form>
+{% endif %}
+{% endblock %}

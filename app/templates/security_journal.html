@@ -89,6 +89,51 @@ Base de données privée</code></pre>
 </section>
 
 <section>
+    <h3>Gestion des inscriptions</h3>
+
+    {% if current_user.is_authenticated and current_user.role == 'admin' %}
+        {% if message %}
+            <p style="color: green;"><strong>{{ message }}</strong></p>
+        {% endif %}
+
+        <p>
+            <strong>Inscription par code d'invitation :</strong>
+            {% if invite_enabled %}
+                activée
+            {% else %}
+                désactivée
+            {% endif %}
+        </p>
+
+        {% if invite_enabled and invite_code %}
+            <p>
+                Code actif : <code>{{ invite_code }}</code><br>
+                Généré le : {{ invite_day }}
+            </p>
+        {% endif %}
+
+        <form method="post" style="display: inline; margin-right: 1rem;">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" name="action" value="generate_invite">Générer un nouveau code</button>
+        </form>
+
+        {% if invite_enabled %}
+            <form method="post" style="display: inline; margin-right: 1rem;">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" name="action" value="disable_invite">Désactiver l'inscription</button>
+            </form>
+        {% else %}
+            <form method="post" style="display: inline; margin-right: 1rem;">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" name="action" value="enable_invite">Activer l'inscription</button>
+            </form>
+        {% endif %}
+    {% else %}
+        <p>Seuls les administrateurs peuvent gérer le code d'invitation et l'activation du registre.</p>
+    {% endif %}
+</section>
+
+<section>
     <h3>Décisions appliquées</h3>
     <table>
         <thead>
@@ -145,9 +190,9 @@ Base de données privée</code></pre>
                 <td>Une attaque utilement détectée est moins silencieuse et plus facile à comprendre.</td>
             </tr>
             <tr>
-                <td>Surveiller l’état minimal</td>
-                <td><code>/healthz</code> vérifie que l’app répond et que la DB accepte une requête simple.</td>
-                <td>Un serveur sérieux doit pouvoir dire rapidement “je suis vivant” sans exposer de données privées.</td>
+                <td>Inscription sur invitation</td>
+                <td>Un code temporaire est généré et affiché sur la page sécurité, et l’inscription ne fonctionne que si le code est fourni.</td>
+                <td>Empêcher les inscriptions ouvertes tout en conservant un flux de test activable rapidement.</td>
             </tr>
         </tbody>
     </table>
