@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 RacinePoir Ludothèque
 =====================
 
@@ -221,3 +222,6 @@ Quick syntax check:
 cd app
 python3 -m compileall .
 ```
+=======
+# racinepoir-ludotheque
+>>>>>>> 295e4dbb376eb7214a63674a591eb99bb9b029d9
