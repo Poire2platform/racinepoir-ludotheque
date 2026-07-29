@@ -83,12 +83,24 @@ Without a configured token or token file, the app still works, but BGG lookup ac
 Development Data
 ----------------
 
+Add the small non-destructive sample dataset to an already migrated development
+database that contains the `admin` account:
+
+```bash
+python -m scripts.seed_sample_data
+```
+
+This command preserves existing rows and can be run more than once. It must still
+be reserved for a development database.
+
 Seed the dev data from the project root:
 
 ```bash
 flask db upgrade
 PYTHONPATH=. python scripts/seed_dev.py
 ```
+
+Unlike `seed_sample_data`, `seed_dev.py` resets the existing application data.
 
 Dev accounts from the seed script:
 

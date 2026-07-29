@@ -54,11 +54,11 @@ Règles :
 | Branche de réparation | `repair/manual-stabilization-2026-07-29` |
 | Schéma PostgreSQL | Reconstruit |
 | Migration courante | `9a1f4e5d8c20` |
-| Compte `max` | Recréé, admin |
+| Compte `admin` (`Maxime`) | Présent, admin actif |
 | Token BGG | Configuré hors dépôt |
 | Anciennes données | Non récupérées |
-| Données de démonstration | À confirmer |
-| Tests automatisés actifs | 8 tests `pytest` réussis sur SQLite isolée |
+| Données de démonstration | Seed non destructif exécuté deux fois et vérifié |
+| Tests automatisés actifs | 9 tests `pytest` réussis sur SQLite isolée |
 
 ---
 
@@ -72,7 +72,7 @@ Règles :
 | REPO-02 | `DONE` | Résoudre les marqueurs de conflit du README | Aucun marqueur de conflit restant |
 | REPO-03 | `DONE` | Vérifier la branche de réparation | Branche `repair/manual-stabilization-2026-07-29` confirmée |
 | REPO-04 | `DONE` | Configurer les dépendances de test | `pytest` installé via `requirements-dev.txt` |
-| REPO-05 | `DONE` | Récupérer ou recréer les premiers tests critiques | 8 tests relus, adaptés et réussis |
+| REPO-05 | `DONE` | Récupérer ou recréer les premiers tests critiques | 9 tests relus, adaptés et réussis |
 | REPO-06 | `DONE` | Créer un checkpoint d’hygiène ciblé | Diff vérifié et commit sans `git add -A` aveugle |
 
 Constats du 29 juillet 2026 :
@@ -105,9 +105,9 @@ STAB-08
 | STAB-03 | `DONE` | Vérifier la compilation Python | `compileall` retourne `0` |
 | STAB-04 | `DONE` | Reconstruire les tables PostgreSQL | 8 tables applicatives + Alembic |
 | STAB-05 | `DONE` | Vérifier Alembic | `9a1f4e5d8c20 (head)` |
-| STAB-06 | `DONE` | Recréer le compte admin `max` | Login et mot de passe validés |
+| STAB-06 | `DONE` | Recréer le compte `admin` de Maxime | Compte admin actif validé |
 | STAB-07 | `DONE` | Configurer le token BGG hors dépôt | Recherche BGG ne réclame plus le token |
-| STAB-08 | `VERIFY` | Exécuter et vérifier le seed non destructif | Users, jeux et boîtes de test présents sans supprimer ou rétrograder `max` |
+| STAB-08 | `DONE` | Exécuter et vérifier le seed non destructif | Deux exécutions stables; compte `admin` inchangé |
 | STAB-09 | `NEXT` | Effectuer un test de fumée complet | Login, jeux, boîtes, détails et navigation sans traceback |
 | STAB-10 | `DONE` | Vérifier l’ajout manuel d’une boîte sans dépendre de BGG | Test automatisé réussi sans appel BGG |
 | STAB-11 | `NEXT` | Vérifier les routes POST sensibles | Aucun changement d’état important par simple GET |
@@ -117,8 +117,7 @@ STAB-08
 Ordre recommandé :
 
 ```text
-STAB-08
-→ STAB-09
+STAB-09
 → STAB-11
 → STAB-12
 ```
@@ -159,7 +158,7 @@ STAB-08
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
 | QA-01 | `NEXT` | Créer une checklist de test manuel | Parcours reproductibles |
-| QA-02 | `VERIFY` | Ajouter des tests automatisés critiques | 8 tests réussis; couverture critique à compléter |
+| QA-02 | `VERIFY` | Ajouter des tests automatisés critiques | 9 tests réussis; couverture critique à compléter |
 | QA-03 | `NEXT` | Vérifier les migrations sur une DB vide | `db upgrade` fonctionne de zéro |
 | QA-04 | `NEXT` | Tester un redémarrage de l’application | Aucun état temporaire nécessaire |
 | QA-05 | `NEXT` | Vérifier les erreurs utilisateur | Pas de traceback visible |
@@ -342,11 +341,11 @@ Exclure les caches et artefacts.
 Créer un commit précis sans git add -A aveugle.
 ```
 
-### Carte 3 — Données de démonstration
+### Carte 3 — Données de démonstration (`DONE`)
 
 ```text
-Exécuter seed_sample_data.py sur la base de développement seulement.
-Confirmer que max reste admin.
+Exécuter python -m scripts.seed_sample_data sur la base de développement seulement.
+Confirmer que le compte `admin` de Maxime reste admin.
 Confirmer qu’une seconde exécution ne crée pas de doublons.
 ```
 

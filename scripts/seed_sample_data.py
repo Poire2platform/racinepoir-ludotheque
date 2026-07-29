@@ -79,10 +79,10 @@ def get_or_create_box(token, game, owner, holder, **values):
 
 
 def seed():
-    max_user = User.query.filter_by(username="max").first()
+    admin_user = User.query.filter_by(username="admin").first()
 
-    if not max_user:
-        raise RuntimeError("Le compte max doit exister avant le seed.")
+    if not admin_user:
+        raise RuntimeError("Le compte admin doit exister avant le seed.")
 
     anouk, anouk_password = get_or_create_user(
         "anouk",
@@ -123,17 +123,17 @@ def seed():
     catan_box = get_or_create_box(
         "dev-catan-box-001",
         catan,
-        max_user,
+        admin_user,
         anouk,
-        notes="Appartient à Max, actuellement chez Anouk.",
+        notes="Appartient à Maxime, actuellement chez Anouk.",
     )
 
     get_or_create_box(
         "dev-azul-box-001",
         azul,
         anouk,
-        max_user,
-        notes="Appartient à Anouk, actuellement chez Max.",
+        admin_user,
+        notes="Appartient à Anouk, actuellement chez Maxime.",
     )
 
     existing_request = BoxRequest.query.filter_by(
