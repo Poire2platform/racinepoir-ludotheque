@@ -58,7 +58,7 @@ Règles :
 | Token BGG | Configuré hors dépôt |
 | Anciennes données | Non récupérées |
 | Données de démonstration | Seed non destructif exécuté deux fois et vérifié |
-| Tests automatisés actifs | 10 tests `pytest` réussis sur SQLite isolée |
+| Tests automatisés actifs | 41 tests `pytest` réussis sur SQLite isolée |
 
 ---
 
@@ -72,7 +72,7 @@ Règles :
 | REPO-02 | `DONE` | Résoudre les marqueurs de conflit du README | Aucun marqueur de conflit restant |
 | REPO-03 | `DONE` | Vérifier la branche de réparation | Branche `repair/manual-stabilization-2026-07-29` confirmée |
 | REPO-04 | `DONE` | Configurer les dépendances de test | `pytest` installé via `requirements-dev.txt` |
-| REPO-05 | `DONE` | Récupérer ou recréer les premiers tests critiques | 10 tests relus, adaptés et réussis |
+| REPO-05 | `DONE` | Récupérer ou recréer les premiers tests critiques | 41 tests relus, adaptés et réussis |
 | REPO-06 | `DONE` | Créer un checkpoint d’hygiène ciblé | Diff vérifié et commit sans `git add -A` aveugle |
 
 Constats du 29 juillet 2026 :
@@ -110,15 +110,14 @@ STAB-08
 | STAB-08 | `DONE` | Exécuter et vérifier le seed non destructif | Deux exécutions stables; compte `admin` inchangé |
 | STAB-09 | `DONE` | Effectuer un test de fumée complet | Login, fiches et navigation validés sans traceback |
 | STAB-10 | `DONE` | Vérifier l’ajout manuel d’une boîte sans dépendre de BGG | Test automatisé réussi sans appel BGG |
-| STAB-11 | `NEXT` | Vérifier les routes POST sensibles | Aucun changement d’état important par simple GET |
+| STAB-11 | `DONE` | Vérifier les routes POST sensibles | Audit et 31 tests dédiés réussis; aucun GET mutateur |
 | STAB-12 | `NEXT` | Committer le checkpoint stable | Branche propre, commit nommé et `logthis` |
 | STAB-13 | `LATER` | Examiner la branche de sauvetage | Récupérer seulement les changements utiles |
 
 Ordre recommandé :
 
 ```text
-STAB-11
-→ STAB-12
+STAB-12
 ```
 
 ---
@@ -157,7 +156,7 @@ STAB-11
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
 | QA-01 | `DONE` | Créer une checklist de test manuel | `docs/SMOKE_TEST.md` |
-| QA-02 | `VERIFY` | Ajouter des tests automatisés critiques | 10 tests réussis; couverture critique à compléter |
+| QA-02 | `DONE` | Ajouter des tests automatisés critiques | 41 tests couvrent login, scan, demandes, CSRF et permissions |
 | QA-03 | `NEXT` | Vérifier les migrations sur une DB vide | `db upgrade` fonctionne de zéro |
 | QA-04 | `NEXT` | Tester un redémarrage de l’application | Aucun état temporaire nécessaire |
 | QA-05 | `NEXT` | Vérifier les erreurs utilisateur | Pas de traceback visible |

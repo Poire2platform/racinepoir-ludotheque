@@ -15,6 +15,10 @@ Les tests automatisés utilisent SQLite en mémoire. Ils couvrent :
 - création de l’application et `/healthz`;
 - connexion valide et invalide;
 - séparation membre/admin;
+- refus des mutations par `GET`;
+- rejet de tous les `POST` sans jeton CSRF;
+- absence de mutation lors de l’affichage des formulaires;
+- permissions des utilisateurs, propriétaires et administrateurs;
 - navigation principale et fiches;
 - création manuelle d’un jeu et d’une boîte sans BGG;
 - création et annulation d’une demande;
