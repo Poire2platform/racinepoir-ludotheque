@@ -289,3 +289,72 @@ def test_authenticated_navigation_smoke(
     for path in paths:
         response = client.get(path)
         assert response.status_code == 200, path
+
+
+def test_boxes_can_be_searched_by_title(client, make_user, make_box):
+    owner = make_user("owner")
+    make_box(owner, title="Azul", token="azul")
+    make_box(owner, title="Catan", token="catan")
+
+    response = client.get("/boxes?title=azu")
+
+    assert response.status_code == 200
+    assert b"Azul" in response.data
+    assert b"Catan" not in response.data
+
+
+def test_boxes_can_be_filtered_by_owner_holder_and_status(
+    client,
+    make_user,
+    make_box,
+):
+    alice = make_user("alice")
+    bob = make_user("bob")
+    matching_box = make_box(
+        alice,
+        holder=bob,
+        title="Boîte correspondante",
+        token="matching",
+    )
+    other_owner_box = make_box(
+        bob,
+        holder=bob,
+        title="Autre propriétaire",
+        token="other-owner",
+    )
+    other_status_box = make_box(
+        alice,
+        holder=bob,
+        title="Boîte perdue",
+        token="lost",
+    )
+    other_status_box.lifecycle_status = "lost"
+    db.session.commit()
+
+    response = client.get(
+        "/boxes",
+        query_string={
+            "owner_id": alice.id,
+            "holder_id": bob.id,
+            "status": "active",
+        },
+    )
+
+    assert response.status_code == 200
+    assert matching_box.display_name.encode() in response.data
+    assert other_owner_box.display_name.encode() not in response.data
+    assert other_status_box.display_name.encode() not in response.data
+
+
+def test_boxes_can_be_filtered_by_unknown_holder(client, make_user, make_box):
+    owner = make_user("owner")
+    unknown_holder_box = make_box(owner, title="Sans détenteur", token="none")
+    known_holder_box = make_box(owner, title="Avec détenteur", token="known")
+    unknown_holder_box.current_holder = None
+    db.session.commit()
+
+    response = client.get("/boxes?holder_id=none")
+
+    assert response.status_code == 200
+    assert unknown_holder_box.display_name.encode() in response.data
+    assert known_holder_box.display_name.encode() not in response.data

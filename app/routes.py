@@ -5,7 +5,7 @@ from io import BytesIO
 
 from flask import Blueprint, current_app, jsonify, render_template, redirect, url_for, request, send_file
 from flask_login import login_user, logout_user, current_user, login_required
-from sqlalchemy import text
+from sqlalchemy import or_, text
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.extensions import db
@@ -15,6 +15,7 @@ from app.security import env_int, is_rate_limited, rate_limit_key, request_ip, s
 
 main = Blueprint("main", __name__)
 BOX_CONDITIONS = ("unknown", "good", "worn", "incomplete")
+BOX_LIFECYCLE_STATUSES = ("active", "lost")
 NEW_GAME_VALUE = "__new__"
 UNCATALOGUED_GAME_VALUE = "__uncatalogued__"
 MANUAL_GAME_VALUE = "__manual__"
@@ -651,7 +652,43 @@ def populate_game_from_bgg(game_id):
 
 @main.route("/boxes")
 def boxes():
-    return render_template("boxes.html", boxes=Box.query.order_by(Box.id.asc()).all())
+    title = (request.args.get("title") or "").strip()
+    owner_id = request.args.get("owner_id") or ""
+    holder_id = request.args.get("holder_id") or ""
+    status = request.args.get("status") or ""
+    query = Box.query
+
+    if title:
+        pattern = f"%{title}%"
+        query = query.filter(or_(
+            Box.display_name.ilike(pattern),
+            Box.game.has(Game.title.ilike(pattern)),
+        ))
+
+    if owner_id.isdigit():
+        query = query.filter(Box.owner_user_id == int(owner_id))
+
+    if holder_id == "none":
+        query = query.filter(Box.current_holder_user_id.is_(None))
+    elif holder_id.isdigit():
+        query = query.filter(Box.current_holder_user_id == int(holder_id))
+
+    if status in BOX_LIFECYCLE_STATUSES:
+        query = query.filter(Box.lifecycle_status == status)
+
+    filters = {
+        "title": title,
+        "owner_id": owner_id,
+        "holder_id": holder_id,
+        "status": status,
+    }
+    return render_template(
+        "boxes.html",
+        boxes=query.order_by(Box.display_name.asc(), Box.id.asc()).all(),
+        users=User.query.order_by(User.display_name.asc()).all(),
+        filters=filters,
+        lifecycle_statuses=BOX_LIFECYCLE_STATUSES,
+    )
 
 
 @main.route("/boxes/new", methods=["GET", "POST"])

@@ -5,6 +5,44 @@
 {% if current_user.is_authenticated %}
 <p><a href="/boxes/new">Ajouter une boîte</a></p>
 {% endif %}
+<form method="get" action="/boxes">
+    <p>
+        <label for="title">Titre ou nom</label><br>
+        <input id="title" name="title" value="{{ filters.title }}">
+    </p>
+    <p>
+        <label for="owner_id">Propriétaire</label><br>
+        <select id="owner_id" name="owner_id">
+            <option value="">Tous</option>
+            {% for user in users %}
+                <option value="{{ user.id }}" {% if filters.owner_id == user.id|string %}selected{% endif %}>{{ user.display_name }}</option>
+            {% endfor %}
+        </select>
+    </p>
+    <p>
+        <label for="holder_id">Détenteur</label><br>
+        <select id="holder_id" name="holder_id">
+            <option value="">Tous</option>
+            <option value="none" {% if filters.holder_id == "none" %}selected{% endif %}>Détenteur inconnu</option>
+            {% for user in users %}
+                <option value="{{ user.id }}" {% if filters.holder_id == user.id|string %}selected{% endif %}>{{ user.display_name }}</option>
+            {% endfor %}
+        </select>
+    </p>
+    <p>
+        <label for="status">Statut</label><br>
+        <select id="status" name="status">
+            <option value="">Tous</option>
+            {% for status in lifecycle_statuses %}
+                <option value="{{ status }}" {% if filters.status == status %}selected{% endif %}>{{ status }}</option>
+            {% endfor %}
+        </select>
+    </p>
+    <p>
+        <button type="submit">Rechercher</button>
+        <a href="/boxes">Réinitialiser</a>
+    </p>
+</form>
 {% if boxes %}
 <table border="1" cellpadding="6">
 <thead><tr><th>ID</th><th>Boîte</th><th>Jeu référencé</th><th>Propriétaire</th><th>Détenteur actuel</th><th>File d’attente</th><th>Condition</th><th>Status</th><th>Action</th></tr></thead>
