@@ -44,6 +44,60 @@ def test_login_rejects_invalid_credentials(client, make_user, csrf_token):
     assert "Login invalide.".encode() in response.data
 
 
+def test_inactive_account_cannot_log_in(client, make_user, csrf_token):
+    make_user("inactive", is_active=False)
+
+    response = client.post(
+        "/login",
+        data={
+            "_csrf_token": csrf_token,
+            "username": "inactive",
+            "password": "secret123",
+        },
+    )
+
+    assert response.status_code == 200
+    assert "Compte désactivé.".encode() in response.data
+    assert client.get("/").status_code == 302
+
+
+def test_authenticated_session_remains_active_across_requests(
+    client,
+    make_user,
+    login_as,
+):
+    member = make_user("member")
+    login_as(member)
+
+    first_response = client.get("/")
+    second_response = client.get("/me/profile")
+
+    assert first_response.status_code == 200
+    assert second_response.status_code == 200
+    assert b"username: <code>member</code>" in first_response.data
+
+
+def test_logout_ends_authenticated_session(
+    client,
+    make_user,
+    login_as,
+    csrf_token,
+):
+    member = make_user("member")
+    login_as(member)
+
+    response = client.post(
+        "/logout",
+        data={"_csrf_token": csrf_token},
+    )
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/"
+    protected_response = client.get("/")
+    assert protected_response.status_code == 302
+    assert "/login" in protected_response.headers["Location"]
+
+
 def test_member_is_denied_admin_user_management(
     client,
     make_user,

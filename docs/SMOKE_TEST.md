@@ -13,7 +13,7 @@ python -m pytest
 Les tests automatisés utilisent SQLite en mémoire. Ils couvrent :
 
 - création de l’application et `/healthz`;
-- connexion valide et invalide;
+- connexion valide et invalide, compte désactivé, session et déconnexion;
 - séparation membre/admin;
 - refus des mutations par `GET`;
 - rejet de tous les `POST` sans jeton CSRF;

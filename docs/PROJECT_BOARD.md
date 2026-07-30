@@ -58,7 +58,7 @@ Règles :
 | Token BGG | Configuré hors dépôt |
 | Anciennes données | Non récupérées |
 | Données de démonstration | Seed non destructif exécuté deux fois et vérifié |
-| Tests automatisés actifs | 47 tests `pytest` réussis sur SQLite isolée |
+| Tests automatisés actifs | 50 tests `pytest` réussis sur SQLite isolée |
 
 ---
 
@@ -72,7 +72,7 @@ Règles :
 | REPO-02 | `DONE` | Résoudre les marqueurs de conflit du README | Aucun marqueur de conflit restant |
 | REPO-03 | `DONE` | Vérifier la branche de réparation | Branche `repair/manual-stabilization-2026-07-29` confirmée |
 | REPO-04 | `DONE` | Configurer les dépendances de test | `pytest` installé via `requirements-dev.txt` |
-| REPO-05 | `DONE` | Récupérer ou recréer les premiers tests critiques | 47 tests relus, adaptés et réussis |
+| REPO-05 | `DONE` | Récupérer ou recréer les premiers tests critiques | 50 tests relus, adaptés et réussis |
 | REPO-06 | `DONE` | Créer un checkpoint d’hygiène ciblé | Diff vérifié et commit sans `git add -A` aveugle |
 
 Constats du 29 juillet 2026 :
@@ -126,7 +126,7 @@ STAB-12
 
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
-| MVP-01 | `VERIFY` | Login/logout | Session stable |
+| MVP-01 | `DONE` | Login/logout | Login valide/invalide, compte désactivé, session et logout testés |
 | MVP-02 | `VERIFY` | Catalogue des jeux | Liste et fiche fonctionnelles |
 | MVP-03 | `VERIFY` | Ajouter un jeu manuellement | Fonctionne sans BGG |
 | MVP-04 | `VERIFY` | Enrichissement BGG | Recherche et import contrôlés |
@@ -156,7 +156,7 @@ STAB-12
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
 | QA-01 | `DONE` | Créer une checklist de test manuel | `docs/SMOKE_TEST.md` |
-| QA-02 | `DONE` | Ajouter des tests automatisés critiques | 47 tests couvrent login, boîtes, filtres, scan, demandes, CSRF et permissions |
+| QA-02 | `DONE` | Ajouter des tests automatisés critiques | 50 tests couvrent login, boîtes, filtres, scan, demandes, CSRF et permissions |
 | QA-03 | `NEXT` | Vérifier les migrations sur une DB vide | `db upgrade` fonctionne de zéro |
 | QA-04 | `NEXT` | Tester un redémarrage de l’application | Aucun état temporaire nécessaire |
 | QA-05 | `NEXT` | Vérifier les erreurs utilisateur | Pas de traceback visible |
