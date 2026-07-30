@@ -15,12 +15,18 @@
         <label for="game_id">Jeu</label><br>
         <select id="game_id" name="game_id" required>
             <option value="{{ new_game_value }}" {% if form.get('game_id') == new_game_value %}selected{% endif %}>Nouveau jeu</option>
+            <option value="{{ uncatalogued_game_value }}" {% if form.get('game_id') == uncatalogued_game_value %}selected{% endif %}>Boîte non cataloguée</option>
             {% for game in games %}
                 <option value="{{ game.id }}" {% if form.get('game_id') == game.id|string %}selected{% endif %}>
                     {{ game.title }}
                 </option>
             {% endfor %}
         </select>
+    </p>
+
+    <p id="uncatalogued-box-name-row">
+        <label for="uncatalogued_box_name">Nom de la boîte non cataloguée</label><br>
+        <input id="uncatalogued_box_name" name="uncatalogued_box_name" value="{{ form.get('uncatalogued_box_name', '') }}">
     </p>
 
     <p id="new-game-title-row">
@@ -82,12 +88,18 @@
 const gameSelect = document.getElementById("game_id");
 const newGameTitleRow = document.getElementById("new-game-title-row");
 const newGameTitleInput = document.getElementById("new_game_title");
+const uncataloguedBoxNameRow = document.getElementById("uncatalogued-box-name-row");
+const uncataloguedBoxNameInput = document.getElementById("uncatalogued_box_name");
 const newGameValue = "{{ new_game_value }}";
+const uncataloguedGameValue = "{{ uncatalogued_game_value }}";
 
 function updateNewGameTitleVisibility() {
     const isNewGame = gameSelect.value === newGameValue;
+    const isUncatalogued = gameSelect.value === uncataloguedGameValue;
     newGameTitleRow.hidden = !isNewGame;
     newGameTitleInput.required = isNewGame;
+    uncataloguedBoxNameRow.hidden = !isUncatalogued;
+    uncataloguedBoxNameInput.required = isUncatalogued;
 }
 
 gameSelect.addEventListener("change", updateNewGameTitleVisibility);

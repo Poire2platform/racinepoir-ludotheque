@@ -99,6 +99,103 @@ def test_manual_box_creation_does_not_require_bgg(
         assert BoxEvent.query.filter_by(event_type="box_created").count() == 1
 
 
+def test_uncatalogued_box_can_be_created_without_game(
+    app,
+    client,
+    make_user,
+    login_as,
+    csrf_token,
+):
+    owner = make_user("owner")
+    login_as(owner)
+
+    response = client.post(
+        "/boxes/new",
+        data={
+            "_csrf_token": csrf_token,
+            "game_id": "__uncatalogued__",
+            "uncatalogued_box_name": "  Prototype maison  ",
+            "owner_user_id": str(owner.id),
+            "condition": "unknown",
+        },
+    )
+
+    assert response.status_code == 302
+    with app.app_context():
+        box = Box.query.one()
+        assert box.display_name == "Prototype maison"
+        assert box.game_id is None
+        assert box.owner_user_id == owner.id
+        assert box.current_holder_user_id == owner.id
+        assert Game.query.count() == 0
+
+
+def test_uncatalogued_box_requires_a_display_name(
+    app,
+    client,
+    make_user,
+    login_as,
+    csrf_token,
+):
+    owner = make_user("owner")
+    login_as(owner)
+
+    response = client.post(
+        "/boxes/new",
+        data={
+            "_csrf_token": csrf_token,
+            "game_id": "__uncatalogued__",
+            "uncatalogued_box_name": " ",
+            "owner_user_id": str(owner.id),
+        },
+    )
+
+    assert response.status_code == 200
+    assert "Le nom de la boîte non cataloguée est obligatoire.".encode() in response.data
+    with app.app_context():
+        assert Box.query.count() == 0
+        assert Game.query.count() == 0
+
+
+def test_box_can_be_changed_to_uncatalogued(
+    app,
+    client,
+    make_user,
+    make_box,
+    login_as,
+    csrf_token,
+):
+    owner = make_user("owner")
+    box = make_box(owner, title="Ancien jeu")
+    login_as(owner)
+
+    edit_page = client.get(f"/boxes/{box.id}/edit")
+    assert edit_page.status_code == 200
+
+    response = client.post(
+        f"/boxes/{box.id}/edit",
+        data={
+            "_csrf_token": csrf_token,
+            "game_id": "__uncatalogued__",
+            "uncatalogued_box_name": "Boîte mystère",
+            "owner_user_id": str(owner.id),
+            "condition": "worn",
+        },
+    )
+
+    assert response.status_code == 302
+    with app.app_context():
+        refreshed_box = db.session.get(Box, box.id)
+        assert refreshed_box.display_name == "Boîte mystère"
+        assert refreshed_box.game_id is None
+        assert refreshed_box.condition == "worn"
+
+    uncatalogued_edit_page = client.get(f"/boxes/{box.id}/edit")
+    assert uncatalogued_edit_page.status_code == 200
+    assert b'value="__uncatalogued__" selected' in uncatalogued_edit_page.data
+    assert b'value="Bo\xc3\xaete myst\xc3\xa8re"' in uncatalogued_edit_page.data
+
+
 def test_request_can_be_created_and_cancelled(
     app,
     client,

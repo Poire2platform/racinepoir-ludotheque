@@ -16,6 +16,7 @@ from app.security import env_int, is_rate_limited, rate_limit_key, request_ip, s
 main = Blueprint("main", __name__)
 BOX_CONDITIONS = ("unknown", "good", "worn", "incomplete")
 NEW_GAME_VALUE = "__new__"
+UNCATALOGUED_GAME_VALUE = "__uncatalogued__"
 MANUAL_GAME_VALUE = "__manual__"
 USER_ROLES = ("member", "admin")
 SESSION_PARTICIPANT_ROWS = 6
@@ -72,8 +73,9 @@ def user_form_data(user):
 
 def box_form_data(box):
     return {
-        "game_id": str(box.game_id) if box.game_id else "",
+        "game_id": str(box.game_id) if box.game_id else UNCATALOGUED_GAME_VALUE,
         "new_game_title": "",
+        "uncatalogued_box_name": box.display_name if not box.game_id else "",
         "owner_user_id": str(box.owner_user_id),
         "condition": box.condition,
         "notes": box.notes or "",
@@ -84,12 +86,16 @@ def render_box_form(**context):
     context.setdefault("games", Game.query.order_by(Game.title.asc()).all())
     context.setdefault("users", User.query.order_by(User.display_name.asc()).all())
     context.setdefault("new_game_value", NEW_GAME_VALUE)
+    context.setdefault("uncatalogued_game_value", UNCATALOGUED_GAME_VALUE)
     context.setdefault("manual_game_value", MANUAL_GAME_VALUE)
     return render_template("box_form.html", **context)
 
 
 def resolve_box_game(form):
     game_choice = form.get("game_id") or ""
+
+    if game_choice == UNCATALOGUED_GAME_VALUE:
+        return None, None, None
 
     if game_choice == NEW_GAME_VALUE:
         title = (form.get("new_game_title") or "").strip()
@@ -155,6 +161,10 @@ def resolve_box_owner(form):
         return None, "Le propriétaire sélectionné est introuvable."
 
     return owner, None
+
+
+def uncatalogued_box_name(form):
+    return " ".join((form.get("uncatalogued_box_name") or "").strip().split())
 
 
 def apply_bgg_details(game, details):
@@ -657,6 +667,13 @@ def new_box():
         if game_error:
             return render_box_form(error=game_error, form=request.form)
 
+        display_name = game.title if game else uncatalogued_box_name(request.form)
+        if not display_name:
+            return render_box_form(
+                error="Le nom de la boîte non cataloguée est obligatoire.",
+                form=request.form,
+            )
+
         owner, owner_error = resolve_box_owner(request.form)
         if owner_error:
             return render_box_form(error=owner_error, form=request.form)
@@ -665,7 +682,7 @@ def new_box():
             condition = "unknown"
 
         box = Box(
-            display_name=game.title,
+            display_name=display_name,
             game=game,
             owner=owner,
             current_holder=owner,
@@ -715,6 +732,15 @@ def edit_box(box_id):
         if game_error:
             return render_box_form(box=box, error=game_error, form=request.form, mode="edit")
 
+        display_name = game.title if game else uncatalogued_box_name(request.form)
+        if not display_name:
+            return render_box_form(
+                box=box,
+                error="Le nom de la boîte non cataloguée est obligatoire.",
+                form=request.form,
+                mode="edit",
+            )
+
         owner, owner_error = resolve_box_owner(request.form)
         if owner_error:
             return render_box_form(box=box, error=owner_error, form=request.form, mode="edit")
@@ -723,7 +749,7 @@ def edit_box(box_id):
             condition = "unknown"
 
         box.game = game
-        box.display_name = game.title
+        box.display_name = display_name
         box.owner = owner
         box.condition = condition
         box.notes = notes
@@ -746,6 +772,7 @@ def edit_box(box_id):
         form=box_form_data(box),
         mode="edit",
         new_game_value=NEW_GAME_VALUE,
+        uncatalogued_game_value=UNCATALOGUED_GAME_VALUE,
         manual_game_value=MANUAL_GAME_VALUE,
     )
 

@@ -21,6 +21,7 @@ Les tests automatisés utilisent SQLite en mémoire. Ils couvrent :
 - permissions des utilisateurs, propriétaires et administrateurs;
 - navigation principale et fiches;
 - création manuelle d’un jeu et d’une boîte sans BGG;
+- création et modification d’une boîte non cataloguée avec `game_id = NULL`;
 - création et annulation d’une demande;
 - scan, changement de détenteur et fulfillment.
 

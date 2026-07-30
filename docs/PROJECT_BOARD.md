@@ -58,7 +58,7 @@ Règles :
 | Token BGG | Configuré hors dépôt |
 | Anciennes données | Non récupérées |
 | Données de démonstration | Seed non destructif exécuté deux fois et vérifié |
-| Tests automatisés actifs | 41 tests `pytest` réussis sur SQLite isolée |
+| Tests automatisés actifs | 44 tests `pytest` réussis sur SQLite isolée |
 
 ---
 
@@ -72,7 +72,7 @@ Règles :
 | REPO-02 | `DONE` | Résoudre les marqueurs de conflit du README | Aucun marqueur de conflit restant |
 | REPO-03 | `DONE` | Vérifier la branche de réparation | Branche `repair/manual-stabilization-2026-07-29` confirmée |
 | REPO-04 | `DONE` | Configurer les dépendances de test | `pytest` installé via `requirements-dev.txt` |
-| REPO-05 | `DONE` | Récupérer ou recréer les premiers tests critiques | 41 tests relus, adaptés et réussis |
+| REPO-05 | `DONE` | Récupérer ou recréer les premiers tests critiques | 44 tests relus, adaptés et réussis |
 | REPO-06 | `DONE` | Créer un checkpoint d’hygiène ciblé | Diff vérifié et commit sans `git add -A` aveugle |
 
 Constats du 29 juillet 2026 :
@@ -131,7 +131,7 @@ STAB-12
 | MVP-03 | `VERIFY` | Ajouter un jeu manuellement | Fonctionne sans BGG |
 | MVP-04 | `VERIFY` | Enrichissement BGG | Recherche et import contrôlés |
 | MVP-05 | `VERIFY` | Liste des boîtes | Affichage sans erreur |
-| MVP-06 | `NEXT` | Ajouter une boîte | Jeu facultatif, propriétaire et détenteur valides |
+| MVP-06 | `DONE` | Ajouter une boîte | Jeu existant, nouveau ou absent (`game_id = NULL`); propriétaire et détenteur valides |
 | MVP-07 | `NEXT` | Modifier une boîte | Validation correcte |
 | MVP-08 | `VERIFY` | Détail d’une boîte | Propriétaire, détenteur, statut, historique |
 | MVP-09 | `VERIFY` | Génération et affichage du QR | Token stable et URL correcte |
@@ -156,7 +156,7 @@ STAB-12
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
 | QA-01 | `DONE` | Créer une checklist de test manuel | `docs/SMOKE_TEST.md` |
-| QA-02 | `DONE` | Ajouter des tests automatisés critiques | 41 tests couvrent login, scan, demandes, CSRF et permissions |
+| QA-02 | `DONE` | Ajouter des tests automatisés critiques | 44 tests couvrent login, boîtes, scan, demandes, CSRF et permissions |
 | QA-03 | `NEXT` | Vérifier les migrations sur une DB vide | `db upgrade` fonctionne de zéro |
 | QA-04 | `NEXT` | Tester un redémarrage de l’application | Aucun état temporaire nécessaire |
 | QA-05 | `NEXT` | Vérifier les erreurs utilisateur | Pas de traceback visible |
