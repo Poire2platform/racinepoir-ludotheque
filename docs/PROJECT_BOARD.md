@@ -111,7 +111,7 @@ STAB-08
 | STAB-09 | `DONE` | Effectuer un test de fumée complet | Login, fiches et navigation validés sans traceback |
 | STAB-10 | `DONE` | Vérifier l’ajout manuel d’une boîte sans dépendre de BGG | Test automatisé réussi sans appel BGG |
 | STAB-11 | `DONE` | Vérifier les routes POST sensibles | Audit et 31 tests dédiés réussis; aucun GET mutateur |
-| STAB-12 | `NEXT` | Committer le checkpoint stable | Branche propre, commit nommé et `logthis` |
+| STAB-12 | `DONE` | Committer le checkpoint stable | Branche propre, commit nommé et `logthis` |
 | STAB-13 | `LATER` | Examiner la branche de sauvetage | Récupérer seulement les changements utiles |
 
 Ordre recommandé :
