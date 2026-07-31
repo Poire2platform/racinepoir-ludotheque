@@ -58,7 +58,7 @@ Règles :
 | Token BGG | Configuré hors dépôt |
 | Anciennes données | Non récupérées |
 | Données de démonstration | Seed non destructif exécuté deux fois et vérifié |
-| Tests automatisés actifs | 52 tests `pytest` réussis sur SQLite isolée |
+| Tests automatisés actifs | 55 tests `pytest` réussis sur SQLite isolée |
 
 ---
 
@@ -144,7 +144,7 @@ STAB-12
 | MVP-16 | `VERIFY` | Vue “Mes boîtes” | Filtre par propriétaire |
 | MVP-17 | `DONE` | Recherche et filtres | Titre, propriétaire, détenteur et statut combinables |
 | MVP-18 | `VERIFY` | Permissions applicatives | Séparation admin/membre testée; autres permissions à couvrir |
-| MVP-19 | `NEXT` | Gestion des utilisateurs | Création, activation, rôle |
+| MVP-19 | `DONE` | Gestion des utilisateurs | Création, activation, rôle, mot de passe et permissions testés |
 | MVP-20 | `VERIFY` | `/healthz` | Cas app/DB disponibles testé; cas DB indisponible à couvrir |
 | MVP-21 | `VERIFY` | Rate limiting | Protection sans casser les tests |
 | MVP-22 | `LATER` | Statistiques de parties | Non bloquant |
@@ -156,7 +156,7 @@ STAB-12
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
 | QA-01 | `DONE` | Créer une checklist de test manuel | `docs/SMOKE_TEST.md` |
-| QA-02 | `DONE` | Ajouter des tests automatisés critiques | 52 tests couvrent login, boîtes, filtres, scan, demandes, CSRF et permissions |
+| QA-02 | `DONE` | Ajouter des tests automatisés critiques | 55 tests couvrent login, utilisateurs, boîtes, filtres, scan, demandes, CSRF et permissions |
 | QA-03 | `NEXT` | Vérifier les migrations sur une DB vide | `db upgrade` fonctionne de zéro |
 | QA-04 | `NEXT` | Tester un redémarrage de l’application | Aucun état temporaire nécessaire |
 | QA-05 | `NEXT` | Vérifier les erreurs utilisateur | Pas de traceback visible |

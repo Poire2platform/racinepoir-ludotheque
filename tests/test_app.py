@@ -1,7 +1,9 @@
 from unittest.mock import patch
 
+from werkzeug.security import check_password_hash
+
 from app.extensions import db
-from app.models import Box, BoxEvent, BoxRequest, Game
+from app.models import Box, BoxEvent, BoxRequest, Game, User
 
 
 def test_healthz_reports_application_and_database_ready(client):
@@ -119,6 +121,107 @@ def test_admin_can_access_user_management(client, make_user, login_as):
 
     assert response.status_code == 200
     assert "Utilisateurs".encode() in response.data
+
+
+def test_admin_can_create_user_with_role_and_activation_state(
+    app,
+    client,
+    make_user,
+    login_as,
+    csrf_token,
+):
+    admin = make_user("admin", role="admin")
+    login_as(admin)
+
+    response = client.post(
+        "/users/new",
+        data={
+            "_csrf_token": csrf_token,
+            "username": "gestionnaire",
+            "email": "gestionnaire@example.test",
+            "display_name": "Gestionnaire",
+            "password": "temporary-password",
+            "role": "admin",
+        },
+    )
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/users"
+    with app.app_context():
+        user = User.query.filter_by(username="gestionnaire").one()
+        assert user.email == "gestionnaire@example.test"
+        assert user.display_name == "Gestionnaire"
+        assert user.role == "admin"
+        assert user.is_active is False
+        assert check_password_hash(user.password_hash, "temporary-password")
+
+
+def test_admin_can_edit_role_activation_and_password(
+    app,
+    client,
+    make_user,
+    login_as,
+    csrf_token,
+):
+    admin = make_user("admin", role="admin")
+    member = make_user("member", is_active=False)
+    login_as(admin)
+
+    response = client.post(
+        f"/users/{member.id}/edit",
+        data={
+            "_csrf_token": csrf_token,
+            "username": "member-renamed",
+            "email": "renamed@example.test",
+            "display_name": "Membre renommé",
+            "password": "new-password",
+            "role": "admin",
+            "is_active": "yes",
+        },
+    )
+
+    assert response.status_code == 302
+    with app.app_context():
+        refreshed_user = db.session.get(User, member.id)
+        assert refreshed_user.username == "member-renamed"
+        assert refreshed_user.email == "renamed@example.test"
+        assert refreshed_user.display_name == "Membre renommé"
+        assert refreshed_user.role == "admin"
+        assert refreshed_user.is_active is True
+        assert check_password_hash(refreshed_user.password_hash, "new-password")
+
+
+def test_edit_user_rejects_invalid_role_without_changing_user(
+    app,
+    client,
+    make_user,
+    login_as,
+    csrf_token,
+):
+    admin = make_user("admin", role="admin")
+    member = make_user("member")
+    login_as(admin)
+
+    response = client.post(
+        f"/users/{member.id}/edit",
+        data={
+            "_csrf_token": csrf_token,
+            "username": "changed",
+            "email": "changed@example.test",
+            "display_name": "Changed",
+            "role": "superadmin",
+        },
+    )
+
+    assert response.status_code == 200
+    assert "Le rôle sélectionné est invalide.".encode() in response.data
+    with app.app_context():
+        refreshed_user = db.session.get(User, member.id)
+        assert refreshed_user.username == "member"
+        assert refreshed_user.email == "member@example.test"
+        assert refreshed_user.display_name == "Member"
+        assert refreshed_user.role == "member"
+        assert refreshed_user.is_active is True
 
 
 def test_manual_box_creation_does_not_require_bgg(

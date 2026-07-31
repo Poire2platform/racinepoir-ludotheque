@@ -462,7 +462,12 @@ def new_user():
             return render_template("user_form.html", error="Tous les champs principaux sont obligatoires.", form=request.form, roles=USER_ROLES)
 
         if role not in USER_ROLES:
-            role = "member"
+            return render_template(
+                "user_form.html",
+                error="Le rôle sélectionné est invalide.",
+                form=request.form,
+                roles=USER_ROLES,
+            )
 
         if User.query.filter_by(username=username).first():
             return render_template("user_form.html", error="Ce username existe déjà.", form=request.form, roles=USER_ROLES)
@@ -506,7 +511,14 @@ def edit_user(user_id):
             return render_template("user_form.html", user=user, error="Username, email et nom affiché sont obligatoires.", form=request.form, roles=USER_ROLES, mode="edit")
 
         if role not in USER_ROLES:
-            role = "member"
+            return render_template(
+                "user_form.html",
+                user=user,
+                error="Le rôle sélectionné est invalide.",
+                form=request.form,
+                roles=USER_ROLES,
+                mode="edit",
+            )
 
         existing_username = User.query.filter_by(username=username).first()
         if existing_username and existing_username.id != user.id:
