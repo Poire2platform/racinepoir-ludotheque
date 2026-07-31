@@ -250,6 +250,88 @@ def test_box_can_be_changed_to_uncatalogued(
     assert b'value="Bo\xc3\xaete myst\xc3\xa8re"' in uncatalogued_edit_page.data
 
 
+def test_owner_can_edit_box_details_and_records_event(
+    app,
+    client,
+    make_user,
+    make_box,
+    login_as,
+    csrf_token,
+):
+    owner = make_user("owner")
+    new_owner = make_user("newowner")
+    box = make_box(owner, title="Ancien jeu")
+    replacement_game = Game(title="Nouveau jeu", normalized_title="nouveau jeu")
+    db.session.add(replacement_game)
+    db.session.commit()
+    login_as(owner)
+
+    response = client.post(
+        f"/boxes/{box.id}/edit",
+        data={
+            "_csrf_token": csrf_token,
+            "game_id": str(replacement_game.id),
+            "owner_user_id": str(new_owner.id),
+            "condition": "incomplete",
+            "notes": "  Il manque un pion.  ",
+        },
+    )
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == f"/boxes/{box.id}"
+    with app.app_context():
+        refreshed_box = db.session.get(Box, box.id)
+        assert refreshed_box.game_id == replacement_game.id
+        assert refreshed_box.display_name == "Nouveau jeu"
+        assert refreshed_box.owner_user_id == new_owner.id
+        assert refreshed_box.condition == "incomplete"
+        assert refreshed_box.notes == "Il manque un pion."
+
+        event = BoxEvent.query.filter_by(
+            box_id=box.id,
+            event_type="box_updated",
+        ).one()
+        assert event.actor_user_id == owner.id
+
+
+def test_edit_box_rejects_unknown_game_without_changing_box(
+    app,
+    client,
+    make_user,
+    make_box,
+    login_as,
+    csrf_token,
+):
+    owner = make_user("owner")
+    box = make_box(owner, title="Jeu intact")
+    original_game_id = box.game_id
+    login_as(owner)
+
+    response = client.post(
+        f"/boxes/{box.id}/edit",
+        data={
+            "_csrf_token": csrf_token,
+            "game_id": "999999",
+            "owner_user_id": str(owner.id),
+            "condition": "worn",
+            "notes": "Ne doit pas être enregistré",
+        },
+    )
+
+    assert response.status_code == 200
+    assert "Le jeu référencé sélectionné est introuvable.".encode() in response.data
+    with app.app_context():
+        refreshed_box = db.session.get(Box, box.id)
+        assert refreshed_box.game_id == original_game_id
+        assert refreshed_box.display_name == "Jeu intact"
+        assert refreshed_box.condition == "good"
+        assert refreshed_box.notes is None
+        assert BoxEvent.query.filter_by(
+            box_id=box.id,
+            event_type="box_updated",
+        ).count() == 0
+
+
 def test_request_can_be_created_and_cancelled(
     app,
     client,

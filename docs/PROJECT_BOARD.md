@@ -2,7 +2,7 @@
 ## RacinePoir — Ludothèque distribuée
 
 **Rôle du document :** tableau de suivi opérationnel du projet.  
-**Dernière mise à jour :** 29 juillet 2026  
+**Dernière mise à jour :** 31 juillet 2026
 **Sources complémentaires :**
 - `docs/infra-plan.md`
 - code et migrations de la branche active
@@ -58,7 +58,7 @@ Règles :
 | Token BGG | Configuré hors dépôt |
 | Anciennes données | Non récupérées |
 | Données de démonstration | Seed non destructif exécuté deux fois et vérifié |
-| Tests automatisés actifs | 50 tests `pytest` réussis sur SQLite isolée |
+| Tests automatisés actifs | 52 tests `pytest` réussis sur SQLite isolée |
 
 ---
 
@@ -132,7 +132,7 @@ STAB-12
 | MVP-04 | `VERIFY` | Enrichissement BGG | Recherche et import contrôlés |
 | MVP-05 | `VERIFY` | Liste des boîtes | Affichage sans erreur |
 | MVP-06 | `DONE` | Ajouter une boîte | Jeu existant, nouveau ou absent (`game_id = NULL`); propriétaire et détenteur valides |
-| MVP-07 | `NEXT` | Modifier une boîte | Validation correcte |
+| MVP-07 | `DONE` | Modifier une boîte | Propriétaire/admin contrôlés; champs, validation et historique testés |
 | MVP-08 | `VERIFY` | Détail d’une boîte | Propriétaire, détenteur, statut, historique |
 | MVP-09 | `VERIFY` | Génération et affichage du QR | Token stable et URL correcte |
 | MVP-10 | `VERIFY` | Scan direct | Change le détenteur et crée un événement |
@@ -156,7 +156,7 @@ STAB-12
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
 | QA-01 | `DONE` | Créer une checklist de test manuel | `docs/SMOKE_TEST.md` |
-| QA-02 | `DONE` | Ajouter des tests automatisés critiques | 50 tests couvrent login, boîtes, filtres, scan, demandes, CSRF et permissions |
+| QA-02 | `DONE` | Ajouter des tests automatisés critiques | 52 tests couvrent login, boîtes, filtres, scan, demandes, CSRF et permissions |
 | QA-03 | `NEXT` | Vérifier les migrations sur une DB vide | `db upgrade` fonctionne de zéro |
 | QA-04 | `NEXT` | Tester un redémarrage de l’application | Aucun état temporaire nécessaire |
 | QA-05 | `NEXT` | Vérifier les erreurs utilisateur | Pas de traceback visible |
