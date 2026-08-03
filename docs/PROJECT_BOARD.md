@@ -5,6 +5,7 @@
 **Dernière mise à jour :** 3 août 2026
 **Sources complémentaires :**
 - `docs/infra-plan.md`
+- `docs/PRODUCTION_DATABASE.md`
 - code et migrations de la branche active
 
 ---
@@ -201,7 +202,7 @@ applicatif `WEB-08` à `WEB-11`.
 
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
-| DB-01 | `BLOCKED` | Choisir DB actuelle ou DB prod séparée | Décision écrite |
+| DB-01 | `DONE` | Choisir DB actuelle ou DB prod séparée | Base séparée `racinepoir_ludotheque_prod` sur SQL101 |
 | DB-02 | `NEXT` | Créer le rôle production | Non superuser |
 | DB-03 | `NEXT` | Créer la base production | Propriétaire correct |
 | DB-04 | `NEXT` | Restreindre `pg_hba.conf` | WEB01 seulement |
@@ -290,7 +291,7 @@ A. Réutiliser racinepoir_ludotheque
 B. Créer racinepoir_ludotheque_prod
 ```
 
-**Recommandation : B.**
+**Décision : B — créer `racinepoir_ludotheque_prod` sur SQL101.**
 
 ## D-02 — Exposition publique
 

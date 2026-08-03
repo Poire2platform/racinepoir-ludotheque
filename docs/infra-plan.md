@@ -48,10 +48,10 @@ Client web
 ### APP — WEB01
 
 - Rôle : serveur applicatif Ludothèque.
-- Statut : à créer.
+- Statut : VM créée; SSH et DNS fonctionnels.
 - OS recommandé : Ubuntu Server LTS.
-- IP locale prévue : à définir, idéalement réservation DHCP ou IP fixe.
-- Nom possible : `WEB01` / `poire1-ludo-web`.
+- IP locale : `192.168.18.38`.
+- Nom : `WEB01` / `poire1-ludoweb`.
 - Doit rester allumée 24/7 : oui.
 
 Services prévus :
@@ -75,6 +75,8 @@ Specs recommandées :
 - IP locale : `192.168.18.30`.
 - Database : `racinepoir_ludotheque`.
 - User applicatif : `racinepoir_app`.
+- Database production choisie : `racinepoir_ludotheque_prod`.
+- User applicatif production prévu : `racinepoir_prod`.
 - PostgreSQL : déjà fonctionnel.
 
 Choix important : on garde PostgreSQL sur SQL101. On ne met pas PostgreSQL
@@ -113,7 +115,9 @@ Raisons :
 
 ## Prochaine étape infra
 
-Créer WEB01 dans Proxmox.
+Préparer la base et le rôle de production séparés sur SQL101, puis préparer
+WEB01 sans installer de service applicatif directement sur l’hyperviseur Poire1.
+La procédure contrôlée est dans `docs/PRODUCTION_DATABASE.md`.
 
 Checklist WEB01 :
 
