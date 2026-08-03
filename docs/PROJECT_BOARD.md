@@ -58,7 +58,7 @@ Règles :
 | Token BGG | Configuré hors dépôt |
 | Anciennes données | Non récupérées |
 | Données de démonstration | Seed non destructif exécuté deux fois et vérifié |
-| Tests automatisés actifs | 87 tests `pytest` réussis sur SQLite isolée |
+| Tests automatisés actifs | 88 tests `pytest` réussis sur SQLite isolée |
 
 ---
 
@@ -157,12 +157,12 @@ STAB-12
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
 | QA-01 | `DONE` | Créer une checklist de test manuel | `docs/SMOKE_TEST.md` |
-| QA-02 | `DONE` | Ajouter des tests automatisés critiques | 87 tests couvrent login, utilisateurs, jeux, notes, boîtes, filtres, scan, demandes, CSRF et permissions |
+| QA-02 | `DONE` | Ajouter des tests automatisés critiques | 88 tests couvrent login, utilisateurs, jeux, notes, boîtes, filtres, scan, demandes, CSRF et permissions |
 | QA-03 | `DONE` | Vérifier les migrations sur une DB vide | SQLite vide migrée jusqu’à `b7c3d4e5f6a7` |
 | QA-04 | `DONE` | Tester un redémarrage de l’application | Données, login, catalogue, boîtes et santé vérifiés après recréation |
 | QA-05 | `DONE` | Vérifier les erreurs utilisateur | Réponses 404/500 sans traceback ni détail interne |
 | QA-06 | `DONE` | Vérifier les secrets Git | Fichiers suivis et historique contrôlés sans secret détecté |
-| QA-07 | `DONE` | Vérifier `requirements.txt` | Venv neuf et imports vérifiés; suite courante de 87 tests réussie |
+| QA-07 | `DONE` | Vérifier `requirements.txt` | Venv neuf et imports vérifiés; suite courante de 88 tests réussie |
 | QA-08 | `DONE` | Préparer un tag de déploiement | Checkpoint QA identifié par `mvp-2026-08-03` |
 
 ---
@@ -273,7 +273,7 @@ DB-01 → DB-05
 | UX-04 | `DONE` | Harmoniser badges et statuts | Libellés français et badges cohérents sur les vues de boîtes |
 | UX-05 | `DONE` | États vides et erreurs | Pages 400/404/500 et listes vides expliquées avec une action utile |
 | UX-06 | `NEXT` | Accessibilité de base | Contraste, focus, labels |
-| UX-07 | `DONE` | Mode liste / miniatures | Catalogue commutable, responsive et préférence mémorisée localement |
+| UX-07 | `DONE` | Mode liste / miniatures | Jeux et boîtes commutables; résumés récents sur l’accueil |
 | UX-08 | `LATER` | Page Communauté | Après déploiement |
 | UX-09 | `LATER` | Scanner caméra intégré | Après HTTPS |
 | UX-10 | `LATER` | Design final portfolio | Après validation fonctionnelle |

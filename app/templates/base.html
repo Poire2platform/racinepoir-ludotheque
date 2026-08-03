@@ -180,7 +180,7 @@ nav {
     background: transparent;
 }
 
-#games-list-view {
+.collection-list-view {
     border: 0;
     padding: 0;
     background: transparent;
@@ -243,6 +243,43 @@ nav {
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+    border: 0;
+    padding: 0;
+    background: transparent;
+}
+
+.summary-card {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 7px;
+    border: 1px solid #59676b;
+    padding: 8px;
+    background: #343b3d;
+    text-decoration: none;
+}
+
+.summary-card img,
+.summary-card__placeholder {
+    display: grid;
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    place-items: center;
+    object-fit: contain;
+    background: #202628;
+    color: #b9c5c8;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.summary-empty {
+    color: #c8d0d2;
 }
 
 table {
@@ -398,6 +435,7 @@ body.anika-love::before {
 {% if current_user.is_authenticated %}
     <a href="/me/held-boxes">Chez moi</a>
     <a href="/me/owned-boxes">Mes boîtes</a>
+    <a href="/me/interested-boxes">I would like</a>
     <a href="/me/profile">Profil</a>
 {% else %}
     <a href="/login">Connexion</a>
@@ -422,5 +460,35 @@ body.anika-love::before {
 </header>
 <main>{% block content %}{% endblock %}</main>
 <button class="anika-button" type="button" onclick="document.body.classList.toggle('anika-love')">Anika</button>
+<script>
+document.querySelectorAll("[data-view-switcher]").forEach((switcher) => {
+    const listView = document.getElementById(switcher.dataset.listTarget);
+    const gridView = document.getElementById(switcher.dataset.gridTarget);
+    const listButton = switcher.querySelector('[data-view="list"]');
+    const gridButton = switcher.querySelector('[data-view="grid"]');
+
+    const setView = (view) => {
+        const showGrid = view === "grid";
+        listView.hidden = showGrid;
+        gridView.hidden = !showGrid;
+        listButton.setAttribute("aria-pressed", String(!showGrid));
+        gridButton.setAttribute("aria-pressed", String(showGrid));
+        try {
+            window.localStorage.setItem(switcher.dataset.storageKey, showGrid ? "grid" : "list");
+        } catch (_error) {
+            // Le sélecteur reste utilisable sans stockage local.
+        }
+    };
+
+    listButton.addEventListener("click", () => setView("list"));
+    gridButton.addEventListener("click", () => setView("grid"));
+
+    try {
+        setView(window.localStorage.getItem(switcher.dataset.storageKey) === "grid" ? "grid" : "list");
+    } catch (_error) {
+        setView("list");
+    }
+});
+</script>
 </body>
 </html>

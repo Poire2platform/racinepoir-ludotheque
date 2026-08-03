@@ -938,6 +938,13 @@ def test_interest_flag_is_available_without_priority_or_duplicates(
     assert home_response.status_code == 200
     assert "Mes marqueurs « I would like »".encode() in home_response.data
     assert "1 marqueur(s) actif(s).".encode() in home_response.data
+    assert f'/boxes/{box.id}'.encode() in home_response.data
+    assert b'href="/me/interested-boxes"' in home_response.data
+
+    interested_response = client.get("/me/interested-boxes")
+    assert interested_response.status_code == 200
+    assert box.display_label.encode() in interested_response.data
+    assert b'id="interested-boxes-grid-view"' in interested_response.data
 
     duplicate_response = client.post(
         f"/boxes/{box.id}/request",
@@ -1096,6 +1103,7 @@ def test_authenticated_navigation_smoke(
         f"/boxes/{box.id}",
         "/me/held-boxes",
         "/me/owned-boxes",
+        "/me/interested-boxes",
         "/sessions",
         "/players",
         "/users",
@@ -1127,6 +1135,7 @@ def test_mobile_navigation_structure_and_scan_primary_action(
     assert b'class="member-nav"' in home_response.data
     assert b'aria-label="Navigation principale"' in home_response.data
     assert b'href="/me/held-boxes"' in home_response.data
+    assert b'href="/me/interested-boxes"' in home_response.data
     assert scan_response.status_code == 200
     assert b'class="scan-action"' in scan_response.data
     assert b'class="primary-action"' in scan_response.data
@@ -1170,6 +1179,9 @@ def test_my_held_boxes_filters_by_current_holder_not_owner(
     assert response.data.index(borrowed_label) < response.data.index(owned_here_label)
     assert response.data.count(b">Chez moi</span>") == 2
     assert response.data.count(">À moi</span>".encode()) == 1
+    assert b'id="held-boxes-list-view"' in response.data
+    assert b'id="held-boxes-grid-view"' in response.data
+    assert b"racinepoir-held-boxes-view" in response.data
 
 
 def test_my_owned_boxes_filters_by_owner_and_displays_current_holder(
@@ -1221,6 +1233,9 @@ def test_my_owned_boxes_filters_by_owner_and_displays_current_holder(
     assert "1 intéressé(s)".encode() in response.data
     assert b"/edit" in response.data
     assert b"/label" in response.data
+    assert b'id="owned-boxes-list-view"' in response.data
+    assert b'id="owned-boxes-grid-view"' in response.data
+    assert b"racinepoir-owned-boxes-view" in response.data
 
 
 def test_boxes_can_be_searched_by_title(client, make_user, make_box):
@@ -1268,6 +1283,32 @@ def test_box_list_displays_catalogued_and_uncatalogued_box_details(
     assert b"Active" in response.data
     assert b"Disponible" in response.data
     assert b"badge--warning" in response.data
+    assert b'id="boxes-list-view"' in response.data
+    assert b'id="boxes-grid-view"' in response.data
+    assert b"racinepoir-boxes-view" in response.data
+
+
+def test_home_summaries_show_only_three_most_recent_boxes(
+    client,
+    make_user,
+    make_box,
+    login_as,
+):
+    owner = make_user("owner")
+    oldest = make_box(owner, title="Oldest", token="summary-oldest")
+    recent_boxes = [
+        make_box(owner, title=title, token=f"summary-{index}")
+        for index, title in enumerate(("Recent one", "Recent two", "Recent three"), start=1)
+    ]
+    login_as(owner)
+
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert oldest.display_label.encode() not in response.data
+    for box in recent_boxes:
+        assert box.display_label.encode() in response.data
+    assert response.data.count(b'class="summary-card"') == 6
 
 
 def test_box_detail_displays_ownership_status_and_history(

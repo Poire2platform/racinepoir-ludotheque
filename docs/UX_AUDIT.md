@@ -42,3 +42,5 @@ souhait et note en pourcentage d’un jeu.
 - Le catalogue de jeux propose une liste détaillée et une grille de miniatures;
   le choix est mémorisé dans le navigateur et les couvertures absentes ont un
   remplacement textuel accessible.
+- Les vues Boîtes, Chez moi, Mes boîtes et I would like réutilisent ce sélecteur.
+  L’accueil résume les trois collections personnelles avec au plus trois boîtes.

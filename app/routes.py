@@ -5,7 +5,7 @@ from io import BytesIO
 
 from flask import Blueprint, current_app, jsonify, render_template, redirect, url_for, request, send_file
 from flask_login import login_user, logout_user, current_user, login_required
-from sqlalchemy import or_, text
+from sqlalchemy import func, or_, text
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.extensions import db
@@ -238,11 +238,30 @@ def index():
         status="active"
     ).count()
 
+    held_boxes = Box.query.filter_by(
+        current_holder_user_id=current_user.id
+    ).order_by(Box.updated_at.desc(), Box.id.desc()).limit(3).all()
+
+    owned_boxes = Box.query.filter_by(
+        owner_user_id=current_user.id
+    ).order_by(
+        func.coalesce(Box.acquired_at, Box.created_at).desc(),
+        Box.id.desc(),
+    ).limit(3).all()
+
+    interest_flags = BoxRequest.query.filter_by(
+        requester_user_id=current_user.id,
+        status="active",
+    ).order_by(BoxRequest.created_at.desc(), BoxRequest.id.desc()).limit(3).all()
+
     return render_template(
         "index.html",
         held_count=held_count,
         owned_count=owned_count,
         interest_count=interest_count,
+        held_boxes=held_boxes,
+        owned_boxes=owned_boxes,
+        interested_boxes=[flag.box for flag in interest_flags],
     )
 
 
@@ -893,6 +912,20 @@ def my_owned_boxes():
     return render_template(
         "my_owned_boxes.html",
         boxes=boxes,
+    )
+
+
+@main.route("/me/interested-boxes")
+@login_required
+def my_interested_boxes():
+    flags = BoxRequest.query.filter_by(
+        requester_user_id=current_user.id,
+        status="active",
+    ).order_by(BoxRequest.created_at.desc(), BoxRequest.id.desc()).all()
+
+    return render_template(
+        "my_interested_boxes.html",
+        boxes=[flag.box for flag in flags],
     )
 
 

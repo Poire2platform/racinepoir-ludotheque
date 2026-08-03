@@ -9,6 +9,9 @@
 <p><a href="/boxes/new">Ajouter une boîte</a></p>
 
 {% if boxes %}
+    {% set collection_id = "owned-boxes" %}
+    {% include "partials/view_switcher.html" %}
+    <div id="owned-boxes-list-view" class="collection-list-view">
     <ul>
         {% for box in boxes %}
             <li>
@@ -39,6 +42,8 @@
             </li>
         {% endfor %}
     </ul>
+    </div>
+    {% include "partials/box_thumbnail_grid.html" %}
 {% else %}
     <section class="empty-state">
         <h3>Aucune boîte enregistrée à ton nom</h3>

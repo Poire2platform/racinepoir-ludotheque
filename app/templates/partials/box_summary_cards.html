@@ -1,0 +1,16 @@
+{% if summary_boxes %}
+<div class="summary-grid">
+{% for box in summary_boxes %}
+    <a class="summary-card" href="/boxes/{{ box.id }}">
+        {% if box.game and box.game.cover_image_url %}
+            <img src="{{ box.game.cover_image_url }}" alt="" loading="lazy">
+        {% else %}
+            <span class="summary-card__placeholder" aria-hidden="true">{{ box.display_label[:1]|upper }}</span>
+        {% endif %}
+        <span>{{ box.display_label }}</span>
+    </a>
+{% endfor %}
+</div>
+{% else %}
+<p class="summary-empty">Rien à afficher pour le moment.</p>
+{% endif %}

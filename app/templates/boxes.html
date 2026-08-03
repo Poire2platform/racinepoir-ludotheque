@@ -44,7 +44,11 @@
     </p>
 </form>
 {% if boxes %}
-<table border="1" cellpadding="6">
+{% set collection_id = "boxes" %}
+{% include "partials/view_switcher.html" %}
+<div id="boxes-list-view" class="collection-list-view">
+<table>
+<caption class="visually-hidden">Liste détaillée des boîtes</caption>
 <thead><tr><th>ID</th><th>Boîte</th><th>Jeu référencé</th><th>Propriétaire</th><th>Détenteur actuel</th><th>Intérêt</th><th>État</th><th>Action</th></tr></thead>
 <tbody>
 {% for box in boxes %}
@@ -61,6 +65,8 @@
 {% endfor %}
 </tbody>
 </table>
+</div>
+{% include "partials/box_thumbnail_grid.html" %}
 {% else %}
 <section class="empty-state">
     <h3>Aucune boîte trouvée</h3>

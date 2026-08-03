@@ -1,32 +1,31 @@
 {% extends "base.html" %}
 
-{% block title %}Chez moi — RacinePoir{% endblock %}
+{% block title %}Mes marqueurs « I would like » — RacinePoir{% endblock %}
 
 {% block content %}
-<h2>Chez moi</h2>
-
-<p>Boîtes actuellement entre tes mains.</p>
+<h2>Mes marqueurs « I would like »</h2>
+<p>Ces marqueurs sont des notes personnelles; ils ne réservent pas les boîtes.</p>
 
 {% if boxes %}
-    {% set collection_id = "held-boxes" %}
+    {% set collection_id = "interested-boxes" %}
     {% include "partials/view_switcher.html" %}
-    <div id="held-boxes-list-view" class="collection-list-view">
-    <ul>
+    <div id="interested-boxes-list-view" class="collection-list-view">
+        <ul>
         {% for box in boxes %}
             <li>
                 <a href="/boxes/{{ box.id }}">{{ box.display_label }}</a>
-                {% include "partials/box_badges.html" %}
                 {% include "partials/box_status_badges.html" %}
+                — détenteur : {% if box.current_holder %}{{ box.current_holder.display_name }}{% else %}inconnu{% endif %}
                 — {% include "partials/interest_button.html" %}
             </li>
         {% endfor %}
-    </ul>
+        </ul>
     </div>
     {% include "partials/box_thumbnail_grid.html" %}
 {% else %}
     <section class="empty-state">
-        <h3>Aucune boîte chez toi</h3>
-        <p>Une boîte apparaîtra ici dès que tu confirmeras son code QR.</p>
+        <h3>Aucun marqueur actif</h3>
+        <p>Utilise « I would like » près d’une boîte pour la retrouver ici.</p>
         <p><a href="/boxes">Parcourir les boîtes</a></p>
     </section>
 {% endif %}

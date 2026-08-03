@@ -7,28 +7,35 @@
 
 <p>Bienvenue, {{ current_user.display_name }}.</p>
 
-<div>
+<section>
     <h3>Chez moi</h3>
     <p>{{ held_count }} boîte(s) actuellement entre tes mains.</p>
+    {% set summary_boxes = held_boxes %}
+    {% include "partials/box_summary_cards.html" %}
     <p><a href="/me/held-boxes">Voir les boîtes chez moi</a></p>
-</div>
+</section>
 
 <hr>
 
-<div>
+<section>
     <h3>Mes boîtes</h3>
     <p>{{ owned_count }} boîte(s) t’appartiennent.</p>
+    <p>Dernières boîtes acquises :</p>
+    {% set summary_boxes = owned_boxes %}
+    {% include "partials/box_summary_cards.html" %}
     <p><a href="/me/owned-boxes">Voir mes boîtes</a></p>
     <p><a href="/boxes/new">Ajouter une boîte</a></p>
-</div>
+</section>
 
 <hr>
 
-<div>
+<section>
     <h3>Mes marqueurs « I would like »</h3>
     <p>{{ interest_count }} marqueur(s) actif(s).</p>
-    <p><a href="/boxes">Parcourir les boîtes</a></p>
-</div>
+    {% set summary_boxes = interested_boxes %}
+    {% include "partials/box_summary_cards.html" %}
+    <p><a href="/me/interested-boxes">Voir tous mes marqueurs</a> — <a href="/boxes">Parcourir les boîtes</a></p>
+</section>
 
 <hr>
 
