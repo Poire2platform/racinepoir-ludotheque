@@ -479,6 +479,9 @@ def test_game_catalog_lists_games_with_reference_information(app, client):
     assert b"https://images.example.test/azul.jpg" in response.data
     assert "Aucune couverture disponible pour Catan".encode() in response.data
     assert b"racinepoir-games-view" in response.data
+    assert b'<th scope="col">ID</th>' not in response.data
+    assert b'class="collection-list-view table-scroll"' in response.data
+    assert "glisse horizontalement".encode() in response.data
 
 
 def test_game_detail_displays_reference_data_and_linked_boxes(
@@ -1283,6 +1286,7 @@ def test_box_list_displays_catalogued_and_uncatalogued_box_details(
     client,
     make_user,
     make_box,
+    login_as,
 ):
     owner = make_user("owner")
     holder = make_user("holder")
@@ -1298,20 +1302,22 @@ def test_box_list_displays_catalogued_and_uncatalogued_box_details(
     )
     db.session.add(uncatalogued_box)
     db.session.commit()
+    login_as(owner)
 
     response = client.get("/boxes")
 
     assert response.status_code == 200
-    assert f"Azul - boîte #{catalogued_box.id}".encode() in response.data
+    assert b"Azul" in response.data
     assert f'/boxes/{catalogued_box.id}'.encode() in response.data
-    assert f"Prototype maison - boîte #{uncatalogued_box.id}".encode() in response.data
+    assert b"Prototype maison" in response.data
     assert f'/boxes/{uncatalogued_box.id}'.encode() in response.data
     assert b"Owner" in response.data
     assert b"Holder" in response.data
-    assert "Usée".encode() in response.data
-    assert b"Active" in response.data
-    assert b"Disponible" in response.data
-    assert b"badge--warning" in response.data
+    assert b'<th scope="col">ID</th>' not in response.data
+    assert '<th scope="col">État</th>'.encode() not in response.data
+    assert b">I would like</button>" in response.data
+    assert "glisse horizontalement".encode() in response.data
+    assert b'class="collection-list-view table-scroll"' in response.data
     assert b'id="boxes-list-view"' in response.data
     assert b'id="boxes-grid-view"' in response.data
     assert b"racinepoir-boxes-view" in response.data
@@ -1368,13 +1374,12 @@ def test_box_detail_displays_ownership_status_and_history(
     response = client.get(f"/boxes/{box.id}")
 
     assert response.status_code == 200
-    assert f"Azul - boîte #{box.id}".encode() in response.data
+    assert b"Azul" in response.data
     assert b"Owner" in response.data
     assert b"Current" in response.data
-    assert "Usée".encode() in response.data
-    assert b"Indisponible" in response.data
-    assert b"Perdue" in response.data
-    assert b"badge--danger" in response.data
+    assert "Usée".encode() not in response.data
+    assert b"Indisponible" not in response.data
+    assert b"Perdue" not in response.data
     assert b"Il manque un sac." in response.data
     assert b"holder_changed" in response.data
     assert b"acteur : Owner" in response.data

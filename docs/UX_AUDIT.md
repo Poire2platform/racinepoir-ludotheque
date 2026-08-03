@@ -46,3 +46,7 @@ souhait et note en pourcentage d’un jeu.
   L’accueil résume les trois collections personnelles avec au plus trois boîtes.
 - La navigation clavier dispose d’un lien d’évitement et d’un focus contrasté;
   la connexion et les tableaux principaux ont des libellés explicites.
+- Les listes détaillées masquent les identifiants et statuts techniques, gardent
+  des colonnes lisibles et permettent un défilement horizontal par glissement.
+- Dans la liste des boîtes, « I would like » est l’action directe de la colonne
+  Intérêt plutôt qu’une information éloignée dans une colonne d’actions.

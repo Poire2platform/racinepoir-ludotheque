@@ -7,14 +7,15 @@
 {% set collection_id = "games" %}
 {% include "partials/view_switcher.html" %}
 
-<div id="games-list-view" class="collection-list-view">
+<p class="scroll-hint">Sur mobile, glisse horizontalement pour voir toutes les colonnes.</p>
+<div id="games-list-view" class="collection-list-view table-scroll" role="region" aria-label="Liste détaillée des jeux" tabindex="0">
 <table>
 <caption class="visually-hidden">Liste détaillée des jeux</caption>
-<thead><tr><th scope="col">ID</th><th scope="col">Titre</th><th scope="col">Note médiane</th><th scope="col">BGG</th><th scope="col">Langue</th><th scope="col">Joueurs</th><th scope="col">Durée</th><th scope="col">Année</th><th scope="col">Boîtes liées</th></tr></thead>
+<thead><tr><th scope="col">Titre</th><th scope="col">Note médiane</th><th scope="col">BGG</th><th scope="col">Langue</th><th scope="col">Joueurs</th><th scope="col">Durée</th><th scope="col">Année</th><th scope="col">Boîtes liées</th></tr></thead>
 <tbody>
 {% for game in games %}
 <tr>
-<td>{{ game.id }}</td><td><a href="/games/{{ game.id }}">{{ game.title }}</a></td>
+<td><a href="/games/{{ game.id }}">{{ game.title }}</a></td>
 <td>{% if game.median_rating is not none %}{{ game.median_rating }} % ({{ game.ratings|length }}){% else %}—{% endif %}</td>
 <td>{% if game.is_bgg_recognized %}<a href="{{ game.bgg_url }}">Reconnu</a>{% else %}—{% endif %}</td>
 <td>{{ game.language or "—" }}</td>

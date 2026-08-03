@@ -314,7 +314,6 @@ nav {
 table {
     width: 100%;
     border-collapse: collapse;
-    overflow-wrap: anywhere;
 }
 
 th,
@@ -322,6 +321,34 @@ td {
     border: 1px solid #59676b;
     padding: 8px;
     vertical-align: top;
+}
+
+.table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    cursor: grab;
+    touch-action: pan-x pan-y;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table-scroll.is-dragging {
+    cursor: grabbing;
+    user-select: none;
+}
+
+#boxes-list-view table {
+    min-width: 720px;
+}
+
+#games-list-view table {
+    min-width: 900px;
+}
+
+.scroll-hint {
+    display: none;
+    color: #c8d0d2;
+    font-size: 0.88rem;
 }
 
 input,
@@ -425,6 +452,16 @@ body.anika-love::before {
         overflow-x: auto;
     }
 
+    .table-scroll table {
+        display: table;
+        overflow: visible;
+        font-size: 0.82rem;
+    }
+
+    .scroll-hint {
+        display: block;
+    }
+
     h1 {
         font-size: 1.55rem;
         line-height: 1.2;
@@ -526,6 +563,41 @@ document.querySelectorAll("[data-view-switcher]").forEach((switcher) => {
     } catch (_error) {
         setView("list");
     }
+});
+
+document.querySelectorAll(".table-scroll").forEach((scroller) => {
+    let dragging = false;
+    let moved = false;
+    let startX = 0;
+    let startScrollLeft = 0;
+
+    scroller.addEventListener("mousedown", (event) => {
+        dragging = true;
+        moved = false;
+        startX = event.clientX;
+        startScrollLeft = scroller.scrollLeft;
+        scroller.classList.add("is-dragging");
+    });
+
+    window.addEventListener("mousemove", (event) => {
+        if (!dragging) return;
+        const distance = event.clientX - startX;
+        if (Math.abs(distance) > 4) moved = true;
+        scroller.scrollLeft = startScrollLeft - distance;
+    });
+
+    window.addEventListener("mouseup", () => {
+        dragging = false;
+        scroller.classList.remove("is-dragging");
+    });
+
+    scroller.addEventListener("click", (event) => {
+        if (moved) {
+            event.preventDefault();
+            event.stopPropagation();
+            moved = false;
+        }
+    }, true);
 });
 </script>
 </body>

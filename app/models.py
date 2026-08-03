@@ -127,8 +127,8 @@ class Box(db.Model):
     @property
     def display_label(self):
         if self.game:
-            return f"{self.game.title} - boîte #{self.id}"
-        return f"{self.display_name} - boîte #{self.id}"
+            return self.game.title
+        return self.display_name
 
 class BoxRequest(db.Model):
     __tablename__ = "box_requests"

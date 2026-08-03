@@ -14,7 +14,6 @@
         {% for box in boxes %}
             <li>
                 <a href="/boxes/{{ box.id }}">{{ box.display_label }}</a>
-                {% include "partials/box_status_badges.html" %}
                 — détenteur : {% if box.current_holder %}{{ box.current_holder.display_name }}{% else %}inconnu{% endif %}
                 — {% include "partials/interest_button.html" %}
             </li>
