@@ -157,12 +157,12 @@ STAB-12
 |---|---|---|---|
 | QA-01 | `DONE` | Créer une checklist de test manuel | `docs/SMOKE_TEST.md` |
 | QA-02 | `DONE` | Ajouter des tests automatisés critiques | 55 tests couvrent login, utilisateurs, boîtes, filtres, scan, demandes, CSRF et permissions |
-| QA-03 | `NEXT` | Vérifier les migrations sur une DB vide | `db upgrade` fonctionne de zéro |
-| QA-04 | `NEXT` | Tester un redémarrage de l’application | Aucun état temporaire nécessaire |
-| QA-05 | `NEXT` | Vérifier les erreurs utilisateur | Pas de traceback visible |
-| QA-06 | `NEXT` | Vérifier les secrets Git | Aucun secret dans le repo ou l’historique |
-| QA-07 | `NEXT` | Vérifier `requirements.txt` | Venv recréable |
-| QA-08 | `NEXT` | Préparer un tag de déploiement | Commit stable identifié |
+| QA-03 | `DONE` | Vérifier les migrations sur une DB vide | SQLite vide migrée jusqu’à `9a1f4e5d8c20` |
+| QA-04 | `DONE` | Tester un redémarrage de l’application | Données, login, catalogue, boîtes et santé vérifiés après recréation |
+| QA-05 | `DONE` | Vérifier les erreurs utilisateur | Réponses 404/500 sans traceback ni détail interne |
+| QA-06 | `DONE` | Vérifier les secrets Git | Fichiers suivis et historique contrôlés sans secret détecté |
+| QA-07 | `DONE` | Vérifier `requirements.txt` | Venv neuf, imports et 79 tests réussis |
+| QA-08 | `DONE` | Préparer un tag de déploiement | Checkpoint QA identifié par `mvp-2026-08-03` |
 
 ---
 

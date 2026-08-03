@@ -28,6 +28,25 @@ def test_healthz_reports_database_unavailable_and_logs_failure(client):
     security_log.assert_called_once_with("health_check_failed", ip="127.0.0.1")
 
 
+def test_error_responses_do_not_expose_tracebacks(app, client):
+    not_found_response = client.get("/route-that-does-not-exist")
+
+    assert not_found_response.status_code == 404
+    assert b"Traceback" not in not_found_response.data
+
+    def raise_unexpected_error():
+        raise RuntimeError("internal diagnostic detail")
+
+    app.view_functions["main.games"] = raise_unexpected_error
+    app.config["PROPAGATE_EXCEPTIONS"] = False
+    with patch.object(app.logger, "exception"):
+        server_error_response = client.get("/games")
+
+    assert server_error_response.status_code == 500
+    assert b"Traceback" not in server_error_response.data
+    assert b"internal diagnostic detail" not in server_error_response.data
+
+
 def test_login_accepts_valid_credentials(client, make_user, csrf_token):
     make_user("max", password="correct-password")
 
