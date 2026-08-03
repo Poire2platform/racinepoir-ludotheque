@@ -9,13 +9,14 @@ Le parcours principal est volontairement direct :
 3. elle confirme avoir la boîte;
 4. la boîte change immédiatement de détenteur et l’historique est écrit.
 
-Le bouton **I would like** ajoute seulement un signal d’intérêt. Il ne réserve
+Le bouton **I would like** ajoute seulement un marqueur de souhait. Il ne réserve
 pas la boîte, ne crée aucun rang, ne bloque pas un transfert et ne propose pas
 d’annulation. Si la personne intéressée reçoit ensuite la boîte, son propre
-signal est marqué comme complété par le scan; les autres signaux restent actifs.
+marqueur est complété par le scan; les autres marqueurs restent actifs.
 
 Priorités UX : parcours scan court sur téléphone, actions explicites, état de la
-boîte lisible et distinction nette entre propriétaire, détenteur et intérêt.
+boîte lisible et distinction nette entre propriétaire, détenteur, marqueur de
+souhait et note en pourcentage d’un jeu.
 
 ## Inventaire des écrans
 

@@ -25,6 +25,17 @@
 <p><strong>Durée :</strong> {% if game.min_playtime and game.max_playtime %}{{ game.min_playtime }}–{{ game.max_playtime }} min{% else %}—{% endif %}</p>
 <p><strong>Âge minimum :</strong> {% if game.age_min %}{{ game.age_min }}+{% else %}—{% endif %}</p>
 <p><strong>Complexité BGG :</strong> {% if game.complexity %}{{ "%.2f"|format(game.complexity) }} / 5{% else %}—{% endif %}</p>
+<p><strong>Note médiane des joueurs :</strong> {% if game.median_rating is not none %}{{ game.median_rating }} % sur {{ game.ratings|length }} note(s){% else %}Aucune note{% endif %}</p>
+
+{% if current_user.is_authenticated %}
+    {% set my_rating = game.rating_for_user(current_user) %}
+    <form method="post" action="/games/{{ game.id }}/rating">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <label for="score_percent">Ma note en pourcentage</label><br>
+        <input id="score_percent" name="score_percent" type="number" min="0" max="100" step="1" required value="{% if my_rating %}{{ my_rating.score_percent }}{% endif %}">
+        <button type="submit">{% if my_rating %}Modifier ma note{% else %}Ajouter ma note{% endif %}</button>
+    </form>
+{% endif %}
 
 {% if game.bgg_id %}
     <p><strong>BoardGameGeek :</strong> <a href="{{ game.bgg_url }}">Consulter la page BGG #{{ game.bgg_id }}</a></p>

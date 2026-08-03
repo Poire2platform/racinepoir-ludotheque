@@ -10,7 +10,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.extensions import db
 from app.bgg import BggApiError, game_details, search_games
-from app.models import User, Game, Box, BoxEvent, BoxRequest, GameSession, GameSessionParticipant, PlayerProfile, utcnow
+from app.models import User, Game, GameRating, Box, BoxEvent, BoxRequest, GameSession, GameSessionParticipant, PlayerProfile, utcnow
 from app.security import env_int, is_rate_limited, rate_limit_key, request_ip, security_event
 
 main = Blueprint("main", __name__)
@@ -680,6 +680,30 @@ def populate_game_from_bgg(game_id):
         return render_template("game_bgg_matches.html", game=game, error=str(exc), matches=[])
 
     return render_template("game_bgg_matches.html", game=game, matches=matches)
+
+
+@main.route("/games/<int:game_id>/rating", methods=["POST"])
+@login_required
+def rate_game(game_id):
+    game = Game.query.get_or_404(game_id)
+    raw_score = (request.form.get("score_percent") or "").strip()
+
+    try:
+        score_percent = int(raw_score)
+    except ValueError:
+        return "La note doit être un nombre entier entre 0 et 100.", 400
+
+    if not 0 <= score_percent <= 100:
+        return "La note doit être comprise entre 0 et 100.", 400
+
+    rating = GameRating.query.filter_by(game_id=game.id, user_id=current_user.id).first()
+    if not rating:
+        rating = GameRating(game=game, user=current_user)
+        db.session.add(rating)
+
+    rating.score_percent = score_percent
+    db.session.commit()
+    return redirect(url_for("main.game_detail", game_id=game.id))
 
 
 @main.route("/boxes")

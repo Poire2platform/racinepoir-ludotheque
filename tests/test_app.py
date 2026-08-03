@@ -1,9 +1,10 @@
 from unittest.mock import Mock, patch
 
+import pytest
 from werkzeug.security import check_password_hash
 
 from app.extensions import db
-from app.models import Box, BoxEvent, BoxRequest, Game, User
+from app.models import Box, BoxEvent, BoxRequest, Game, GameRating, User
 
 
 def test_healthz_reports_application_and_database_ready(client):
@@ -490,6 +491,101 @@ def test_game_detail_returns_not_found_for_unknown_game(client):
     assert client.get("/games/999999").status_code == 404
 
 
+def test_players_can_rate_game_and_median_is_displayed(
+    app,
+    client,
+    make_user,
+    make_box,
+    login_as,
+    csrf_token,
+):
+    owner = make_user("owner")
+    second_player = make_user("second")
+    box = make_box(owner, title="Azul")
+
+    login_as(owner)
+    first_response = client.post(
+        f"/games/{box.game_id}/rating",
+        data={"_csrf_token": csrf_token, "score_percent": "80"},
+    )
+    assert first_response.status_code == 302
+
+    client.post("/logout", data={"_csrf_token": csrf_token})
+    login_as(second_player)
+    second_response = client.post(
+        f"/games/{box.game_id}/rating",
+        data={"_csrf_token": csrf_token, "score_percent": "40"},
+    )
+    assert second_response.status_code == 302
+
+    catalog_response = client.get("/games")
+    detail_response = client.get(f"/games/{box.game_id}")
+    assert b"60 % (2)" in catalog_response.data
+    assert b"60 % sur 2 note(s)" in detail_response.data
+
+    with app.app_context():
+        assert GameRating.query.filter_by(game_id=box.game_id).count() == 2
+
+
+def test_player_can_update_rating_without_creating_duplicate(
+    app,
+    client,
+    make_user,
+    make_box,
+    login_as,
+    csrf_token,
+):
+    owner = make_user("owner")
+    player = make_user("player")
+    box = make_box(owner)
+    with app.app_context():
+        db.session.add(GameRating(game_id=box.game_id, user_id=owner.id, score_percent=40))
+        db.session.commit()
+
+    login_as(player)
+    client.post(
+        f"/games/{box.game_id}/rating",
+        data={"_csrf_token": csrf_token, "score_percent": "80"},
+    )
+    update_response = client.post(
+        f"/games/{box.game_id}/rating",
+        data={"_csrf_token": csrf_token, "score_percent": "90"},
+    )
+
+    assert update_response.status_code == 302
+    detail_response = client.get(f"/games/{box.game_id}")
+    assert b"65 % sur 2 note(s)" in detail_response.data
+    assert b'value="90"' in detail_response.data
+    assert b"Modifier ma note" in detail_response.data
+    with app.app_context():
+        ratings = GameRating.query.filter_by(game_id=box.game_id).all()
+        assert sorted(rating.score_percent for rating in ratings) == [40, 90]
+
+
+@pytest.mark.parametrize("score", ("abc", "-1", "101"))
+def test_game_rating_rejects_invalid_percentages_without_mutation(
+    score,
+    app,
+    client,
+    make_user,
+    make_box,
+    login_as,
+    csrf_token,
+):
+    owner = make_user("owner")
+    box = make_box(owner)
+    login_as(owner)
+
+    response = client.post(
+        f"/games/{box.game_id}/rating",
+        data={"_csrf_token": csrf_token, "score_percent": score},
+    )
+
+    assert response.status_code == 400
+    with app.app_context():
+        assert GameRating.query.count() == 0
+
+
 def test_bgg_enrichment_search_displays_matches_without_changing_game(
     app,
     client,
@@ -809,8 +905,8 @@ def test_interest_flag_is_available_without_priority_or_duplicates(
     assert b"Annuler" not in detail_response.data
     home_response = client.get("/")
     assert home_response.status_code == 200
-    assert "Mes intérêts".encode() in home_response.data
-    assert "1 signalement(s) « I would like » actif(s).".encode() in home_response.data
+    assert "Mes marqueurs « I would like »".encode() in home_response.data
+    assert "1 marqueur(s) actif(s).".encode() in home_response.data
 
     duplicate_response = client.post(
         f"/boxes/{box.id}/request",

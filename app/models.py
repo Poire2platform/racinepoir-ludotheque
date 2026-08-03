@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from statistics import median
 from flask_login import UserMixin
 from app.extensions import db
 
@@ -19,6 +20,7 @@ class User(UserMixin, db.Model):
     owned_boxes = db.relationship("Box", foreign_keys="Box.owner_user_id", back_populates="owner")
     held_boxes = db.relationship("Box", foreign_keys="Box.current_holder_user_id", back_populates="current_holder")
     box_requests = db.relationship("BoxRequest", foreign_keys="BoxRequest.requester_user_id", back_populates="requester")
+    game_ratings = db.relationship("GameRating", back_populates="user", cascade="all, delete-orphan")
     player_profile = db.relationship("PlayerProfile", back_populates="linked_user", uselist=False)
 
 class Game(db.Model):
@@ -42,6 +44,23 @@ class Game(db.Model):
     created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utcnow)
     updated_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utcnow, onupdate=utcnow)
     boxes = db.relationship("Box", back_populates="game")
+    ratings = db.relationship("GameRating", back_populates="game", cascade="all, delete-orphan")
+
+    @property
+    def median_rating(self):
+        values = [rating.score_percent for rating in self.ratings]
+        if not values:
+            return None
+        result = median(values)
+        return int(result) if isinstance(result, float) and result.is_integer() else result
+
+    def rating_for_user(self, user):
+        if not user or not getattr(user, "is_authenticated", False):
+            return None
+        for rating in self.ratings:
+            if rating.user_id == user.id:
+                return rating
+        return None
 
     @property
     def is_bgg_recognized(self):
@@ -52,6 +71,22 @@ class Game(db.Model):
         if not self.bgg_id:
             return None
         return f"https://boardgamegeek.com/boardgame/{self.bgg_id}"
+
+
+class GameRating(db.Model):
+    __tablename__ = "game_ratings"
+    __table_args__ = (
+        db.UniqueConstraint("game_id", "user_id", name="uq_game_ratings_game_user"),
+        db.CheckConstraint("score_percent >= 0 AND score_percent <= 100", name="ck_game_ratings_score_percent"),
+    )
+    id = db.Column(db.Integer, primary_key=True)
+    game_id = db.Column(db.Integer, db.ForeignKey("games.id"), nullable=False, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
+    score_percent = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utcnow)
+    updated_at = db.Column(db.DateTime(timezone=True), nullable=False, default=utcnow, onupdate=utcnow)
+    game = db.relationship("Game", back_populates="ratings")
+    user = db.relationship("User", back_populates="game_ratings")
 
 class Box(db.Model):
     __tablename__ = "boxes"

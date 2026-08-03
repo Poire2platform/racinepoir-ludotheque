@@ -52,6 +52,7 @@ def test_mutation_only_routes_reject_get(
         "/users/1/edit",
         "/security",
         "/games/1/bgg",
+        "/games/1/rating",
         "/boxes/new",
         "/boxes/1/edit",
         "/boxes/1/transfer",
