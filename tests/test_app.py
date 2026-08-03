@@ -459,6 +459,7 @@ def test_game_catalog_lists_games_with_reference_information(app, client):
                 max_playtime=45,
                 year_published=2017,
                 bgg_id=230802,
+                cover_image_url="https://images.example.test/azul.jpg",
             ),
         ])
         db.session.commit()
@@ -471,6 +472,13 @@ def test_game_catalog_lists_games_with_reference_information(app, client):
     assert b"30\xe2\x80\x9345 min" in response.data
     assert b"2017" in response.data
     assert b"Reconnu" in response.data
+    assert "Liste détaillée".encode() in response.data
+    assert b"Miniatures" in response.data
+    assert b'id="games-list-view"' in response.data
+    assert b'id="games-grid-view"' in response.data
+    assert b"https://images.example.test/azul.jpg" in response.data
+    assert "Aucune couverture disponible pour Catan".encode() in response.data
+    assert b"racinepoir-games-view" in response.data
 
 
 def test_game_detail_displays_reference_data_and_linked_boxes(

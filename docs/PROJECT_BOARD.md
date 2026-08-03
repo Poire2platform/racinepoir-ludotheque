@@ -273,7 +273,7 @@ DB-01 → DB-05
 | UX-04 | `DONE` | Harmoniser badges et statuts | Libellés français et badges cohérents sur les vues de boîtes |
 | UX-05 | `DONE` | États vides et erreurs | Pages 400/404/500 et listes vides expliquées avec une action utile |
 | UX-06 | `NEXT` | Accessibilité de base | Contraste, focus, labels |
-| UX-07 | `LATER` | Mode liste / miniatures | Après MVP stable |
+| UX-07 | `DONE` | Mode liste / miniatures | Catalogue commutable, responsive et préférence mémorisée localement |
 | UX-08 | `LATER` | Page Communauté | Après déploiement |
 | UX-09 | `LATER` | Scanner caméra intégré | Après HTTPS |
 | UX-10 | `LATER` | Design final portfolio | Après validation fonctionnelle |

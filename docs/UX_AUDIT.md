@@ -39,3 +39,6 @@ souhait et note en pourcentage d’un jeu.
   400/404/500 utilisent une page cohérente sans détail interne.
 - Les statuts de boîte sont traduits et présentés avec des badges cohérents dans
   la liste, la fiche et les vues personnelles.
+- Le catalogue de jeux propose une liste détaillée et une grille de miniatures;
+  le choix est mémorisé dans le navigateur et les couvertures absentes ont un
+  remplacement textuel accessible.

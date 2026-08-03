@@ -4,7 +4,15 @@
 <h2>Jeux de référence</h2>
 <p>Ces fiches servent à enrichir les boîtes avec des statistiques générales. Elles ne sont pas le noyau opérationnel.</p>
 {% if games %}
-<table border="1" cellpadding="6">
+<div class="view-switcher" role="group" aria-label="Mode d’affichage des jeux">
+    <span>Affichage :</span>
+    <button id="games-view-list" type="button" aria-pressed="true">☷ Liste détaillée</button>
+    <button id="games-view-grid" type="button" aria-pressed="false">▦ Miniatures</button>
+</div>
+
+<div id="games-list-view">
+<table>
+<caption class="visually-hidden">Liste détaillée des jeux</caption>
 <thead><tr><th>ID</th><th>Titre</th><th>Note médiane</th><th>BGG</th><th>Langue</th><th>Joueurs</th><th>Durée</th><th>Année</th><th>Boîtes liées</th></tr></thead>
 <tbody>
 {% for game in games %}
@@ -20,6 +28,60 @@
 {% endfor %}
 </tbody>
 </table>
+</div>
+
+<div id="games-grid-view" class="game-grid" hidden>
+{% for game in games %}
+<article class="game-card">
+    {% if game.cover_image_url %}
+        <img class="game-card__cover" src="{{ game.cover_image_url }}" alt="Couverture de {{ game.title }}" loading="lazy">
+    {% else %}
+        <div class="game-card__placeholder" role="img" aria-label="Aucune couverture disponible pour {{ game.title }}">{{ game.title[:1]|upper }}</div>
+    {% endif %}
+    <div class="game-card__content">
+        <h3><a href="/games/{{ game.id }}">{{ game.title }}</a></h3>
+        <p><strong>Note :</strong> {% if game.median_rating is not none %}{{ game.median_rating }} % ({{ game.ratings|length }}){% else %}Aucune{% endif %}</p>
+        <p><strong>Joueurs :</strong> {% if game.min_players and game.max_players %}{{ game.min_players }}–{{ game.max_players }}{% else %}—{% endif %}</p>
+        <p><strong>Durée :</strong> {% if game.min_playtime and game.max_playtime %}{{ game.min_playtime }}–{{ game.max_playtime }} min{% else %}—{% endif %}</p>
+        <p><strong>Boîtes :</strong> {{ game.boxes|length }}</p>
+    </div>
+</article>
+{% endfor %}
+</div>
+
+<script>
+(() => {
+    const listButton = document.getElementById("games-view-list");
+    const gridButton = document.getElementById("games-view-grid");
+    const listView = document.getElementById("games-list-view");
+    const gridView = document.getElementById("games-grid-view");
+    const storageKey = "racinepoir-games-view";
+
+    const setView = (view) => {
+        const showGrid = view === "grid";
+        listView.hidden = showGrid;
+        gridView.hidden = !showGrid;
+        listButton.setAttribute("aria-pressed", String(!showGrid));
+        gridButton.setAttribute("aria-pressed", String(showGrid));
+        try {
+            window.localStorage.setItem(storageKey, showGrid ? "grid" : "list");
+        } catch (_error) {
+            // Le mode fonctionne même lorsque le stockage local est désactivé.
+        }
+    };
+
+    listButton.addEventListener("click", () => setView("list"));
+    gridButton.addEventListener("click", () => setView("grid"));
+
+    try {
+        if (window.localStorage.getItem(storageKey) === "grid") {
+            setView("grid");
+        }
+    } catch (_error) {
+        setView("list");
+    }
+})();
+</script>
 {% else %}
 <section class="empty-state">
     <h3>Aucun jeu de référence</h3>
