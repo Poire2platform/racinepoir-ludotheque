@@ -1,6 +1,6 @@
 {% if current_user.is_authenticated and box.current_holder_user_id != current_user.id %}
     {% if box.interest_flag_for_user(current_user) %}
-        <strong>[I would like]</strong>
+        <span class="badge badge--warning">I would like</span>
     {% else %}
         <form class="inline-action" method="post" action="/boxes/{{ box.id }}/request">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">

@@ -899,7 +899,7 @@ def test_interest_flag_is_available_without_priority_or_duplicates(
     assert detail_response.status_code == 200
     assert b"<h3>Int" in detail_response.data
     assert "Interested — toi".encode() in detail_response.data
-    assert b"[I would like]" in detail_response.data
+    assert b'<span class="badge badge--warning">I would like</span>' in detail_response.data
     assert "file d’attente".encode() not in detail_response.data
     assert b"Tu es #" not in detail_response.data
     assert b"Annuler" not in detail_response.data
@@ -1137,8 +1137,8 @@ def test_my_held_boxes_filters_by_current_holder_not_owner(
     assert owned_here_label in response.data
     assert owned_elsewhere_box.display_label.encode() not in response.data
     assert response.data.index(borrowed_label) < response.data.index(owned_here_label)
-    assert response.data.count(b"[Chez moi]") == 2
-    assert response.data.count("[À moi]".encode()) == 1
+    assert response.data.count(b">Chez moi</span>") == 2
+    assert response.data.count(">À moi</span>".encode()) == 1
 
 
 def test_my_owned_boxes_filters_by_owner_and_displays_current_holder(
@@ -1233,8 +1233,10 @@ def test_box_list_displays_catalogued_and_uncatalogued_box_details(
     assert f'/boxes/{uncatalogued_box.id}'.encode() in response.data
     assert b"Owner" in response.data
     assert b"Holder" in response.data
-    assert b"worn" in response.data
-    assert b"active" in response.data
+    assert "Usée".encode() in response.data
+    assert b"Active" in response.data
+    assert b"Disponible" in response.data
+    assert b"badge--warning" in response.data
 
 
 def test_box_detail_displays_ownership_status_and_history(
@@ -1268,9 +1270,10 @@ def test_box_detail_displays_ownership_status_and_history(
     assert f"Azul - boîte #{box.id}".encode() in response.data
     assert b"Owner" in response.data
     assert b"Current" in response.data
-    assert b"worn" in response.data
-    assert b"unavailable" in response.data
-    assert b"lost" in response.data
+    assert "Usée".encode() in response.data
+    assert b"Indisponible" in response.data
+    assert b"Perdue" in response.data
+    assert b"badge--danger" in response.data
     assert b"Il manque un sac." in response.data
     assert b"holder_changed" in response.data
     assert b"acteur : Owner" in response.data

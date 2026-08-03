@@ -37,5 +37,5 @@ souhait et note en pourcentage d’un jeu.
   boutons intégrés à une ligne.
 - Les états vides et erreurs sont fonctionnels, mais leur présentation n’est pas
   encore harmonisée.
-- Les libellés de statut techniques (`active`, `lost`, `good`, etc.) restent à
-  traduire ou présenter de manière cohérente.
+- Les statuts de boîte sont traduits et présentés avec des badges cohérents dans
+  la liste, la fiche et les vues personnelles.

@@ -1,0 +1,21 @@
+{% set lifecycle_labels = {
+    "active": ("Active", "positive"),
+    "lost": ("Perdue", "danger"),
+    "archived": ("Archivée", "warning")
+} %}
+{% set condition_labels = {
+    "good": ("Bon état", "positive"),
+    "worn": ("Usée", "warning"),
+    "incomplete": ("Incomplète", "danger"),
+    "unknown": ("État inconnu", "info")
+} %}
+{% set availability_labels = {
+    "available": ("Disponible", "positive"),
+    "unavailable": ("Indisponible", "warning")
+} %}
+{% set lifecycle = lifecycle_labels.get(box.lifecycle_status, (box.lifecycle_status, "info")) %}
+{% set condition = condition_labels.get(box.condition, (box.condition, "info")) %}
+{% set availability = availability_labels.get(box.availability_status, (box.availability_status, "info")) %}
+<span class="badge badge--{{ lifecycle[1] }}">{{ lifecycle[0] }}</span>
+<span class="badge badge--{{ condition[1] }}">{{ condition[0] }}</span>
+<span class="badge badge--{{ availability[1] }}">{{ availability[0] }}</span>

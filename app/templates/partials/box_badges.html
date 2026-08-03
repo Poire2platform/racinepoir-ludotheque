@@ -1,15 +1,15 @@
 {% if box.owner_user_id == current_user.id %}
-    <strong>[À moi]</strong>
+    <span class="badge badge--info">À moi</span>
 {% endif %}
 
 {% if box.current_holder_user_id == current_user.id %}
-    <strong>[Chez moi]</strong>
+    <span class="badge badge--positive">Chez moi</span>
 {% endif %}
 
 {% if box.interest_flags %}
-    <strong>[{{ box.interest_flags|length }} intéressé(s)]</strong>
+    <span class="badge badge--warning">{{ box.interest_flags|length }} intéressé(s)</span>
 {% endif %}
 
 {% if box.interest_flag_for_user(current_user) %}
-    <strong>[I would like]</strong>
+    <span class="badge badge--warning">I would like</span>
 {% endif %}

@@ -6,9 +6,7 @@
 <p><strong>Jeu référencé :</strong> {% if box.game %}<a href="/games/{{ box.game.id }}">{{ box.game.title }}</a>{% if box.game.is_bgg_recognized %} <strong>[BGG]</strong>{% endif %}{% else %}—{% endif %}</p>
 <p><strong>Propriétaire :</strong> {{ box.owner.display_name }}</p>
 <p><strong>Détenteur actuel :</strong> {% if box.current_holder %}{{ box.current_holder.display_name }}{% else %}—{% endif %}</p>
-<p><strong>Condition :</strong> {{ box.condition }}</p>
-<p><strong>Disponibilité :</strong> {{ box.availability_status }}</p>
-<p><strong>Status :</strong> {{ box.lifecycle_status }}</p>
+<p><strong>État :</strong> {% include "partials/box_status_badges.html" %}</p>
 <p><strong>QR token :</strong> <code>{{ box.qr_code_token }}</code></p>
 {% if box.notes %}<p><strong>Notes :</strong> {{ box.notes }}</p>{% endif %}
 {% if current_user.is_authenticated and (current_user.role == "admin" or box.owner_user_id == current_user.id) %}

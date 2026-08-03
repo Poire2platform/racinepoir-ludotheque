@@ -270,7 +270,7 @@ DB-01 → DB-05
 | UX-01 | `DONE` | Mettre à jour le mandat UX/UI | Scan direct et intérêt informatif documentés |
 | UX-02 | `DONE` | Inventorier les écrans actuels | Écrans publics, membres et admin recensés |
 | UX-03 | `DONE` | Améliorer la navigation mobile | Navigation flexible et confirmation scan tactile |
-| UX-04 | `NEXT` | Harmoniser badges et statuts | Cohérence visuelle |
+| UX-04 | `DONE` | Harmoniser badges et statuts | Libellés français et badges cohérents sur les vues de boîtes |
 | UX-05 | `NEXT` | États vides et erreurs | Compréhensibles |
 | UX-06 | `NEXT` | Accessibilité de base | Contraste, focus, labels |
 | UX-07 | `LATER` | Mode liste / miniatures | Après MVP stable |
