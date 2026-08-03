@@ -164,6 +164,7 @@ STAB-12
 | QA-06 | `DONE` | Vérifier les secrets Git | Fichiers suivis et historique contrôlés sans secret détecté |
 | QA-07 | `DONE` | Vérifier `requirements.txt` | Venv neuf et imports vérifiés; suite courante de 89 tests réussie |
 | QA-08 | `DONE` | Préparer un tag de déploiement | Checkpoint QA identifié par `mvp-2026-08-03` |
+| QA-09 | `DONE` | Revalider après la passe UX | 89 tests, head Alembic et tag `mvp-2026-08-03-ux` vérifiés |
 
 ---
 
@@ -299,15 +300,11 @@ B. Cloudflare Tunnel
 C. Accès privé seulement
 ```
 
-## D-03 — Scan direct
+## D-03 — Scan direct (`CLOSED`)
 
-Décider avant publication s’il faut ajouter :
-
-```text
-- annuler le dernier transfert;
-- confirmation optionnelle;
-- historique visible immédiatement.
-```
+Décision MVP : la confirmation tactile transfère directement la boîte. Aucun
+mécanisme d’annulation ou de réservation n’est ajouté. L’historique demeure
+visible sur la fiche de la boîte.
 
 ## D-04 — Données initiales
 
