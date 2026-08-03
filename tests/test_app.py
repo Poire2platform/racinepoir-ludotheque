@@ -1136,7 +1136,15 @@ def test_mobile_navigation_structure_and_scan_primary_action(
     assert b'name="viewport"' in home_response.data
     assert b'class="primary-nav"' in home_response.data
     assert b'class="member-nav"' in home_response.data
+    assert b'class="scorebook-nav"' in home_response.data
     assert b'aria-label="Navigation principale"' in home_response.data
+    assert b'aria-label="Carnet de pointage"' in home_response.data
+    primary_navigation = home_response.data.split(b'<nav class="primary-nav"', 1)[1].split(b"</nav>", 1)[0]
+    scorebook_navigation = home_response.data.split(b'<nav class="scorebook-nav"', 1)[1].split(b"</nav>", 1)[0]
+    assert b'href="/sessions"' not in primary_navigation
+    assert b'href="/players"' not in primary_navigation
+    assert b'href="/sessions"' in scorebook_navigation
+    assert b'href="/players"' in scorebook_navigation
     assert b'href="/me/held-boxes"' in home_response.data
     assert b'href="/me/interested-boxes"' in home_response.data
     assert scan_response.status_code == 200

@@ -52,3 +52,5 @@ souhait et note en pourcentage d’un jeu.
   Intérêt plutôt qu’une information éloignée dans une colonne d’actions.
 - La page Boîtes est centrée sur l’inventaire : l’ajout ouvre une page dédiée et
   les filtres restent repliés tant qu’aucun critère n’est actif.
+- Parties et Joueurs sont regroupés dans un onglet « Carnet de pointage » séparé
+  de la navigation de la ludothèque.

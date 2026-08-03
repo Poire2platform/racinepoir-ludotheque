@@ -86,16 +86,34 @@ nav {
 }
 
 .primary-nav,
-.member-nav {
+.member-nav,
+.scorebook-nav {
     display: flex;
     flex-wrap: wrap;
     gap: 8px 14px;
 }
 
 .primary-nav a,
-.member-nav a {
+.member-nav a,
+.scorebook-nav a {
     display: inline-block;
     padding: 4px 0;
+}
+
+.scorebook-nav {
+    width: fit-content;
+    max-width: 100%;
+    align-items: center;
+    border-color: #9a7a3f;
+    background: #443a25;
+}
+
+.scorebook-nav__label {
+    color: #ffe7a3;
+    font-size: 0.86rem;
+    font-weight: bold;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
 .inline-action,
@@ -509,12 +527,14 @@ body.anika-love::before {
     }
 
     .primary-nav,
-    .member-nav {
+    .member-nav,
+    .scorebook-nav {
         gap: 4px 8px;
     }
 
     .primary-nav a,
-    .member-nav a {
+    .member-nav a,
+    .scorebook-nav a {
         min-height: 40px;
         padding: 8px 4px;
     }
@@ -538,15 +558,18 @@ body.anika-love::before {
     <a href="/">Accueil</a>
     <a href="/boxes">Boîtes</a>
     <a href="/games">Jeux de référence</a>
-    {% if current_user.is_authenticated %}
-        <a href="/sessions">Parties</a>
-        <a href="/players">Joueurs</a>
-    {% endif %}
     <a href="/security">Sécurité</a>
     {% if current_user.is_authenticated and current_user.role == "admin" %}
         <a href="/users">Utilisateurs</a>
     {% endif %}
 </nav>
+{% if current_user.is_authenticated %}
+<nav class="scorebook-nav" aria-label="Carnet de pointage">
+    <span class="scorebook-nav__label">Carnet de pointage</span>
+    <a href="/sessions">Parties</a>
+    <a href="/players">Joueurs</a>
+</nav>
+{% endif %}
 <nav class="member-nav" aria-label="Navigation du compte">
 {% if current_user.is_authenticated %}
     <a href="/me/held-boxes">Chez moi</a>
