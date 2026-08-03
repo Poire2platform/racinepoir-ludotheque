@@ -1,10 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Boîtes — RacinePoir{% endblock %}
 {% block content %}
-<h2>Boîtes physiques</h2>
-{% if current_user.is_authenticated %}
-<p><a href="/boxes/new">Ajouter une boîte</a></p>
-{% endif %}
+<div class="inventory-heading">
+    <h2>Inventaire des boîtes</h2>
+    {% if current_user.is_authenticated %}
+        <a class="button-link" href="/boxes/new">Ajouter une boîte</a>
+    {% endif %}
+</div>
+<details class="inventory-tools"{% if filters.title or filters.owner_id or filters.holder_id or filters.status %} open{% endif %} data-filter-panel>
+<summary>Rechercher et filtrer</summary>
 <form method="get" action="/boxes">
     <p>
         <label for="title">Titre ou nom</label><br>
@@ -30,19 +34,11 @@
         </select>
     </p>
     <p>
-        <label for="status">Statut</label><br>
-        <select id="status" name="status">
-            <option value="">Tous</option>
-            {% for status in lifecycle_statuses %}
-                <option value="{{ status }}" {% if filters.status == status %}selected{% endif %}>{% if status == "active" %}Active{% elif status == "lost" %}Perdue{% elif status == "archived" %}Archivée{% else %}{{ status }}{% endif %}</option>
-            {% endfor %}
-        </select>
-    </p>
-    <p>
         <button type="submit">Rechercher</button>
         <a href="/boxes">Réinitialiser</a>
     </p>
 </form>
+</details>
 {% if boxes %}
 {% set collection_id = "boxes" %}
 {% include "partials/view_switcher.html" %}

@@ -50,3 +50,5 @@ souhait et note en pourcentage d’un jeu.
   des colonnes lisibles et permettent un défilement horizontal par glissement.
 - Dans la liste des boîtes, « I would like » est l’action directe de la colonne
   Intérêt plutôt qu’une information éloignée dans une colonne d’actions.
+- La page Boîtes est centrée sur l’inventaire : l’ajout ouvre une page dédiée et
+  les filtres restent repliés tant qu’aucun critère n’est actif.

@@ -1280,6 +1280,7 @@ def test_boxes_can_be_searched_by_title(client, make_user, make_box):
     assert response.status_code == 200
     assert b"Azul" in response.data
     assert b"Catan" not in response.data
+    assert b'<details class="inventory-tools" open data-filter-panel>' in response.data
 
 
 def test_box_list_displays_catalogued_and_uncatalogued_box_details(
@@ -1313,6 +1314,11 @@ def test_box_list_displays_catalogued_and_uncatalogued_box_details(
     assert f'/boxes/{uncatalogued_box.id}'.encode() in response.data
     assert b"Owner" in response.data
     assert b"Holder" in response.data
+    assert b"Inventaire des bo" in response.data
+    assert b'href="/boxes/new"' in response.data
+    assert b'<details class="inventory-tools" data-filter-panel>' in response.data
+    assert b"Rechercher et filtrer" in response.data
+    assert b'id="status"' not in response.data
     assert b'<th scope="col">ID</th>' not in response.data
     assert '<th scope="col">État</th>'.encode() not in response.data
     assert b">I would like</button>" in response.data
