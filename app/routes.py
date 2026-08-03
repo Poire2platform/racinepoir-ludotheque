@@ -233,7 +233,7 @@ def index():
         owner_user_id=current_user.id
     ).count()
 
-    requested_count = BoxRequest.query.filter_by(
+    interest_count = BoxRequest.query.filter_by(
         requester_user_id=current_user.id,
         status="active"
     ).count()
@@ -242,7 +242,7 @@ def index():
         "index.html",
         held_count=held_count,
         owned_count=owned_count,
-        requested_count=requested_count,
+        interest_count=interest_count,
     )
 
 

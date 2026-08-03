@@ -15,9 +15,9 @@
     <p>Détenteur actuel : inconnu</p>
 {% endif %}
 
-<form method="post" action="/scan/{{ box.qr_code_token }}/confirm">
+<form class="scan-action" method="post" action="/scan/{{ box.qr_code_token }}/confirm">
     <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-    <button type="submit">Confirmer que j’ai cette boîte</button>
+    <button class="primary-action" type="submit">Confirmer que j’ai cette boîte</button>
 </form>
 
 <p><a href="/boxes/{{ box.id }}">Annuler et voir la boîte</a></p>

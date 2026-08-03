@@ -807,6 +807,10 @@ def test_interest_flag_is_available_without_priority_or_duplicates(
     assert "file d’attente".encode() not in detail_response.data
     assert b"Tu es #" not in detail_response.data
     assert b"Annuler" not in detail_response.data
+    home_response = client.get("/")
+    assert home_response.status_code == 200
+    assert "Mes intérêts".encode() in home_response.data
+    assert "1 signalement(s) « I would like » actif(s).".encode() in home_response.data
 
     duplicate_response = client.post(
         f"/boxes/{box.id}/request",
@@ -975,6 +979,30 @@ def test_authenticated_navigation_smoke(
     for path in paths:
         response = client.get(path)
         assert response.status_code == 200, path
+
+
+def test_mobile_navigation_structure_and_scan_primary_action(
+    client,
+    make_user,
+    make_box,
+    login_as,
+):
+    owner = make_user("owner")
+    box = make_box(owner, token="mobile-scan")
+    login_as(owner)
+
+    home_response = client.get("/")
+    scan_response = client.get("/scan/mobile-scan")
+
+    assert home_response.status_code == 200
+    assert b'name="viewport"' in home_response.data
+    assert b'class="primary-nav"' in home_response.data
+    assert b'class="member-nav"' in home_response.data
+    assert b'aria-label="Navigation principale"' in home_response.data
+    assert b'href="/me/held-boxes"' in home_response.data
+    assert scan_response.status_code == 200
+    assert b'class="scan-action"' in scan_response.data
+    assert b'class="primary-action"' in scan_response.data
 
 
 def test_my_held_boxes_filters_by_current_holder_not_owner(

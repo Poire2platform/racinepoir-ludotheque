@@ -61,6 +61,33 @@ nav {
     margin-bottom: 10px;
 }
 
+.primary-nav,
+.member-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+}
+
+.primary-nav a,
+.member-nav a {
+    display: inline-block;
+    padding: 4px 0;
+}
+
+.inline-action,
+.logout-form {
+    display: inline;
+    border: 0;
+    padding: 0;
+    background: transparent;
+}
+
+.primary-action {
+    min-height: 44px;
+    padding: 10px 16px;
+    font-weight: bold;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -166,37 +193,68 @@ body.anika-love::before {
         display: block;
         overflow-x: auto;
     }
+
+    h1 {
+        font-size: 1.55rem;
+        line-height: 1.2;
+    }
+
+    .primary-nav,
+    .member-nav {
+        gap: 4px 8px;
+    }
+
+    .primary-nav a,
+    .member-nav a {
+        min-height: 40px;
+        padding: 8px 4px;
+    }
+
+    .scan-action .primary-action {
+        width: 100%;
+    }
 }
 </style>
 </head>
 <body>
 <header>
 <h1>RacinePoir — Ludothèque</h1>
-<nav><a href="/">Accueil</a> |
-    <a href="/boxes">Boîtes</a> |
-     <a href="/sessions">Parties</a> |
-     <a href="/players">Joueurs</a> |
-     <a href="/games">Jeux de référence</a> |
-     <a href="/security">Sécurité</a>{% if current_user.is_authenticated and current_user.role == "admin" %} |
-     <a href="/users">Utilisateurs</a>{% endif %}</nav>
-{% if not current_user.is_authenticated %}
-    <a href="/register">Inscription</a> |
+<nav class="primary-nav" aria-label="Navigation principale">
+    <a href="/">Accueil</a>
+    <a href="/boxes">Boîtes</a>
+    <a href="/games">Jeux de référence</a>
+    {% if current_user.is_authenticated %}
+        <a href="/sessions">Parties</a>
+        <a href="/players">Joueurs</a>
+    {% endif %}
+    <a href="/security">Sécurité</a>
+    {% if current_user.is_authenticated and current_user.role == "admin" %}
+        <a href="/users">Utilisateurs</a>
+    {% endif %}
+</nav>
+<nav class="member-nav" aria-label="Navigation du compte">
+{% if current_user.is_authenticated %}
+    <a href="/me/held-boxes">Chez moi</a>
+    <a href="/me/owned-boxes">Mes boîtes</a>
+    <a href="/me/profile">Profil</a>
+{% else %}
+    <a href="/login">Connexion</a>
+    <a href="/register">Inscription</a>
 {% endif %}
-<a href="/me/held-boxes">Chez moi</a> |
-<a href="/me/owned-boxes">Mes boîtes</a> |<hr>
+</nav>
+<hr>
 {% if current_user.is_authenticated %}
 <p>
     Connecté comme : <strong>{{ current_user.display_name }}</strong>
     — username: <code>{{ current_user.username }}</code>
     — rôle: <code>{{ current_user.role }}</code>
-    — <a href="/me/profile">Profil</a>
 </p>
-<form method="post" action="/logout">
+<form class="logout-form" method="post" action="/logout">
     <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
     <button type="submit">Déconnexion</button>
 </form>
 {% else %}
-<p>Non connecté — <a href="/login">Connexion</a></p>
+<p>Non connecté.</p>
 {% endif %}
 <hr>
 </header>

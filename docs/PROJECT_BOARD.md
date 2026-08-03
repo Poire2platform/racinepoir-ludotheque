@@ -266,9 +266,9 @@ DB-01 → DB-05
 
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
-| UX-01 | `NEXT` | Mettre à jour le mandat UX/UI | Box, file, scan direct |
-| UX-02 | `NEXT` | Inventorier les écrans actuels | Liste complète |
-| UX-03 | `NEXT` | Améliorer la navigation mobile | Parcours scan simple |
+| UX-01 | `DONE` | Mettre à jour le mandat UX/UI | Scan direct et intérêt informatif documentés |
+| UX-02 | `DONE` | Inventorier les écrans actuels | Écrans publics, membres et admin recensés |
+| UX-03 | `DONE` | Améliorer la navigation mobile | Navigation flexible et confirmation scan tactile |
 | UX-04 | `NEXT` | Harmoniser badges et statuts | Cohérence visuelle |
 | UX-05 | `NEXT` | États vides et erreurs | Compréhensibles |
 | UX-06 | `NEXT` | Accessibilité de base | Contraste, focus, labels |
