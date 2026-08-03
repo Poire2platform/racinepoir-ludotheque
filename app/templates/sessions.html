@@ -31,6 +31,10 @@
     </tbody>
 </table>
 {% else %}
-    <p>Aucune partie enregistrée.</p>
+    <section class="empty-state">
+        <h3>Aucune partie enregistrée</h3>
+        <p>Ajoute ta première partie pour commencer l’historique.</p>
+        <p><a href="/sessions/new">Ajouter une partie</a></p>
+    </section>
 {% endif %}
 {% endblock %}

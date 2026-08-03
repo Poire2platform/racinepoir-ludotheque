@@ -19,6 +19,10 @@
         {% endfor %}
     </ul>
 {% else %}
-    <p>Aucune boîte chez toi.</p>
+    <section class="empty-state">
+        <h3>Aucune boîte chez toi</h3>
+        <p>Une boîte apparaîtra ici dès que tu confirmeras son code QR.</p>
+        <p><a href="/boxes">Parcourir les boîtes</a></p>
+    </section>
 {% endif %}
 {% endblock %}

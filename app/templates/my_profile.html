@@ -6,7 +6,7 @@
 <h2>Mon profil</h2>
 
 {% if error %}
-    <p><strong>{{ error }}</strong></p>
+    <p class="notice notice--error" role="alert"><strong>{{ error }}</strong></p>
 {% endif %}
 
 <p>Username : <code>{{ current_user.username }}</code></p>

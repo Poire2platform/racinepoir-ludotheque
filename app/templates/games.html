@@ -20,5 +20,11 @@
 {% endfor %}
 </tbody>
 </table>
-{% else %}<p>Aucun jeu trouvé.</p>{% endif %}
+{% else %}
+<section class="empty-state">
+    <h3>Aucun jeu de référence</h3>
+    <p>Les jeux apparaîtront ici lorsqu’une boîte cataloguée sera ajoutée.</p>
+    {% if current_user.is_authenticated %}<p><a href="/boxes/new">Ajouter une boîte</a></p>{% endif %}
+</section>
+{% endif %}
 {% endblock %}

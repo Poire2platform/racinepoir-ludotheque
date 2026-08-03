@@ -35,7 +35,7 @@ souhait et note en pourcentage d’un jeu.
   faciles à atteindre sur petit écran.
 - Les formulaires héritent tous du même encadrement, y compris les petits
   boutons intégrés à une ligne.
-- Les états vides et erreurs sont fonctionnels, mais leur présentation n’est pas
-  encore harmonisée.
+- Les états vides principaux expliquent la prochaine action et les erreurs
+  400/404/500 utilisent une page cohérente sans détail interne.
 - Les statuts de boîte sont traduits et présentés avec des badges cohérents dans
   la liste, la fiche et les vues personnelles.

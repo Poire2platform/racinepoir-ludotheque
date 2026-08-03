@@ -61,5 +61,11 @@
 {% endfor %}
 </tbody>
 </table>
-{% else %}<p>Aucune boîte trouvée.</p>{% endif %}
+{% else %}
+<section class="empty-state">
+    <h3>Aucune boîte trouvée</h3>
+    <p>{% if filters.title or filters.owner_id or filters.holder_id or filters.status %}Aucune boîte ne correspond à ces filtres.{% else %}La ludothèque ne contient encore aucune boîte.{% endif %}</p>
+    <p><a href="/boxes">Réinitialiser les filtres</a>{% if current_user.is_authenticated %} — <a href="/boxes/new">Ajouter une boîte</a>{% endif %}</p>
+</section>
+{% endif %}
 {% endblock %}

@@ -40,6 +40,10 @@
         {% endfor %}
     </ul>
 {% else %}
-    <p>Tu n’as aucune boîte enregistrée.</p>
+    <section class="empty-state">
+        <h3>Aucune boîte enregistrée à ton nom</h3>
+        <p>Ajoute ta première boîte pour générer son identité et son étiquette QR.</p>
+        <p><a href="/boxes/new">Ajouter une boîte</a></p>
+    </section>
 {% endif %}
 {% endblock %}

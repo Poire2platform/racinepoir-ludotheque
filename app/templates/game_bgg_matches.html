@@ -7,7 +7,7 @@
 <h3>{{ game.title }}</h3>
 
 {% if error %}
-    <p><strong>{{ error }}</strong></p>
+    <p class="notice notice--error" role="alert"><strong>{{ error }}</strong></p>
 {% endif %}
 
 {% if matches %}

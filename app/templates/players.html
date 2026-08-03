@@ -25,6 +25,10 @@
     </tbody>
 </table>
 {% else %}
-    <p>Aucun joueur trouvé. Les joueurs seront créés en enregistrant des parties.</p>
+    <section class="empty-state">
+        <h3>Aucun joueur trouvé</h3>
+        <p>Les joueurs seront créés automatiquement en enregistrant une partie.</p>
+        <p><a href="/sessions/new">Ajouter une partie</a></p>
+    </section>
 {% endif %}
 {% endblock %}

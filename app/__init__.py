@@ -1,7 +1,7 @@
 import os
 import secrets
 import logging
-from flask import Flask, abort, request, session
+from flask import Flask, abort, render_template, request, session
 from dotenv import load_dotenv
 from werkzeug.middleware.proxy_fix import ProxyFix
 
@@ -78,6 +78,31 @@ def create_app():
     @app.context_processor
     def inject_csrf_token():
         return {"csrf_token": csrf_token}
+
+    @app.errorhandler(400)
+    def bad_request(error):
+        return render_template(
+            "error.html",
+            title="Demande invalide",
+            message=getattr(error, "description", None) or "La demande ne peut pas être traitée.",
+        ), 400
+
+    @app.errorhandler(404)
+    def not_found(_error):
+        return render_template(
+            "error.html",
+            title="Page introuvable",
+            message="Cette page ou cet élément n’existe pas, ou n’est plus disponible.",
+        ), 404
+
+    @app.errorhandler(500)
+    def internal_error(_error):
+        db.session.rollback()
+        return render_template(
+            "error.html",
+            title="Erreur inattendue",
+            message="Un problème est survenu. Rien d’autre n’est requis de ta part pour le moment.",
+        ), 500
 
     from .models import User
 

@@ -30,9 +30,17 @@ def test_healthz_reports_database_unavailable_and_logs_failure(client):
 
 
 def test_error_responses_do_not_expose_tracebacks(app, client):
+    bad_request_response = client.post("/logout")
+    assert bad_request_response.status_code == 400
+    assert "Demande invalide".encode() in bad_request_response.data
+    assert "Jeton de formulaire invalide.".encode() in bad_request_response.data
+
     not_found_response = client.get("/route-that-does-not-exist")
 
     assert not_found_response.status_code == 404
+    assert "Page introuvable".encode() in not_found_response.data
+    assert b"Retour" in not_found_response.data
+    assert b'role="alert"' in not_found_response.data
     assert b"Traceback" not in not_found_response.data
 
     def raise_unexpected_error():
@@ -44,8 +52,23 @@ def test_error_responses_do_not_expose_tracebacks(app, client):
         server_error_response = client.get("/games")
 
     assert server_error_response.status_code == 500
+    assert "Erreur inattendue".encode() in server_error_response.data
+    assert b'role="alert"' in server_error_response.data
     assert b"Traceback" not in server_error_response.data
     assert b"internal diagnostic detail" not in server_error_response.data
+
+
+def test_empty_catalogs_explain_the_next_action(client):
+    games_response = client.get("/games")
+    boxes_response = client.get("/boxes?title=introuvable")
+
+    assert games_response.status_code == 200
+    assert b'class="empty-state"' in games_response.data
+    assert b"Aucun jeu de r" in games_response.data
+    assert boxes_response.status_code == 200
+    assert b'class="empty-state"' in boxes_response.data
+    assert "Aucune boîte ne correspond à ces filtres.".encode() in boxes_response.data
+    assert b"R\xc3\xa9initialiser les filtres" in boxes_response.data
 
 
 def test_login_accepts_valid_credentials(client, make_user, csrf_token):

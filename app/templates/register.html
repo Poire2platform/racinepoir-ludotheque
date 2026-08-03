@@ -6,7 +6,7 @@
 <h2>Inscription</h2>
 
 {% if register_error %}
-    <p style="color: red;"><strong>{{ register_error }}</strong></p>
+    <p class="notice notice--error" role="alert"><strong>{{ register_error }}</strong></p>
 {% endif %}
 
 {% if not invite_enabled %}
