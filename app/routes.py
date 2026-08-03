@@ -304,7 +304,7 @@ def login():
             login_user(user, remember=True)
             security_event("login_success", ip=request_ip(), username=username, user_id=user.id)
 
-            if next_page and next_page.startswith("/"):
+            if next_page and next_page.startswith("/") and not next_page.startswith("//"):
                 return redirect(next_page)
 
             return redirect(url_for("main.index"))
@@ -455,11 +455,20 @@ def new_user():
         email = (request.form.get("email") or "").strip()
         display_name = (request.form.get("display_name") or "").strip()
         password = request.form.get("password") or ""
+        confirm_password = request.form.get("confirm_password") or ""
         role = request.form.get("role") or "member"
         is_active = request.form.get("is_active") == "yes"
 
         if not username or not email or not display_name or not password:
             return render_template("user_form.html", error="Tous les champs principaux sont obligatoires.", form=request.form, roles=USER_ROLES)
+
+        if password != confirm_password:
+            return render_template(
+                "user_form.html",
+                error="Les mots de passe ne correspondent pas.",
+                form=request.form,
+                roles=USER_ROLES,
+            )
 
         if role not in USER_ROLES:
             return render_template(
@@ -504,11 +513,22 @@ def edit_user(user_id):
         email = (request.form.get("email") or "").strip()
         display_name = (request.form.get("display_name") or "").strip()
         password = request.form.get("password") or ""
+        confirm_password = request.form.get("confirm_password") or ""
         role = request.form.get("role") or "member"
         is_active = request.form.get("is_active") == "yes"
 
         if not username or not email or not display_name:
             return render_template("user_form.html", user=user, error="Username, email et nom affiché sont obligatoires.", form=request.form, roles=USER_ROLES, mode="edit")
+
+        if password and password != confirm_password:
+            return render_template(
+                "user_form.html",
+                user=user,
+                error="Les mots de passe ne correspondent pas.",
+                form=request.form,
+                roles=USER_ROLES,
+                mode="edit",
+            )
 
         if role not in USER_ROLES:
             return render_template(
@@ -947,24 +967,24 @@ def claim_box_for_current_user(box):
         notes=notes,
     ))
 
-    fulfilled_request = None
-    active_request = box.active_request_for_user(current_user)
+    fulfilled_interest = None
+    interest_flag = box.interest_flag_for_user(current_user)
 
-    if active_request:
-        active_request.status = "fulfilled"
-        active_request.fulfilled_at = utcnow()
-        fulfilled_request = active_request
+    if interest_flag:
+        interest_flag.status = "fulfilled"
+        interest_flag.fulfilled_at = utcnow()
+        fulfilled_interest = interest_flag
 
         db.session.add(BoxEvent(
             box=box,
-            event_type="box_request_fulfilled",
+            event_type="box_interest_fulfilled",
             actor_user_id=current_user.id,
-            related_request=active_request,
+            related_request=interest_flag,
             to_holder_user_id=current_user.id,
-            notes=f"La demande de {current_user.display_name} a été complétée par le scan.",
+            notes=f"Le signal d’intérêt de {current_user.display_name} a été complété par le scan.",
         ))
 
-    return old_holder, fulfilled_request, already_holder
+    return old_holder, fulfilled_interest, already_holder
 
 
 @main.route("/scan/<token>")
@@ -996,7 +1016,7 @@ def confirm_scan_box(token):
         )
         return f"Trop de confirmations de scan. Réessaie dans environ {retry_after} secondes.", 429
 
-    old_holder, fulfilled_request, already_holder = claim_box_for_current_user(box)
+    old_holder, fulfilled_interest, already_holder = claim_box_for_current_user(box)
     db.session.commit()
     security_event(
         "scan_confirmed",
@@ -1010,7 +1030,7 @@ def confirm_scan_box(token):
         "scan_result.html",
         box=box,
         old_holder=old_holder,
-        fulfilled_request=fulfilled_request,
+        fulfilled_interest=fulfilled_interest,
         already_holder=already_holder,
     )
 
@@ -1030,7 +1050,7 @@ def request_box(box_id):
         db.session.commit()
         return redirect(url_for("main.box_detail", box_id=box.id))
 
-    if box.active_request_for_user(current_user):
+    if box.interest_flag_for_user(current_user):
         return redirect(url_for("main.box_detail", box_id=box.id))
 
     box_request = BoxRequest(box=box, requester=current_user, status="active")
@@ -1039,45 +1059,11 @@ def request_box(box_id):
 
     db.session.add(BoxEvent(
         box=box,
-        event_type="box_requested",
+        event_type="box_interest_flagged",
         actor_user_id=current_user.id,
         related_request=box_request,
         to_holder_user_id=current_user.id,
-        notes=f"{current_user.display_name} a ajouté son nom à la file d’attente.",
-    ))
-
-    db.session.commit()
-    return redirect(url_for("main.box_detail", box_id=box.id))
-
-
-@main.route("/boxes/<int:box_id>/request/clear", methods=["POST"])
-@login_required
-def clear_box_request(box_id):
-    box = Box.query.get_or_404(box_id)
-    active_request = box.active_request_for_user(current_user)
-
-    if not active_request and current_user.role != "admin":
-        return "Action refusée : tu peux seulement annuler ta propre demande.", 403
-
-    if current_user.role == "admin" and not active_request:
-        active_request = BoxRequest.query.filter_by(
-            box_id=box.id,
-            status="active",
-        ).order_by(BoxRequest.created_at.asc()).first()
-
-    if not active_request:
-        return redirect(url_for("main.box_detail", box_id=box.id))
-
-    active_request.status = "cancelled"
-    active_request.cancelled_at = utcnow()
-
-    db.session.add(BoxEvent(
-        box=box,
-        event_type="box_request_cancelled",
-        actor_user_id=current_user.id,
-        related_request=active_request,
-        from_holder_user_id=active_request.requester_user_id,
-        notes=f"Demande annulée par {current_user.display_name}.",
+        notes=f"{current_user.display_name} a indiqué son intérêt pour cette boîte.",
     ))
 
     db.session.commit()

@@ -1,0 +1,10 @@
+{% if current_user.is_authenticated and box.current_holder_user_id != current_user.id %}
+    {% if box.interest_flag_for_user(current_user) %}
+        <strong>[I would like]</strong>
+    {% else %}
+        <form method="post" action="/boxes/{{ box.id }}/request" style="display: inline">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <button type="submit">I would like</button>
+        </form>
+    {% endif %}
+{% endif %}

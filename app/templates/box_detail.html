@@ -47,33 +47,15 @@
     <p><a href="/login">Connecte-toi</a> pour déclarer que tu as cette boîte.</p>
 {% endif %}
 <hr>
-<h3>File d’attente</h3>
-{% if box.active_requests %}
-<ol>
-{% for request in box.active_requests %}
-<li>{{ request.requester.display_name }}{% if current_user.is_authenticated and request.requester.id == current_user.id %} — toi{% endif %}</li>
+<h3>Intérêt</h3>
+{% if box.interest_flags %}
+<ul>
+{% for flag in box.interest_flags %}
+<li>{{ flag.requester.display_name }}{% if current_user.is_authenticated and flag.requester.id == current_user.id %} — toi{% endif %}</li>
 {% endfor %}
-</ol>
-{% else %}<p>Aucune demande active.</p>{% endif %}
-{% if current_user.is_authenticated %}
-    {% set my_request = box.active_request_for_user(current_user) %}
-    {% if box.current_holder and box.current_holder.id == current_user.id %}
-        <p>Tu as déjà cette boîte, donc tu n’as pas besoin de la demander.</p>
-    {% elif my_request %}
-        <p>Tu es #{{ box.active_request_position_for_user(current_user) }} dans la file d’attente.</p>
-        <form method="post" action="/boxes/{{ box.id }}/request/clear">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-            <button type="submit">Annuler ma demande</button>
-        </form>
-    {% else %}
-        <form method="post" action="/boxes/{{ box.id }}/request">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-            <button type="submit">Je veux cette boîte</button>
-        </form>
-    {% endif %}
-{% else %}
-    <p><a href="/login">Connecte-toi</a> pour demander cette boîte.</p>
-{% endif %}
+</ul>
+{% else %}<p>Personne n’a signalé son intérêt.</p>{% endif %}
+{% include "partials/interest_button.html" %}
 <hr>
 <h3>État</h3>
 {% if current_user.is_authenticated and (current_user.role == "admin" or box.owner_user_id == current_user.id) %}

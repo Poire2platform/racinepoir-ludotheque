@@ -127,26 +127,26 @@ STAB-12
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
 | MVP-01 | `DONE` | Login/logout | Login valide/invalide, compte désactivé, session et logout testés |
-| MVP-02 | `VERIFY` | Catalogue des jeux | Liste et fiche fonctionnelles |
-| MVP-03 | `VERIFY` | Ajouter un jeu manuellement | Fonctionne sans BGG |
-| MVP-04 | `VERIFY` | Enrichissement BGG | Recherche et import contrôlés |
-| MVP-05 | `VERIFY` | Liste des boîtes | Affichage sans erreur |
+| MVP-02 | `DONE` | Catalogue des jeux | Liste, fiche, données de référence, boîtes liées et absence testées |
+| MVP-03 | `DONE` | Ajouter un jeu manuellement | Création sans BGG, propriétaire et historique testés |
+| MVP-04 | `DONE` | Enrichissement BGG | Recherche sans mutation et import choisi testés |
+| MVP-05 | `DONE` | Liste des boîtes | Boîtes cataloguées/non cataloguées, détenteurs et statuts testés |
 | MVP-06 | `DONE` | Ajouter une boîte | Jeu existant, nouveau ou absent (`game_id = NULL`); propriétaire et détenteur valides |
 | MVP-07 | `DONE` | Modifier une boîte | Propriétaire/admin contrôlés; champs, validation et historique testés |
-| MVP-08 | `VERIFY` | Détail d’une boîte | Propriétaire, détenteur, statut, historique |
-| MVP-09 | `VERIFY` | Génération et affichage du QR | Token stable et URL correcte |
-| MVP-10 | `VERIFY` | Scan direct | Change le détenteur et crée un événement |
-| MVP-11 | `VERIFY` | Retour au scan après login | Paramètre `next` fonctionnel |
-| MVP-12 | `VERIFY` | File d’attente | Création, position et affichage |
-| MVP-13 | `VERIFY` | Annulation d’une demande | Retirée de la file active |
-| MVP-14 | `VERIFY` | Fulfillment au scan | Demande complétée |
-| MVP-15 | `VERIFY` | Vue “Chez moi” | Filtre par détenteur |
-| MVP-16 | `VERIFY` | Vue “Mes boîtes” | Filtre par propriétaire |
+| MVP-08 | `DONE` | Détail d’une boîte | Propriétaire, détenteur, statut, historique et absence testés |
+| MVP-09 | `DONE` | Génération et affichage du QR | Token stable, URL publique et image PNG testés |
+| MVP-10 | `DONE` | Scan direct | Confirmation, changement de détenteur et événement testés |
+| MVP-11 | `DONE` | Retour au scan après login | Retour local au scan et rejet des redirections externes testés |
+| MVP-12 | `DONE` | Indicateur “I would like” | Note sans priorité, doublon ni impact sur le scan |
+| MVP-13 | `CANCELLED` | Annulation d’une demande | Sans objet : l’indicateur n’est pas une réservation |
+| MVP-14 | `DONE` | Clôture du flag au scan | Seul le flag du scanneur est complété; autres intérêts conservés |
+| MVP-15 | `DONE` | Vue “Chez moi” | Détention courante distincte de la propriété testée |
+| MVP-16 | `DONE` | Vue “Mes boîtes” | Propriété, détenteur réel et intérêts testés |
 | MVP-17 | `DONE` | Recherche et filtres | Titre, propriétaire, détenteur et statut combinables |
-| MVP-18 | `VERIFY` | Permissions applicatives | Séparation admin/membre testée; autres permissions à couvrir |
+| MVP-18 | `DONE` | Permissions applicatives | Admin, membre, propriétaire et non-propriétaire testés |
 | MVP-19 | `DONE` | Gestion des utilisateurs | Création, activation, rôle, mot de passe et permissions testés |
-| MVP-20 | `VERIFY` | `/healthz` | Cas app/DB disponibles testé; cas DB indisponible à couvrir |
-| MVP-21 | `VERIFY` | Rate limiting | Protection sans casser les tests |
+| MVP-20 | `DONE` | `/healthz` | Disponibilité DB, panne 503 et journalisation testées |
+| MVP-21 | `DONE` | Rate limiting | Login et scan bloqués en 429 sans mutation supplémentaire |
 | MVP-22 | `LATER` | Statistiques de parties | Non bloquant |
 
 ---

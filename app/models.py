@@ -78,28 +78,22 @@ class Box(db.Model):
     sessions = db.relationship("GameSession", back_populates="box")
 
     @property
-    def active_requests(self):
+    def interest_flags(self):
         return [r for r in self.requests if r.status == "active"]
 
-    def active_request_for_user(self, user):
+    def interest_flag_for_user(self, user):
         if not user or not getattr(user, "is_authenticated", False):
             return None
-        for r in self.active_requests:
+        for r in self.interest_flags:
             if r.requester_user_id == user.id:
                 return r
-        return None
-
-    def active_request_position_for_user(self, user):
-        for index, r in enumerate(self.active_requests, start=1):
-            if r.requester_user_id == user.id:
-                return index
         return None
 
     @property
     def display_label(self):
         if self.game:
             return f"{self.game.title} - boîte #{self.id}"
-        return f"Boîte #{self.id}"
+        return f"{self.display_name} - boîte #{self.id}"
 
 class BoxRequest(db.Model):
     __tablename__ = "box_requests"

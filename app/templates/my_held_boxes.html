@@ -13,6 +13,7 @@
             <li>
                 <a href="/boxes/{{ box.id }}">{{ box.display_label }}</a>
 			{% include "partials/box_badges.html" %}
+                — {% include "partials/interest_button.html" %}
             </li>
         {% endfor %}
     </ul>

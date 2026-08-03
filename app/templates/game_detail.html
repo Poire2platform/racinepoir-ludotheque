@@ -82,6 +82,7 @@
                 <a href="/boxes/{{ box.id }}">{{ box.display_label }}</a>
                 — propriétaire : {{ box.owner.display_name }}
                 — détenteur : {% if box.current_holder %}{{ box.current_holder.display_name }}{% else %}—{% endif %}
+                — {% include "partials/interest_button.html" %}
             </li>
         {% endfor %}
     </ul>

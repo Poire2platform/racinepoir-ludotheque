@@ -26,13 +26,14 @@
                     — <strong>Chez moi</strong>
                 {% endif %}
 
-                {% if box.active_requests %}
-                    — <strong>Demandée</strong>
+                {% if box.interest_flags %}
+                    — <strong>{{ box.interest_flags|length }} intéressé(s)</strong>
                 {% endif %}
 
                 — <a href="/boxes/{{ box.id }}/edit">Modifier</a>
                 — <a href="/boxes/{{ box.id }}/label">Étiquette</a>
                 — <a href="/boxes/{{ box.id }}">Détenteur</a>
+                — {% include "partials/interest_button.html" %}
             </li>
         {% endfor %}
     </ul>

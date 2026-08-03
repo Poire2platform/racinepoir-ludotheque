@@ -32,6 +32,13 @@
     </p>
 
     <p>
+        <label for="confirm_password">
+            {% if mode == "edit" %}Confirmation du nouveau mot de passe{% else %}Confirmation du mot de passe temporaire{% endif %}
+        </label><br>
+        <input id="confirm_password" name="confirm_password" type="password" {% if mode != "edit" %}required{% endif %}>
+    </p>
+
+    <p>
         <label for="role">Rôle</label><br>
         <select id="role" name="role">
             {% for role in roles %}

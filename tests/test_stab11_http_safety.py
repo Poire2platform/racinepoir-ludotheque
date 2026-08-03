@@ -22,7 +22,6 @@ from app.models import (
         "/boxes/1/transfer",
         "/scan/test-box-token/confirm",
         "/boxes/1/request",
-        "/boxes/1/request/clear",
         "/boxes/1/mark-lost",
         "/boxes/1/mark-active",
     ),
@@ -58,7 +57,6 @@ def test_mutation_only_routes_reject_get(
         "/boxes/1/transfer",
         "/scan/test-box-token/confirm",
         "/boxes/1/request",
-        "/boxes/1/request/clear",
         "/boxes/1/mark-lost",
         "/boxes/1/mark-active",
         "/sessions/new",
@@ -164,6 +162,34 @@ def test_member_cannot_manage_users(
     assert member.role == "member"
 
 
+def test_member_cannot_manage_registration_invites(
+    app,
+    client,
+    make_user,
+    login_as,
+    csrf_token,
+):
+    member = make_user("member")
+    login_as(member)
+    initial_invite_state = (
+        app.config["REGISTRATION_INVITE_ENABLED"],
+        app.config["REGISTRATION_INVITE_CODE"],
+        app.config["REGISTRATION_INVITE_DAY"],
+    )
+
+    response = client.post(
+        "/security",
+        data={"_csrf_token": csrf_token, "action": "generate_invite"},
+    )
+
+    assert response.status_code == 403
+    assert (
+        app.config["REGISTRATION_INVITE_ENABLED"],
+        app.config["REGISTRATION_INVITE_CODE"],
+        app.config["REGISTRATION_INVITE_DAY"],
+    ) == initial_invite_state
+
+
 @pytest.mark.parametrize(
     "path,data",
     (
@@ -196,6 +222,68 @@ def test_non_owner_cannot_manage_box(
     assert response.status_code == 403
     assert database_state() == initial_state
     assert box.owner_user_id == owner.id
+
+
+@pytest.mark.parametrize(
+    "path_template",
+    (
+        "/boxes/{box_id}/edit",
+        "/boxes/{box_id}/label",
+        "/boxes/{box_id}/qr.png",
+    ),
+)
+def test_non_owner_cannot_access_box_management_pages(
+    path_template,
+    client,
+    make_user,
+    make_box,
+    login_as,
+):
+    owner = make_user("owner")
+    non_owner = make_user("nonowner")
+    box = make_box(owner)
+    login_as(non_owner)
+    initial_state = database_state()
+
+    response = client.get(path_template.format(box_id=box.id))
+
+    assert response.status_code == 403
+    assert database_state() == initial_state
+
+
+def test_admin_can_manage_another_members_box(
+    client,
+    make_user,
+    make_box,
+    login_as,
+    csrf_token,
+):
+    owner = make_user("owner")
+    new_holder = make_user("holder")
+    admin = make_user("admin", role="admin")
+    box = make_box(owner)
+    login_as(admin)
+
+    assert client.get(f"/boxes/{box.id}/edit").status_code == 200
+    assert client.get(f"/boxes/{box.id}/label").status_code == 200
+
+    transfer_response = client.post(
+        f"/boxes/{box.id}/transfer",
+        data={
+            "_csrf_token": csrf_token,
+            "current_holder_user_id": new_holder.id,
+        },
+    )
+    lost_response = client.post(
+        f"/boxes/{box.id}/mark-lost",
+        data={"_csrf_token": csrf_token},
+    )
+
+    assert transfer_response.status_code == 302
+    assert lost_response.status_code == 302
+    db.session.refresh(box)
+    assert box.current_holder_user_id == new_holder.id
+    assert box.lifecycle_status == "lost"
 
 
 def test_admin_cannot_remove_own_access(

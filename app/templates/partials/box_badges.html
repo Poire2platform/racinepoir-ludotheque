@@ -6,11 +6,10 @@
     <strong>[Chez moi]</strong>
 {% endif %}
 
-{% if box.active_requests %}
-    <strong>[Demandée]</strong>
+{% if box.interest_flags %}
+    <strong>[{{ box.interest_flags|length }} intéressé(s)]</strong>
 {% endif %}
 
-{% set my_position = box.active_request_position_for_user(current_user) %}
-{% if my_position %}
-    <strong>[Tu attends #{{ my_position }}]</strong>
+{% if box.interest_flag_for_user(current_user) %}
+    <strong>[I would like]</strong>
 {% endif %}

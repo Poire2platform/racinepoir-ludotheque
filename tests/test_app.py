@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from werkzeug.security import check_password_hash
 
@@ -12,6 +12,20 @@ def test_healthz_reports_application_and_database_ready(client):
     assert response.status_code == 200
     assert response.get_json()["status"] == "ok"
     assert response.get_json()["database"] == "ok"
+
+
+def test_healthz_reports_database_unavailable_and_logs_failure(client):
+    with (
+        patch("app.routes.db.session.execute", side_effect=RuntimeError("database offline")),
+        patch("app.routes.security_event") as security_log,
+    ):
+        response = client.get("/healthz")
+
+    assert response.status_code == 503
+    assert response.get_json()["status"] == "error"
+    assert response.get_json()["database"] == "unavailable"
+    assert response.get_json()["checked_at"]
+    security_log.assert_called_once_with("health_check_failed", ip="127.0.0.1")
 
 
 def test_login_accepts_valid_credentials(client, make_user, csrf_token):
@@ -28,6 +42,104 @@ def test_login_accepts_valid_credentials(client, make_user, csrf_token):
 
     assert response.status_code == 302
     assert response.headers["Location"] == "/"
+
+
+def test_login_returns_anonymous_scanner_to_scan_confirmation(
+    client,
+    make_user,
+    make_box,
+    csrf_token,
+):
+    owner = make_user("owner")
+    scanner = make_user("scanner")
+    make_box(owner, token="return-to-scan")
+
+    anonymous_response = client.get("/scan/return-to-scan")
+
+    assert anonymous_response.status_code == 302
+    assert anonymous_response.headers["Location"].endswith(
+        "/login?next=%2Fscan%2Freturn-to-scan"
+    )
+
+    login_response = client.post(
+        "/login",
+        data={
+            "_csrf_token": csrf_token,
+            "username": scanner.username,
+            "password": "secret123",
+            "next": "/scan/return-to-scan",
+        },
+    )
+
+    assert login_response.status_code == 302
+    assert login_response.headers["Location"] == "/scan/return-to-scan"
+    confirmation_response = client.get(login_response.headers["Location"])
+    assert confirmation_response.status_code == 200
+    assert b"Confirmer le scan" in confirmation_response.data
+    assert b"Owner" in confirmation_response.data
+
+
+def test_login_rejects_external_next_redirect(client, make_user, csrf_token):
+    make_user("member")
+
+    response = client.post(
+        "/login",
+        data={
+            "_csrf_token": csrf_token,
+            "username": "member",
+            "password": "secret123",
+            "next": "//malicious.example.test/phishing",
+        },
+    )
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/"
+
+
+def test_login_rate_limit_blocks_repeated_attempts_but_not_other_username(
+    client,
+    make_user,
+    csrf_token,
+    monkeypatch,
+):
+    make_user("target", password="correct-password")
+    make_user("other", password="correct-password")
+    monkeypatch.setenv("LOGIN_RATE_LIMIT_ATTEMPTS", "2")
+    monkeypatch.setenv("LOGIN_RATE_LIMIT_WINDOW_SECONDS", "300")
+
+    with patch("app.routes.security_event") as security_log:
+        for _ in range(2):
+            response = client.post(
+                "/login",
+                data={
+                    "_csrf_token": csrf_token,
+                    "username": "target",
+                    "password": "wrong-password",
+                },
+            )
+            assert response.status_code == 200
+
+        blocked_response = client.post(
+            "/login",
+            data={
+                "_csrf_token": csrf_token,
+                "username": "target",
+                "password": "correct-password",
+            },
+        )
+        other_response = client.post(
+            "/login",
+            data={
+                "_csrf_token": csrf_token,
+                "username": "other",
+                "password": "correct-password",
+            },
+        )
+
+    assert blocked_response.status_code == 429
+    assert "Trop d’essais.".encode() in blocked_response.data
+    assert other_response.status_code == 302
+    assert "login_rate_limited" in [call.args[0] for call in security_log.call_args_list]
 
 
 def test_login_rejects_invalid_credentials(client, make_user, csrf_token):
@@ -141,6 +253,7 @@ def test_admin_can_create_user_with_role_and_activation_state(
             "email": "gestionnaire@example.test",
             "display_name": "Gestionnaire",
             "password": "temporary-password",
+            "confirm_password": "temporary-password",
             "role": "admin",
         },
     )
@@ -154,6 +267,35 @@ def test_admin_can_create_user_with_role_and_activation_state(
         assert user.role == "admin"
         assert user.is_active is False
         assert check_password_hash(user.password_hash, "temporary-password")
+
+
+def test_admin_user_creation_rejects_password_mismatch(
+    app,
+    client,
+    make_user,
+    login_as,
+    csrf_token,
+):
+    admin = make_user("admin", role="admin")
+    login_as(admin)
+
+    response = client.post(
+        "/users/new",
+        data={
+            "_csrf_token": csrf_token,
+            "username": "gestionnaire",
+            "email": "gestionnaire@example.test",
+            "display_name": "Gestionnaire",
+            "password": "temporary-password",
+            "confirm_password": "different-password",
+            "role": "member",
+        },
+    )
+
+    assert response.status_code == 200
+    assert "Les mots de passe ne correspondent pas.".encode() in response.data
+    with app.app_context():
+        assert User.query.filter_by(username="gestionnaire").first() is None
 
 
 def test_admin_can_edit_role_activation_and_password(
@@ -175,6 +317,7 @@ def test_admin_can_edit_role_activation_and_password(
             "email": "renamed@example.test",
             "display_name": "Membre renommé",
             "password": "new-password",
+            "confirm_password": "new-password",
             "role": "admin",
             "is_active": "yes",
         },
@@ -189,6 +332,42 @@ def test_admin_can_edit_role_activation_and_password(
         assert refreshed_user.role == "admin"
         assert refreshed_user.is_active is True
         assert check_password_hash(refreshed_user.password_hash, "new-password")
+
+
+def test_edit_user_rejects_password_mismatch_without_changing_user(
+    app,
+    client,
+    make_user,
+    login_as,
+    csrf_token,
+):
+    admin = make_user("admin", role="admin")
+    member = make_user("member")
+    login_as(admin)
+
+    response = client.post(
+        f"/users/{member.id}/edit",
+        data={
+            "_csrf_token": csrf_token,
+            "username": "member-renamed",
+            "email": "renamed@example.test",
+            "display_name": "Membre renommé",
+            "password": "new-password",
+            "confirm_password": "different-password",
+            "role": "admin",
+            "is_active": "yes",
+        },
+    )
+
+    assert response.status_code == 200
+    assert "Les mots de passe ne correspondent pas.".encode() in response.data
+    with app.app_context():
+        refreshed_user = db.session.get(User, member.id)
+        assert refreshed_user.username == "member"
+        assert refreshed_user.email == "member@example.test"
+        assert refreshed_user.display_name == "Member"
+        assert refreshed_user.role == "member"
+        assert check_password_hash(refreshed_user.password_hash, "secret123")
 
 
 def test_edit_user_rejects_invalid_role_without_changing_user(
@@ -222,6 +401,146 @@ def test_edit_user_rejects_invalid_role_without_changing_user(
         assert refreshed_user.display_name == "Member"
         assert refreshed_user.role == "member"
         assert refreshed_user.is_active is True
+
+
+def test_game_catalog_lists_games_with_reference_information(app, client):
+    with app.app_context():
+        db.session.add_all([
+            Game(title="Catan", language="fr", min_players=3, max_players=4),
+            Game(
+                title="Azul",
+                language="fr",
+                min_players=2,
+                max_players=4,
+                min_playtime=30,
+                max_playtime=45,
+                year_published=2017,
+                bgg_id=230802,
+            ),
+        ])
+        db.session.commit()
+
+    response = client.get("/games")
+
+    assert response.status_code == 200
+    assert response.data.index(b"Azul") < response.data.index(b"Catan")
+    assert b"2\xe2\x80\x934" in response.data
+    assert b"30\xe2\x80\x9345 min" in response.data
+    assert b"2017" in response.data
+    assert b"Reconnu" in response.data
+
+
+def test_game_detail_displays_reference_data_and_linked_boxes(
+    app,
+    client,
+    make_user,
+    make_box,
+):
+    owner = make_user("owner")
+    box = make_box(owner, title="Azul")
+    with app.app_context():
+        game = db.session.get(Game, box.game_id)
+        game.language = "fr"
+        game.edition_name = "Édition française"
+        game.publisher = "Plan B Games"
+        game.description = "Jeu de placement de tuiles."
+        game.year_published = 2017
+        game.min_players = 2
+        game.max_players = 4
+        game.min_playtime = 30
+        game.max_playtime = 45
+        game.age_min = 8
+        game.bgg_id = 230802
+        db.session.commit()
+        game_id = game.id
+
+    response = client.get(f"/games/{game_id}")
+
+    assert response.status_code == 200
+    assert b"Azul" in response.data
+    assert "Édition française".encode() in response.data
+    assert b"Plan B Games" in response.data
+    assert b"Jeu de placement de tuiles." in response.data
+    assert b"Consulter la page BGG #230802" in response.data
+    assert b"https://boardgamegeek.com/boardgame/230802" in response.data
+    assert b"Owner" in response.data
+    assert f'/boxes/{box.id}'.encode() in response.data
+
+
+def test_game_detail_returns_not_found_for_unknown_game(client):
+    assert client.get("/games/999999").status_code == 404
+
+
+def test_bgg_enrichment_search_displays_matches_without_changing_game(
+    app,
+    client,
+    make_user,
+    login_as,
+):
+    user = make_user("member")
+    login_as(user)
+    with app.app_context():
+        game = Game(title="Azul inconnu", normalized_title="azul inconnu")
+        db.session.add(game)
+        db.session.commit()
+        game_id = game.id
+
+    matches = [{"bgg_id": "230802", "title": "Azul", "year_published": "2017"}]
+    with patch("app.routes.search_games", return_value=matches) as search:
+        response = client.get(f"/games/{game_id}/bgg")
+
+    assert response.status_code == 200
+    assert b"Azul (2017)" in response.data
+    search.assert_called_once_with("Azul inconnu")
+    with app.app_context():
+        unchanged_game = db.session.get(Game, game_id)
+        assert unchanged_game.title == "Azul inconnu"
+        assert unchanged_game.bgg_id is None
+
+
+def test_bgg_enrichment_imports_selected_details_and_updates_linked_boxes(
+    app,
+    client,
+    make_user,
+    make_box,
+    login_as,
+    csrf_token,
+):
+    owner = make_user("owner")
+    box = make_box(owner, title="Azul inconnu")
+    login_as(owner)
+    details = {
+        "bgg_id": 230802,
+        "title": "Azul",
+        "description": "Jeu de placement de tuiles.",
+        "publisher": "Plan B Games",
+        "year_published": 2017,
+        "min_players": 2,
+        "max_players": 4,
+        "min_playtime": 30,
+        "max_playtime": 45,
+        "age_min": 8,
+        "complexity": 1.75,
+        "cover_image_url": "https://example.test/azul.jpg",
+    }
+
+    with patch("app.routes.game_details", return_value=details) as fetch_details:
+        response = client.post(
+            f"/games/{box.game_id}/bgg",
+            data={"_csrf_token": csrf_token, "bgg_choice": "230802"},
+        )
+
+    assert response.status_code == 302
+    fetch_details.assert_called_once_with("230802")
+    with app.app_context():
+        enriched_game = db.session.get(Game, box.game_id)
+        linked_box = db.session.get(Box, box.id)
+        assert enriched_game.title == "Azul"
+        assert enriched_game.bgg_id == 230802
+        assert enriched_game.publisher == "Plan B Games"
+        assert enriched_game.min_players == 2
+        assert enriched_game.max_players == 4
+        assert linked_box.display_name == "Azul"
 
 
 def test_manual_box_creation_does_not_require_bgg(
@@ -435,7 +754,7 @@ def test_edit_box_rejects_unknown_game_without_changing_box(
         ).count() == 0
 
 
-def test_request_can_be_created_and_cancelled(
+def test_interest_flag_is_available_without_priority_or_duplicates(
     app,
     client,
     make_user,
@@ -444,29 +763,85 @@ def test_request_can_be_created_and_cancelled(
     csrf_token,
 ):
     owner = make_user("owner")
-    requester = make_user("requester")
-    box = make_box(owner)
-    login_as(requester)
+    interested = make_user("interested")
+    box = make_box(owner, token="interest")
 
-    response = client.post(
+    login_as(interested)
+    list_response = client.get("/boxes")
+    game_response = client.get(f"/games/{box.game_id}")
+    detail_response = client.get(f"/boxes/{box.id}")
+    for response in (list_response, game_response, detail_response):
+        assert response.status_code == 200
+        assert b">I would like</button>" in response.data
+
+    creation_response = client.post(
         f"/boxes/{box.id}/request",
         data={"_csrf_token": csrf_token},
     )
-    assert response.status_code == 302
+    assert creation_response.status_code == 302
 
-    response = client.post(
-        f"/boxes/{box.id}/request/clear",
+    detail_response = client.get(f"/boxes/{box.id}")
+    assert detail_response.status_code == 200
+    assert b"<h3>Int" in detail_response.data
+    assert "Interested — toi".encode() in detail_response.data
+    assert b"[I would like]" in detail_response.data
+    assert "file d’attente".encode() not in detail_response.data
+    assert b"Tu es #" not in detail_response.data
+    assert b"Annuler" not in detail_response.data
+
+    duplicate_response = client.post(
+        f"/boxes/{box.id}/request",
         data={"_csrf_token": csrf_token},
     )
-    assert response.status_code == 302
+    assert duplicate_response.status_code == 302
 
     with app.app_context():
-        box_request = BoxRequest.query.one()
-        assert box_request.status == "cancelled"
-        assert box_request.cancelled_at is not None
+        flags = BoxRequest.query.filter_by(box_id=box.id, status="active").all()
+        assert [flag.requester_user_id for flag in flags] == [interested.id]
+        assert BoxEvent.query.filter_by(
+            box_id=box.id,
+            event_type="box_interest_flagged",
+        ).count() == 1
 
 
-def test_scan_changes_holder_and_fulfills_request(
+def test_direct_scan_changes_holder_and_records_history(
+    app,
+    client,
+    make_user,
+    make_box,
+    login_as,
+    csrf_token,
+):
+    owner = make_user("owner")
+    scanner = make_user("scanner")
+    box = make_box(owner, token="direct-scan")
+    login_as(scanner)
+
+    confirmation_page = client.get("/scan/direct-scan")
+    assert confirmation_page.status_code == 200
+    assert b"Owner" in confirmation_page.data
+
+    response = client.post(
+        "/scan/direct-scan/confirm",
+        data={"_csrf_token": csrf_token},
+    )
+
+    assert response.status_code == 200
+    assert b"Scanner" in response.data
+    assert "Ancien détenteur : Owner".encode() in response.data
+    with app.app_context():
+        refreshed_box = db.session.get(Box, box.id)
+        event = BoxEvent.query.filter_by(
+            box_id=box.id,
+            event_type="box_claimed",
+        ).one()
+        assert refreshed_box.current_holder_user_id == scanner.id
+        assert event.actor_user_id == scanner.id
+        assert event.from_holder_user_id == owner.id
+        assert event.to_holder_user_id == scanner.id
+
+
+def test_scan_changes_holder_and_completes_interest_flag(
     app,
     client,
     make_user,
@@ -476,13 +851,19 @@ def test_scan_changes_holder_and_fulfills_request(
 ):
     owner = make_user("owner")
     requester = make_user("requester")
+    observer = make_user("observer")
     box = make_box(owner, token="scan-me")
     box_request = BoxRequest(
         box_id=box.id,
         requester_user_id=requester.id,
         status="active",
     )
-    db.session.add(box_request)
+    observer_flag = BoxRequest(
+        box_id=box.id,
+        requester_user_id=observer.id,
+        status="active",
+    )
+    db.session.add_all([box_request, observer_flag])
     db.session.commit()
     login_as(requester)
 
@@ -492,12 +873,59 @@ def test_scan_changes_holder_and_fulfills_request(
     )
 
     assert response.status_code == 200
+    assert "Ton signal « I would like » a été marqué comme complété.".encode() in response.data
     with app.app_context():
         refreshed_box = db.session.get(Box, box.id)
         refreshed_request = db.session.get(BoxRequest, box_request.id)
+        refreshed_observer_flag = db.session.get(BoxRequest, observer_flag.id)
         assert refreshed_box.current_holder_user_id == requester.id
         assert refreshed_request.status == "fulfilled"
         assert refreshed_request.fulfilled_at is not None
+        assert refreshed_observer_flag.status == "active"
+        assert refreshed_observer_flag.fulfilled_at is None
+        assert BoxEvent.query.filter_by(
+            box_id=box.id,
+            event_type="box_interest_fulfilled",
+        ).count() == 1
+
+
+def test_scan_rate_limit_blocks_repeat_without_second_mutation(
+    app,
+    client,
+    make_user,
+    make_box,
+    login_as,
+    csrf_token,
+    monkeypatch,
+):
+    owner = make_user("owner")
+    scanner = make_user("scanner")
+    box = make_box(owner, token="limited-scan")
+    login_as(scanner)
+    monkeypatch.setenv("SCAN_CONFIRM_RATE_LIMIT_ATTEMPTS", "1")
+    monkeypatch.setenv("SCAN_CONFIRM_RATE_LIMIT_WINDOW_SECONDS", "300")
+
+    with patch("app.routes.security_event") as security_log:
+        first_response = client.post(
+            "/scan/limited-scan/confirm",
+            data={"_csrf_token": csrf_token},
+        )
+        with app.app_context():
+            event_count_after_first_scan = BoxEvent.query.filter_by(box_id=box.id).count()
+
+        blocked_response = client.post(
+            "/scan/limited-scan/confirm",
+            data={"_csrf_token": csrf_token},
+        )
+
+    assert first_response.status_code == 200
+    assert blocked_response.status_code == 429
+    assert "Trop de confirmations de scan.".encode() in blocked_response.data
+    assert "scan_confirm_rate_limited" in [call.args[0] for call in security_log.call_args_list]
+    with app.app_context():
+        refreshed_box = db.session.get(Box, box.id)
+        assert refreshed_box.current_holder_user_id == scanner.id
+        assert BoxEvent.query.filter_by(box_id=box.id).count() == event_count_after_first_scan
 
 
 def test_authenticated_navigation_smoke(
@@ -530,6 +958,97 @@ def test_authenticated_navigation_smoke(
         assert response.status_code == 200, path
 
 
+def test_my_held_boxes_filters_by_current_holder_not_owner(
+    client,
+    make_user,
+    make_box,
+    login_as,
+):
+    member = make_user("member")
+    other = make_user("other")
+    borrowed_box = make_box(
+        other,
+        holder=member,
+        title="Borrowed game",
+        token="borrowed",
+    )
+    owned_and_held_box = make_box(
+        member,
+        title="Owned here",
+        token="owned-here",
+    )
+    owned_elsewhere_box = make_box(
+        member,
+        holder=other,
+        title="Owned elsewhere",
+        token="owned-elsewhere",
+    )
+    login_as(member)
+
+    response = client.get("/me/held-boxes")
+
+    assert response.status_code == 200
+    borrowed_label = borrowed_box.display_label.encode()
+    owned_here_label = owned_and_held_box.display_label.encode()
+    assert borrowed_label in response.data
+    assert owned_here_label in response.data
+    assert owned_elsewhere_box.display_label.encode() not in response.data
+    assert response.data.index(borrowed_label) < response.data.index(owned_here_label)
+    assert response.data.count(b"[Chez moi]") == 2
+    assert response.data.count("[À moi]".encode()) == 1
+
+
+def test_my_owned_boxes_filters_by_owner_and_displays_current_holder(
+    client,
+    make_user,
+    make_box,
+    login_as,
+):
+    member = make_user("member")
+    other = make_user("other")
+    interested = make_user("interested")
+    owned_elsewhere_box = make_box(
+        member,
+        holder=other,
+        title="Away game",
+        token="away",
+    )
+    owned_here_box = make_box(
+        member,
+        title="Home game",
+        token="home",
+    )
+    borrowed_box = make_box(
+        other,
+        holder=member,
+        title="Borrowed game",
+        token="borrowed-owned-view",
+    )
+    db.session.add(
+        BoxRequest(
+            box=owned_elsewhere_box,
+            requester=interested,
+            status="active",
+        )
+    )
+    db.session.commit()
+    login_as(member)
+
+    response = client.get("/me/owned-boxes")
+
+    assert response.status_code == 200
+    away_label = owned_elsewhere_box.display_label.encode()
+    home_label = owned_here_box.display_label.encode()
+    assert away_label in response.data
+    assert home_label in response.data
+    assert borrowed_box.display_label.encode() not in response.data
+    assert response.data.index(away_label) < response.data.index(home_label)
+    assert "détenteur :\n                \n                    Other".encode() in response.data
+    assert "1 intéressé(s)".encode() in response.data
+    assert b"/edit" in response.data
+    assert b"/label" in response.data
+
+
 def test_boxes_can_be_searched_by_title(client, make_user, make_box):
     owner = make_user("owner")
     make_box(owner, title="Azul", token="azul")
@@ -540,6 +1059,139 @@ def test_boxes_can_be_searched_by_title(client, make_user, make_box):
     assert response.status_code == 200
     assert b"Azul" in response.data
     assert b"Catan" not in response.data
+
+
+def test_box_list_displays_catalogued_and_uncatalogued_box_details(
+    client,
+    make_user,
+    make_box,
+):
+    owner = make_user("owner")
+    holder = make_user("holder")
+    catalogued_box = make_box(owner, holder=holder, title="Azul", token="azul")
+    uncatalogued_box = Box(
+        display_name="Prototype maison",
+        owner=owner,
+        current_holder=None,
+        qr_code_token="prototype",
+        condition="worn",
+        availability_status="available",
+        lifecycle_status="active",
+    )
+    db.session.add(uncatalogued_box)
+    db.session.commit()
+
+    response = client.get("/boxes")
+
+    assert response.status_code == 200
+    assert f"Azul - boîte #{catalogued_box.id}".encode() in response.data
+    assert f'/boxes/{catalogued_box.id}'.encode() in response.data
+    assert f"Prototype maison - boîte #{uncatalogued_box.id}".encode() in response.data
+    assert f'/boxes/{uncatalogued_box.id}'.encode() in response.data
+    assert b"Owner" in response.data
+    assert b"Holder" in response.data
+    assert b"worn" in response.data
+    assert b"active" in response.data
+
+
+def test_box_detail_displays_ownership_status_and_history(
+    client,
+    make_user,
+    make_box,
+):
+    owner = make_user("owner")
+    previous_holder = make_user("previous")
+    current_holder = make_user("current")
+    box = make_box(owner, holder=current_holder, title="Azul", token="detail")
+    box.condition = "worn"
+    box.availability_status = "unavailable"
+    box.lifecycle_status = "lost"
+    box.notes = "Il manque un sac."
+    db.session.add(
+        BoxEvent(
+            box=box,
+            event_type="holder_changed",
+            actor=owner,
+            from_holder=previous_holder,
+            to_holder=current_holder,
+            notes="Transfert vérifié.",
+        )
+    )
+    db.session.commit()
+
+    response = client.get(f"/boxes/{box.id}")
+
+    assert response.status_code == 200
+    assert f"Azul - boîte #{box.id}".encode() in response.data
+    assert b"Owner" in response.data
+    assert b"Current" in response.data
+    assert b"worn" in response.data
+    assert b"unavailable" in response.data
+    assert b"lost" in response.data
+    assert b"Il manque un sac." in response.data
+    assert b"holder_changed" in response.data
+    assert b"acteur : Owner" in response.data
+    assert b"de : Previous" in response.data
+    assert b"vers : Current" in response.data
+    assert "Transfert vérifié.".encode() in response.data
+
+
+def test_box_detail_returns_not_found_for_unknown_box(client):
+    assert client.get("/boxes/999999").status_code == 404
+
+
+def test_new_box_gets_stable_qr_token_and_correct_scan_url(
+    app,
+    client,
+    make_user,
+    login_as,
+    csrf_token,
+):
+    owner = make_user("owner")
+    login_as(owner)
+    with patch("app.routes.search_games", return_value=[]):
+        creation_response = client.post(
+            "/boxes/new",
+            data={
+                "_csrf_token": csrf_token,
+                "game_id": "__new__",
+                "new_game_title": "Jeu QR",
+                "owner_user_id": str(owner.id),
+            },
+        )
+
+    assert creation_response.status_code == 302
+    with app.app_context():
+        box = Box.query.one()
+        box_id = box.id
+        original_token = box.qr_code_token
+    assert original_token
+    expected_scan_url = f"https://ludo.example.test/scan/{original_token}"
+
+    label_response = client.get(
+        f"/boxes/{box_id}/label",
+        base_url="https://ludo.example.test",
+    )
+
+    assert label_response.status_code == 200
+    assert expected_scan_url.encode() in label_response.data
+    assert f'/boxes/{box_id}/qr.png'.encode() in label_response.data
+
+    image = Mock()
+    image.save.side_effect = lambda output, format: output.write(b"PNG")
+    with patch("qrcode.make", return_value=image) as make_qr:
+        qr_response = client.get(
+            f"/boxes/{box_id}/qr.png",
+            base_url="https://ludo.example.test",
+        )
+
+    assert qr_response.status_code == 200
+    assert qr_response.mimetype == "image/png"
+    assert qr_response.data == b"PNG"
+    make_qr.assert_called_once_with(expected_scan_url)
+    image.save.assert_called_once()
+    with app.app_context():
+        assert db.session.get(Box, box_id).qr_code_token == original_token
 
 
 def test_boxes_can_be_filtered_by_owner_holder_and_status(
