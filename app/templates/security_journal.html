@@ -93,7 +93,7 @@ Base de données privée</code></pre>
 
     {% if current_user.is_authenticated and current_user.role == 'admin' %}
         {% if message %}
-            <p style="color: green;"><strong>{{ message }}</strong></p>
+            <p class="notice notice--success" role="status"><strong>{{ message }}</strong></p>
         {% endif %}
 
         <p>
@@ -136,11 +136,12 @@ Base de données privée</code></pre>
 <section>
     <h3>Décisions appliquées</h3>
     <table>
+        <caption class="visually-hidden">Décisions de sécurité appliquées</caption>
         <thead>
             <tr>
-                <th>Principe</th>
-                <th>Application</th>
-                <th>Pourquoi</th>
+                <th scope="col">Principe</th>
+                <th scope="col">Application</th>
+                <th scope="col">Pourquoi</th>
             </tr>
         </thead>
         <tbody>

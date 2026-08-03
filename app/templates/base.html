@@ -32,6 +32,30 @@ a:visited {
     color: #c8b8ff;
 }
 
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 4px solid #ffd66b;
+    outline-offset: 3px;
+}
+
+.skip-link {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    z-index: 100;
+    padding: 10px 14px;
+    background: #fff;
+    color: #111;
+    transform: translateY(-160%);
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+}
+
 header,
 main {
     width: min(1120px, 100%);
@@ -137,6 +161,11 @@ nav {
 .notice--error {
     border-color: #e18484;
     background: #532929;
+}
+
+.notice--success {
+    border-color: #75b98b;
+    background: #234b31;
 }
 
 .empty-state {
@@ -304,6 +333,14 @@ button {
     font: inherit;
 }
 
+input,
+select,
+textarea {
+    padding: 6px 8px;
+    border: 2px solid #829095;
+    background: #fff;
+}
+
 button,
 input[type="submit"] {
     cursor: pointer;
@@ -416,6 +453,7 @@ body.anika-love::before {
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main-content">Aller au contenu principal</a>
 <header>
 <h1>RacinePoir — Ludothèque</h1>
 <nav class="primary-nav" aria-label="Navigation principale">
@@ -458,7 +496,7 @@ body.anika-love::before {
 {% endif %}
 <hr>
 </header>
-<main>{% block content %}{% endblock %}</main>
+<main id="main-content" tabindex="-1">{% block content %}{% endblock %}</main>
 <button class="anika-button" type="button" onclick="document.body.classList.toggle('anika-love')">Anika</button>
 <script>
 document.querySelectorAll("[data-view-switcher]").forEach((switcher) => {

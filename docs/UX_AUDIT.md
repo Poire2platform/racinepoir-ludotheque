@@ -44,3 +44,5 @@ souhait et note en pourcentage d’un jeu.
   remplacement textuel accessible.
 - Les vues Boîtes, Chez moi, Mes boîtes et I would like réutilisent ce sélecteur.
   L’accueil résume les trois collections personnelles avec au plus trois boîtes.
+- La navigation clavier dispose d’un lien d’évitement et d’un focus contrasté;
+  la connexion et les tableaux principaux ont des libellés explicites.

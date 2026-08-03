@@ -16,14 +16,15 @@
 <h3>Joueurs</h3>
 {% if session.participants %}
 <table border="1" cellpadding="6">
+    <caption class="visually-hidden">Résultats des joueurs</caption>
     <thead>
         <tr>
-            <th>Joueur</th>
-            <th>Équipe</th>
-            <th>Score</th>
-            <th>Rang</th>
-            <th>Gagnant</th>
-            <th>Notes</th>
+            <th scope="col">Joueur</th>
+            <th scope="col">Équipe</th>
+            <th scope="col">Score</th>
+            <th scope="col">Rang</th>
+            <th scope="col">Gagnant</th>
+            <th scope="col">Notes</th>
         </tr>
     </thead>
     <tbody>

@@ -52,16 +52,17 @@
     <p>Choisis un utilisateur enregistré ou écris un nom invité.</p>
 
     <table border="1" cellpadding="6">
+        <caption class="visually-hidden">Joueurs participant à la partie</caption>
         <thead>
             <tr>
-                <th>#</th>
-                <th>Utilisateur</th>
-                <th>Nom invité</th>
-                <th>Équipe</th>
-                <th>Score</th>
-                <th>Rang</th>
-                <th>Gagnant</th>
-                <th>Notes</th>
+                <th scope="col">#</th>
+                <th scope="col">Utilisateur</th>
+                <th scope="col">Nom invité</th>
+                <th scope="col">Équipe</th>
+                <th scope="col">Score</th>
+                <th scope="col">Rang</th>
+                <th scope="col">Gagnant</th>
+                <th scope="col">Notes</th>
             </tr>
         </thead>
         <tbody>
@@ -69,7 +70,7 @@
                 <tr>
                     <td>{{ index }}</td>
                     <td>
-                        <select name="participant_user_id_{{ index }}">
+                        <select name="participant_user_id_{{ index }}" aria-label="Utilisateur, joueur {{ index }}">
                             <option value="">—</option>
                             {% for user in users %}
                                 <option value="{{ user.id }}" {% if form.get('participant_user_id_' ~ index) == user.id|string %}selected{% endif %}>
@@ -78,12 +79,12 @@
                             {% endfor %}
                         </select>
                     </td>
-                    <td><input name="participant_guest_name_{{ index }}" value="{{ form.get('participant_guest_name_' ~ index, '') }}"></td>
-                    <td><input name="team_label_{{ index }}" value="{{ form.get('team_label_' ~ index, '') }}"></td>
-                    <td><input name="score_{{ index }}" type="number" value="{{ form.get('score_' ~ index, '') }}"></td>
-                    <td><input name="rank_{{ index }}" type="number" min="1" value="{{ form.get('rank_' ~ index, '') }}"></td>
-                    <td><input type="checkbox" name="is_winner_{{ index }}" value="yes" {% if form.get('is_winner_' ~ index) == 'yes' %}checked{% endif %}></td>
-                    <td><input name="participant_notes_{{ index }}" value="{{ form.get('participant_notes_' ~ index, '') }}"></td>
+                    <td><input name="participant_guest_name_{{ index }}" aria-label="Nom invité, joueur {{ index }}" value="{{ form.get('participant_guest_name_' ~ index, '') }}"></td>
+                    <td><input name="team_label_{{ index }}" aria-label="Équipe, joueur {{ index }}" value="{{ form.get('team_label_' ~ index, '') }}"></td>
+                    <td><input name="score_{{ index }}" type="number" aria-label="Score, joueur {{ index }}" value="{{ form.get('score_' ~ index, '') }}"></td>
+                    <td><input name="rank_{{ index }}" type="number" min="1" aria-label="Rang, joueur {{ index }}" value="{{ form.get('rank_' ~ index, '') }}"></td>
+                    <td><input type="checkbox" name="is_winner_{{ index }}" aria-label="Gagnant, joueur {{ index }}" value="yes" {% if form.get('is_winner_' ~ index) == 'yes' %}checked{% endif %}></td>
+                    <td><input name="participant_notes_{{ index }}" aria-label="Notes, joueur {{ index }}" value="{{ form.get('participant_notes_' ~ index, '') }}"></td>
                 </tr>
             {% endfor %}
         </tbody>

@@ -1141,6 +1141,35 @@ def test_mobile_navigation_structure_and_scan_primary_action(
     assert b'class="primary-action"' in scan_response.data
 
 
+def test_accessibility_foundations_are_present(
+    client,
+    make_user,
+    make_box,
+    login_as,
+):
+    login_response = client.get("/login")
+    assert b'href="#main-content"' in login_response.data
+    assert b'id="main-content" tabindex="-1"' in login_response.data
+    assert b'label for="login-username"' in login_response.data
+    assert b'id="login-username"' in login_response.data
+    assert b'autocomplete="username"' in login_response.data
+    assert b'label for="login-password"' in login_response.data
+    assert b'autocomplete="current-password"' in login_response.data
+    assert b":focus-visible" in login_response.data
+
+    owner = make_user("owner")
+    make_box(owner)
+    login_as(owner)
+    games_response = client.get("/games")
+    session_form_response = client.get("/sessions/new")
+
+    assert b'<caption class="visually-hidden">Liste d' in games_response.data
+    assert b'<th scope="col">Titre</th>' in games_response.data
+    assert b"Joueurs participant" in session_form_response.data
+    assert 'aria-label="Utilisateur, joueur 1"'.encode() in session_form_response.data
+    assert 'aria-label="Notes, joueur 1"'.encode() in session_form_response.data
+
+
 def test_my_held_boxes_filters_by_current_holder_not_owner(
     client,
     make_user,
