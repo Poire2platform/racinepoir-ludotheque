@@ -2,10 +2,10 @@
 
 ## Décision
 
-La production utilise une base séparée sur SQL101 :
+La production utilise une base séparée sur SQL01 :
 
 ```text
-Serveur : SQL101 / 192.168.18.30
+Serveur : SQL01 / 192.168.18.30
 Base : racinepoir_ludotheque_prod
 Rôle applicatif : racinepoir_prod
 Client applicatif autorisé : WEB01 / 192.168.18.38
@@ -15,9 +15,9 @@ La base de développement `racinepoir_ludotheque` et son rôle ne sont pas
 réutilisés par WEB01. Aucun seed de développement ne doit être exécuté sur la
 base de production.
 
-## 1. Vérifications en lecture seule sur SQL101
+## 1. Vérifications en lecture seule sur SQL01
 
-À exécuter par Maxime sur SQL101 :
+À exécuter par Maxime sur SQL01 :
 
 ```bash
 sudo -u postgres psql -X -v ON_ERROR_STOP=1 -c "SELECT datname FROM pg_database WHERE datname = 'racinepoir_ludotheque_prod';"
@@ -76,7 +76,7 @@ pas être autorisée par une règle plus large.
 
 ## 5. Configuration privée de WEB01
 
-Le futur fichier `/etc/racinepoir/app.env`, non versionné, contiendra notamment :
+Le fichier déployé `/opt/racinepoir/.env`, non versionné, contient notamment :
 
 ```env
 DATABASE_URL=postgresql://racinepoir_prod:MOT_DE_PASSE_ENCODE@192.168.18.30:5432/racinepoir_ludotheque_prod

@@ -40,10 +40,11 @@ Règles :
 |---|---|
 | Proxmox `Poire1` — `192.168.18.100` | Fonctionnel |
 | Développement `pmax-host` — `192.168.18.18` | Fonctionnel |
-| PostgreSQL `SQL101` — `192.168.18.30` | Fonctionnel |
+| pfSense CE 2.8.1 — VM `100` | WAN, NAT, DNS et réseaux MGMT/DMZ/APP/DB validés; règles applicatives à faire |
+| PostgreSQL `SQL01` — VM `101` — `192.168.18.30` | Base prod séparée fonctionnelle; migrations appliquées |
 | DNS `poire1-dns` — `192.168.18.34` | Fonctionnel |
 | Portal — `http://poire1-portal.home.arpa/` | Fonctionnel |
-| WEB01 `poire1-ludoweb` — `192.168.18.38` | Créée; SSH et DNS fonctionnels |
+| WEB01 `poire1-ludoweb` — VM `104` — `192.168.18.38` | Déploiement LAN fonctionnel; HTTP seulement |
 | Domaine public prévu | `ludotheque.filsdepoire.ca` |
 | Publication Internet | Non configurée |
 
@@ -84,7 +85,7 @@ Constats du 29 juillet 2026 :
   relu avant toute récupération sélective; ses scénarios utiles ont été recréés
   proprement plutôt que de restaurer le fichier tel quel;
 - la branche de sauvetage complète ne doit pas être fusionnée;
-- les tests utilisent SQLite en mémoire et ne touchent pas SQL101;
+- les tests utilisent SQLite en mémoire et ne touchent pas SQL01;
 - les avertissements Flask-Login et SQLAlchemy sur des API dépréciées sont une
   dette technique non bloquante;
 - le déploiement demeure en pause jusqu’au checkpoint stable.
@@ -177,21 +178,21 @@ de l’administration système.
 
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
-| WEB-01 | `VERIFY` | Confirmer le VMID de WEB01 | `qm list` |
-| WEB-02 | `NEXT` | Activer le démarrage automatique | `onboot: 1` |
+| WEB-01 | `DONE` | Confirmer le VMID de WEB01 | VM `104` |
+| WEB-02 | `NEXT` | Activer le démarrage automatique de la VM | `onboot: 1` dans Proxmox |
 | WEB-03 | `NEXT` | Prendre un snapshot propre | Snapshot visible |
-| WEB-04 | `NEXT` | Installer les paquets système | Git, Python, venv, libpq, client PostgreSQL |
-| WEB-05 | `NEXT` | Tester WEB01 → SQL101 | `pg_isready` et `psql` |
-| WEB-06 | `NEXT` | Créer l’utilisateur système `racinepoir` | Service sans root |
-| WEB-07 | `NEXT` | Créer `/srv/racinepoir/app` | Permissions correctes |
-| WEB-08 | `NEXT` | Créer `/etc/racinepoir/app.env` | Secrets hors dépôt |
-| WEB-09 | `NEXT` | Déployer le code | Clone Git ou rsync contrôlé |
-| WEB-10 | `NEXT` | Créer le venv de production | Imports réussis |
-| WEB-11 | `NEXT` | Appliquer les migrations | DB à jour |
-| WEB-12 | `NEXT` | Tester Gunicorn manuellement | Répond sur `127.0.0.1:8000` |
-| WEB-13 | `NEXT` | Créer le service systemd | Démarrage automatique |
-| WEB-14 | `NEXT` | Installer et configurer Caddy | Reverse proxy local |
-| WEB-15 | `NEXT` | Tester depuis le LAN | URL locale répond |
+| WEB-04 | `DONE` | Installer les paquets système | Déploiement opérationnel |
+| WEB-05 | `DONE` | Tester WEB01 → SQL01 | `/healthz` confirme la DB |
+| WEB-06 | `DONE` | Choisir l’utilisateur système | Service sous `pmax`, sans root |
+| WEB-07 | `DONE` | Créer le répertoire applicatif | `/opt/racinepoir` |
+| WEB-08 | `DONE` | Créer l’environnement privé | `/opt/racinepoir/.env`, mode `600` |
+| WEB-09 | `DONE` | Déployer le code | Branche de stabilisation déployée |
+| WEB-10 | `DONE` | Créer le venv de production | `/opt/racinepoir/.venv` fonctionnel |
+| WEB-11 | `DONE` | Appliquer les migrations | Head `b7c3d4e5f6a7` appliqué |
+| WEB-12 | `DONE` | Tester Gunicorn | Répond sur `127.0.0.1:8000` |
+| WEB-13 | `DONE` | Créer le service systemd | Activé et actif |
+| WEB-14 | `DONE` | Installer et configurer Caddy | Reverse proxy HTTP validé |
+| WEB-15 | `DONE` | Tester depuis le LAN | `/` et `/healthz` accessibles depuis Windows |
 
 ---
 
@@ -202,12 +203,12 @@ applicatif `WEB-08` à `WEB-11`.
 
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
-| DB-01 | `DONE` | Choisir DB actuelle ou DB prod séparée | Base séparée `racinepoir_ludotheque_prod` sur SQL101 |
-| DB-02 | `NEXT` | Créer le rôle production | Non superuser |
-| DB-03 | `NEXT` | Créer la base production | Propriétaire correct |
-| DB-04 | `NEXT` | Restreindre `pg_hba.conf` | WEB01 seulement |
-| DB-05 | `NEXT` | Tester TLS PostgreSQL | Connexion chiffrée |
-| DB-06 | `NEXT` | Appliquer les migrations | Schéma complet |
+| DB-01 | `DONE` | Choisir DB actuelle ou DB prod séparée | Base séparée `racinepoir_ludotheque_prod` sur SQL01 |
+| DB-02 | `DONE` | Créer le rôle production | Rôle `racinepoir_prod` opérationnel |
+| DB-03 | `DONE` | Créer la base production | `racinepoir_ludotheque_prod` opérationnelle |
+| DB-04 | `DONE` | Restreindre `pg_hba.conf` | WEB01 autorisé |
+| DB-05 | `DONE` | Tester TLS PostgreSQL | `sslmode=require` validé |
+| DB-06 | `DONE` | Appliquer les migrations | Head `b7c3d4e5f6a7` appliqué |
 | DB-07 | `NEXT` | Créer le premier admin prod | Mot de passe non journalisé |
 | DB-08 | `NEXT` | Créer le premier dump prod | Fichier vérifié |
 
@@ -253,11 +254,11 @@ DB-01 → DB-05
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
 | OPS-01 | `NEXT` | Script `pg_dump` automatisé | Dump quotidien |
-| OPS-02 | `NEXT` | Stockage hors SQL101 | Deuxième emplacement |
+| OPS-02 | `NEXT` | Stockage hors SQL01 | Deuxième emplacement |
 | OPS-03 | `NEXT` | Politique de rétention | Quotidien/hebdo/mensuel |
 | OPS-04 | `NEXT` | Test de restauration | DB temporaire validée |
 | OPS-05 | `NEXT` | Monitoring `/healthz` | Alerte en cas de panne |
-| OPS-06 | `NEXT` | Monitoring espace disque | WEB01 et SQL101 |
+| OPS-06 | `NEXT` | Monitoring espace disque | WEB01 et SQL01 |
 | OPS-07 | `NEXT` | Monitoring certificat TLS | Alerte avant expiration |
 | OPS-08 | `NEXT` | Procédure de mise à jour | Déploiement reproductible |
 | OPS-09 | `NEXT` | Procédure de rollback | Code, DB et VM |
@@ -291,7 +292,7 @@ A. Réutiliser racinepoir_ludotheque
 B. Créer racinepoir_ludotheque_prod
 ```
 
-**Décision : B — créer `racinepoir_ludotheque_prod` sur SQL101.**
+**Décision : B — créer `racinepoir_ludotheque_prod` sur SQL01.**
 
 ## D-02 — Exposition publique
 
@@ -399,7 +400,7 @@ DB-01 → DB-05
 | Code applicatif | Codex, sous validation de Maxime |
 | Revue technique et planification | ChatGPT Projet |
 | Proxmox et WEB01 | Maxime |
-| PostgreSQL et SQL101 | Maxime |
+| PostgreSQL et SQL01 | Maxime |
 | DNS interne et public | Maxime |
 | UX/UI visuel | Designer et Maxime |
 | Déclenchement du déploiement | Maxime |
@@ -415,13 +416,13 @@ changements sur l’infrastructure.
 # 7. Définition de “première version web prête”
 
 - [ ] branche stable et propre;
-- [ ] migrations reproductibles;
+- [x] migrations reproductibles;
 - [ ] admin créable sans seed destructif;
 - [ ] login, jeux, boîtes, scan et demandes fonctionnent;
 - [ ] ajout manuel indépendant de BGG;
-- [ ] application sur WEB01 avec Gunicorn/systemd;
-- [ ] Caddy fonctionne;
-- [ ] base prod décidée;
+- [x] application sur WEB01 avec Gunicorn/systemd;
+- [x] Caddy fonctionne sur le LAN en HTTP;
+- [x] base prod séparée créée et migrée;
 - [ ] HTTPS public;
 - [ ] QR avec domaine public;
 - [ ] backup créé;

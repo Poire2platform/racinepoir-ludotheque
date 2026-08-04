@@ -28,7 +28,7 @@ Les tests automatisés utilisent SQLite en mémoire. Ils couvrent :
 
 ## Vérification sur la base de développement
 
-Ces parcours sont en lecture et ne doivent pas modifier SQL101 :
+Ces parcours sont en lecture et ne doivent pas modifier SQL01 :
 
 - [x] `/healthz`;
 - [x] `/games`;
@@ -45,7 +45,7 @@ Ces parcours sont en lecture et ne doivent pas modifier SQL101 :
 - [x] connexion avec le mot de passe administratif courant.
 
 Le 29 juillet 2026, le mot de passe de développement `admin123` a été renouvelé
-avec l’autorisation du propriétaire, puis la connexion réelle sur SQL101 a été
+avec l’autorisation du propriétaire, puis la connexion réelle sur SQL01 a été
 validée.
 
 ## Avant un checkpoint

@@ -3,8 +3,14 @@ RacinePoir Ludothèque
 
 Private Flask app for managing a small shared board game library.
 
-Infrastructure note: the current development machine is not the production
-target. The planned WEB01 / SQL101 deployment is documented in
+Infrastructure note: the development machine is separate from production.
+WEB01 currently serves the application over the historical LAN and uses the
+production database on SQL01. This working deployment and its reproducible
+service files are documented in
+[`docs/WEB01_DEPLOYMENT.md`](docs/WEB01_DEPLOYMENT.md).
+
+The final segmented network and public HTTPS publication are not deployed yet.
+Their target architecture is documented in
 [`docs/infra-plan.md`](docs/infra-plan.md).
 
 Core Concepts

@@ -1,0 +1,17 @@
+[Unit]
+Description=RacinePoir Ludotheque Gunicorn service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pmax
+Group=pmax
+WorkingDirectory=/opt/racinepoir
+EnvironmentFile=/opt/racinepoir/.env
+ExecStart=/opt/racinepoir/.venv/bin/gunicorn --workers 2 --bind 127.0.0.1:8000 run:app
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
