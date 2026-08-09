@@ -36,6 +36,9 @@ la documentation ou les journaux.
 - `requirements-production.txt` ajoute Gunicorn aux dépendances applicatives.
 - `deploy/racinepoir.service` représente le service systemd validé.
 - `deploy/Caddyfile` représente le reverse proxy LAN actuel.
+- `docs/WEB01_CODEX_ACCESS.md` et `deploy/web01-access/` préparent un accès SSH
+  en écriture dédié; cet accès n’est pas installé tant que Maxime n’a pas
+  exécuté et validé la procédure sur WEB01.
 
 Après copie contrôlée sur WEB01 :
 

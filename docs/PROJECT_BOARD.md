@@ -60,7 +60,7 @@ Règles :
 | Token BGG | Configuré hors dépôt |
 | Anciennes données | Non récupérées |
 | Données de démonstration | Seed non destructif exécuté deux fois et vérifié |
-| Tests automatisés actifs | 93 tests `pytest` réussis sur SQLite isolée |
+| Tests automatisés actifs | 96 tests `pytest` réussis sur SQLite isolée |
 
 ---
 
@@ -159,12 +159,12 @@ STAB-12
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
 | QA-01 | `DONE` | Créer une checklist de test manuel | `docs/SMOKE_TEST.md` |
-| QA-02 | `DONE` | Ajouter des tests automatisés critiques | 93 tests couvrent login, utilisateurs, création d’admin, jeux, notes, boîtes, filtres, scan, demandes, CSRF, permissions et accessibilité structurelle |
+| QA-02 | `DONE` | Ajouter des tests automatisés critiques | 96 tests couvrent login, utilisateurs, création d’admin, jeux, notes, boîtes, filtres, scan, demandes, CSRF, permissions, accessibilité et artefacts d’accès WEB01 |
 | QA-03 | `DONE` | Vérifier les migrations sur une DB vide | SQLite vide migrée jusqu’à `b7c3d4e5f6a7` |
 | QA-04 | `DONE` | Tester un redémarrage de l’application | Données, login, catalogue, boîtes et santé vérifiés après recréation |
 | QA-05 | `DONE` | Vérifier les erreurs utilisateur | Réponses 404/500 sans traceback ni détail interne |
 | QA-06 | `DONE` | Vérifier les secrets Git | Fichiers suivis et historique contrôlés sans secret détecté |
-| QA-07 | `DONE` | Vérifier `requirements.txt` | Venv neuf et imports vérifiés; suite courante de 93 tests réussie |
+| QA-07 | `DONE` | Vérifier `requirements.txt` | Venv neuf et imports vérifiés; suite courante de 96 tests réussie |
 | QA-08 | `DONE` | Préparer un tag de déploiement | Checkpoint QA identifié par `mvp-2026-08-03` |
 | QA-09 | `DONE` | Revalider après la passe UX | 89 tests, head Alembic et tag `mvp-2026-08-03-ux` vérifiés |
 
@@ -193,6 +193,7 @@ de l’administration système.
 | WEB-13 | `DONE` | Créer le service systemd | Activé et actif |
 | WEB-14 | `DONE` | Installer et configurer Caddy | Reverse proxy HTTP validé |
 | WEB-15 | `DONE` | Tester depuis le LAN | `/` et `/healthz` accessibles depuis Windows |
+| WEB-16 | `NEXT` | Installer l’accès SSH de déploiement dédié | Écriture limitée à RacinePoir, secrets protégés et révocation testée |
 
 ---
 
@@ -316,6 +317,14 @@ n’est ajouté. L’historique demeure visible sur la fiche de la boîte.
 - données de démonstration;
 - aucune donnée préchargée.
 ```
+
+## D-05 — Accès Codex à WEB01 (`CLOSED`)
+
+Décision : préparer un compte SSH dédié avec écriture sur le checkout
+RacinePoir et des commandes d’exploitation limitées. Les secrets, l’environnement
+Python et l’administration générale du serveur ne sont pas directement exposés.
+L’installation demeure sous le contrôle de Maxime et suit
+`docs/WEB01_CODEX_ACCESS.md`.
 
 ---
 

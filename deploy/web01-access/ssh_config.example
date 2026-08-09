@@ -1,0 +1,8 @@
+Host web01-racinepoir
+    HostName 192.168.18.38
+    User deploy-racinepoir
+    IdentityFile ~/.ssh/id_ed25519_web01_racinepoir
+    IdentitiesOnly yes
+    ForwardAgent no
+    ServerAliveInterval 15
+    ServerAliveCountMax 3

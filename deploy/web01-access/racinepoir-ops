@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+APP_DIR=/opt/racinepoir
+APP_USER=pmax
+SERVICE_NAME=racinepoir.service
+
+fail() {
+    printf 'Erreur: %s\n' "$*" >&2
+    exit 1
+}
+
+require_argument_count() {
+    local expected=$1
+    local actual=$2
+
+    if [[ "$actual" -ne "$expected" ]]; then
+        fail "nombre d’arguments invalide"
+    fi
+}
+
+run_as_app() {
+    runuser --user "$APP_USER" -- \
+        /bin/bash -c 'cd "$1"; shift; exec "$@"' \
+        racinepoir-ops "$APP_DIR" "$@"
+}
+
+require_clean_checkout() {
+    local state
+    state=$(run_as_app /usr/bin/git status --porcelain --untracked-files=all)
+
+    if [[ -n "$state" ]]; then
+        fail "le checkout WEB01 doit être propre avant cette opération"
+    fi
+}
+
+check_health() {
+    local attempt
+
+    for attempt in {1..10}; do
+        if /usr/bin/curl --fail --silent --show-error \
+            http://127.0.0.1:8000/healthz; then
+            printf '\n'
+            return 0
+        fi
+        /usr/bin/sleep 1
+    done
+
+    fail "le contrôle /healthz a échoué après 10 tentatives"
+}
+
+usage() {
+    cat <<'EOF'
+Usage:
+  sudo /usr/local/sbin/racinepoir-ops status
+  sudo /usr/local/sbin/racinepoir-ops logs [nombre-de-lignes]
+  sudo /usr/local/sbin/racinepoir-ops health
+  sudo /usr/local/sbin/racinepoir-ops restart
+  sudo /usr/local/sbin/racinepoir-ops migrate
+  sudo /usr/local/sbin/racinepoir-ops create-admin [options non secrètes]
+EOF
+}
+
+command_name=${1:-}
+
+case "$command_name" in
+    status)
+        require_argument_count 1 "$#"
+        /usr/bin/systemctl status "$SERVICE_NAME" --no-pager
+        run_as_app /usr/bin/git status --short --branch
+        run_as_app /usr/bin/git log -1 --oneline --decorate
+        ;;
+    logs)
+        [[ "$#" -le 2 ]] || fail "logs accepte au maximum un argument"
+        line_count=${2:-100}
+        [[ "$line_count" =~ ^[1-9][0-9]{0,2}$ ]] || \
+            fail "le nombre de lignes doit être compris entre 1 et 999"
+        /usr/bin/journalctl --unit "$SERVICE_NAME" \
+            --lines "$line_count" --no-pager
+        ;;
+    health)
+        require_argument_count 1 "$#"
+        check_health
+        ;;
+    restart)
+        require_argument_count 1 "$#"
+        require_clean_checkout
+        /usr/bin/systemctl restart "$SERVICE_NAME"
+        check_health
+        ;;
+    migrate)
+        require_argument_count 1 "$#"
+        require_clean_checkout
+        run_as_app "$APP_DIR/.venv/bin/flask" db upgrade
+        run_as_app "$APP_DIR/.venv/bin/flask" db current
+        ;;
+    create-admin)
+        shift
+        require_clean_checkout
+        run_as_app "$APP_DIR/.venv/bin/flask" create-admin "$@"
+        ;;
+    help|-h|--help)
+        usage
+        ;;
+    *)
+        usage >&2
+        exit 2
+        ;;
+esac

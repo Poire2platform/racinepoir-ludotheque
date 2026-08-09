@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+APP_DIR=/opt/racinepoir
+APP_USER=pmax
+DEPLOY_USER=deploy-racinepoir
+DEPLOY_GROUP=racinepoir-deploy
+EXPECTED_SOURCE=192.168.18.18
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+
+fail() {
+    printf 'Erreur: %s\n' "$*" >&2
+    exit 1
+}
+
+if [[ $(id -u) -ne 0 ]]; then
+    fail "exécuter ce programme avec sudo sur WEB01"
+fi
+
+if [[ "$#" -ne 1 ]]; then
+    fail "usage: install-web01-access /chemin/vers/cle-publique"
+fi
+
+public_key_file=$1
+
+[[ -d "$APP_DIR/.git" ]] || fail "$APP_DIR n’est pas un checkout Git"
+[[ -f "$APP_DIR/.env" ]] || fail "$APP_DIR/.env est absent"
+[[ -x "$APP_DIR/.venv/bin/flask" ]] || fail "l’environnement Flask est absent"
+[[ -r "$public_key_file" ]] || fail "clé publique illisible"
+[[ $(/usr/bin/awk 'NF { count++ } END { print count + 0 }' "$public_key_file") -eq 1 ]] || \
+    fail "le fichier doit contenir exactement une clé publique"
+
+public_key=$(/usr/bin/awk 'NF { print; exit }' "$public_key_file")
+[[ "$public_key" == ssh-ed25519\ * ]] || fail "une clé publique Ed25519 est requise"
+
+/usr/sbin/groupadd --force "$DEPLOY_GROUP"
+
+if ! /usr/bin/id "$DEPLOY_USER" >/dev/null 2>&1; then
+    /usr/sbin/useradd --create-home --shell /bin/bash "$DEPLOY_USER"
+fi
+
+/usr/sbin/usermod --append --groups "$DEPLOY_GROUP" "$APP_USER"
+/usr/sbin/usermod --append --groups "$DEPLOY_GROUP" "$DEPLOY_USER"
+
+deploy_home=$(/usr/bin/getent passwd "$DEPLOY_USER" | /usr/bin/cut -d: -f6)
+/usr/bin/install --directory --owner "$DEPLOY_USER" --group "$DEPLOY_USER" \
+    --mode 0700 "$deploy_home/.ssh"
+
+authorized_key="from=\"$EXPECTED_SOURCE\",no-agent-forwarding,no-port-forwarding,no-X11-forwarding,no-user-rc $public_key"
+authorized_keys_file="$deploy_home/.ssh/authorized_keys"
+/usr/bin/touch "$authorized_keys_file"
+/usr/bin/chown "$DEPLOY_USER:$DEPLOY_USER" "$authorized_keys_file"
+/usr/bin/chmod 0600 "$authorized_keys_file"
+
+if ! /usr/bin/grep --fixed-strings --line-regexp --quiet \
+    "$authorized_key" "$authorized_keys_file"; then
+    printf '%s\n' "$authorized_key" >> "$authorized_keys_file"
+fi
+
+# Le checkout et son historique deviennent modifiables par le groupe de
+# déploiement. Les secrets et l’environnement Python sont explicitement exclus.
+/usr/bin/find "$APP_DIR" -xdev \
+    \( -path "$APP_DIR/.env" -o -path "$APP_DIR/.venv" \) -prune -o \
+    -exec /usr/bin/chgrp "$DEPLOY_GROUP" {} +
+/usr/bin/find "$APP_DIR" -xdev \
+    \( -path "$APP_DIR/.env" -o -path "$APP_DIR/.venv" \) -prune -o \
+    -type d -exec /usr/bin/chmod g+rwx,g+s {} +
+/usr/bin/find "$APP_DIR" -xdev \
+    \( -path "$APP_DIR/.env" -o -path "$APP_DIR/.venv" \) -prune -o \
+    -type f -exec /usr/bin/chmod g+rw {} +
+
+# Le sticky bit empêche deploy-racinepoir de supprimer ou remplacer le .env
+# appartenant à pmax, même si la racine du checkout est inscriptible.
+/usr/bin/chown "$APP_USER:$APP_USER" "$APP_DIR/.env"
+/usr/bin/chmod 0600 "$APP_DIR/.env"
+/usr/bin/chmod 3775 "$APP_DIR"
+
+/usr/bin/install --owner root --group root --mode 0755 \
+    "$SCRIPT_DIR/racinepoir-ops" /usr/local/sbin/racinepoir-ops
+/usr/bin/install --owner root --group root --mode 0440 \
+    "$SCRIPT_DIR/racinepoir-ops.sudoers" /etc/sudoers.d/racinepoir-ops
+/usr/sbin/visudo --check --file /etc/sudoers.d/racinepoir-ops
+/usr/sbin/sshd -t
+
+printf '%s\n' \
+    "Accès préparé pour $DEPLOY_USER depuis $EXPECTED_SOURCE." \
+    "Ouvrir une nouvelle connexion SSH avant de fermer la session administrative." \
+    "Aucun service n’a été redémarré et aucune migration n’a été exécutée."

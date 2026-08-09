@@ -1,0 +1,3 @@
+# Install as /etc/sudoers.d/racinepoir-ops with mode 0440.
+# The root-owned wrapper validates every accepted operation and argument.
+deploy-racinepoir ALL=(root) NOPASSWD: /usr/local/sbin/racinepoir-ops
