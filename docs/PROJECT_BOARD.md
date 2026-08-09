@@ -60,7 +60,7 @@ Règles :
 | Token BGG | Configuré hors dépôt |
 | Anciennes données | Non récupérées |
 | Données de démonstration | Seed non destructif exécuté deux fois et vérifié |
-| Tests automatisés actifs | 89 tests `pytest` réussis sur SQLite isolée |
+| Tests automatisés actifs | 93 tests `pytest` réussis sur SQLite isolée |
 
 ---
 
@@ -159,12 +159,12 @@ STAB-12
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
 | QA-01 | `DONE` | Créer une checklist de test manuel | `docs/SMOKE_TEST.md` |
-| QA-02 | `DONE` | Ajouter des tests automatisés critiques | 89 tests couvrent login, utilisateurs, jeux, notes, boîtes, filtres, scan, demandes, CSRF, permissions et accessibilité structurelle |
+| QA-02 | `DONE` | Ajouter des tests automatisés critiques | 93 tests couvrent login, utilisateurs, création d’admin, jeux, notes, boîtes, filtres, scan, demandes, CSRF, permissions et accessibilité structurelle |
 | QA-03 | `DONE` | Vérifier les migrations sur une DB vide | SQLite vide migrée jusqu’à `b7c3d4e5f6a7` |
 | QA-04 | `DONE` | Tester un redémarrage de l’application | Données, login, catalogue, boîtes et santé vérifiés après recréation |
 | QA-05 | `DONE` | Vérifier les erreurs utilisateur | Réponses 404/500 sans traceback ni détail interne |
 | QA-06 | `DONE` | Vérifier les secrets Git | Fichiers suivis et historique contrôlés sans secret détecté |
-| QA-07 | `DONE` | Vérifier `requirements.txt` | Venv neuf et imports vérifiés; suite courante de 89 tests réussie |
+| QA-07 | `DONE` | Vérifier `requirements.txt` | Venv neuf et imports vérifiés; suite courante de 93 tests réussie |
 | QA-08 | `DONE` | Préparer un tag de déploiement | Checkpoint QA identifié par `mvp-2026-08-03` |
 | QA-09 | `DONE` | Revalider après la passe UX | 89 tests, head Alembic et tag `mvp-2026-08-03-ux` vérifiés |
 
@@ -418,7 +418,7 @@ changements sur l’infrastructure.
 
 - [ ] branche stable et propre;
 - [x] migrations reproductibles;
-- [ ] admin créable sans seed destructif;
+- [x] admin créable sans seed destructif avec `flask create-admin`;
 - [ ] login, jeux, boîtes, scan et demandes fonctionnent;
 - [ ] ajout manuel indépendant de BGG;
 - [x] application sur WEB01 avec Gunicorn/systemd;

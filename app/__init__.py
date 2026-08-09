@@ -37,6 +37,9 @@ def create_app():
     login_manager.init_app(app)
     login_manager.login_view = "main.login"
 
+    from .cli import register_commands
+    register_commands(app)
+
     def csrf_token():
         token = session.get("_csrf_token")
         if not token:

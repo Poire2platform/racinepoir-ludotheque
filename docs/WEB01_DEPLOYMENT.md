@@ -77,8 +77,9 @@ Effectuer ensuite la checklist fonctionnelle de `docs/SMOKE_TEST.md`.
 
 ## Suite
 
-1. créer le premier administrateur avec une procédure qui ne journalise pas le
-   mot de passe;
+1. créer le premier administrateur avec la commande interactive `flask
+   create-admin` documentée dans `docs/PRODUCTION_DATABASE.md`, sans journaliser
+   le mot de passe;
 2. produire et vérifier une première sauvegarde PostgreSQL;
 3. ajouter `ludotheque.home.arpa` au DNS local;
 4. exécuter le smoke test fonctionnel complet;

@@ -95,5 +95,24 @@ Après préparation de WEB01 et de son environnement privé :
 .venv/bin/flask db current
 ```
 
-Le head attendu est `b7c3d4e5f6a7`. Il faudra ensuite créer le premier admin par
-une procédure contrôlée et produire immédiatement un premier dump vérifié.
+Le head attendu est `b7c3d4e5f6a7`.
+
+## 7. Créer le premier administrateur
+
+À exécuter par Maxime sur WEB01 depuis `/opt/racinepoir`, après avoir confirmé
+que l’environnement privé vise bien `racinepoir_ludotheque_prod` :
+
+```bash
+.venv/bin/flask create-admin \
+  --username NOM_DE_CONNEXION \
+  --email ADRESSE_COURRIEL \
+  --display-name NOM_AFFICHE
+```
+
+La commande demande le mot de passe deux fois dans une invite masquée. Ne pas
+mettre le mot de passe dans la commande, le terminal, `logthis` ou un document.
+Elle refuse un nom d’utilisateur ou une adresse courriel déjà présents et ne
+modifie aucun compte existant.
+
+Après validation de la connexion de cet administrateur, produire immédiatement
+le premier dump vérifié décrit par `DB-08`.
