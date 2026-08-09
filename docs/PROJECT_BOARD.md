@@ -44,7 +44,7 @@ Règles :
 | PostgreSQL `SQL01` — VM `101` — `192.168.18.30` | Base prod séparée fonctionnelle; migrations appliquées |
 | DNS `poire1-dns` — `192.168.18.34` | Fonctionnel |
 | Portal — `http://poire1-portal.home.arpa/` | Fonctionnel |
-| WEB01 `poire1-ludoweb` — VM `104` — `192.168.18.38` | Services actifs en HTTP LAN; `/healthz` à diagnostiquer depuis le contrôle du 9 août |
+| WEB01 `poire1-ludoweb` — VM `104` — `10.10.20.10` | Déplacée dans DMZ; Caddy et Gunicorn actifs; accès PostgreSQL bloqué |
 | Domaine public prévu | `ludotheque.filsdepoire.ca` |
 | Publication Internet | Non configurée |
 
@@ -182,7 +182,7 @@ de l’administration système.
 | WEB-02 | `NEXT` | Activer le démarrage automatique de la VM | `onboot: 1` dans Proxmox |
 | WEB-03 | `NEXT` | Prendre un snapshot propre | Snapshot visible |
 | WEB-04 | `DONE` | Installer les paquets système | Déploiement opérationnel |
-| WEB-05 | `DONE` | Tester WEB01 → SQL01 | `/healthz` confirme la DB |
+| WEB-05 | `VERIFY` | Rétablir et tester WEB01 → SQL01 après segmentation | TCP 5432 puis `/healthz` réussissent depuis `10.10.20.10` |
 | WEB-06 | `DONE` | Choisir l’utilisateur système | Service sous `pmax`, sans root |
 | WEB-07 | `DONE` | Créer le répertoire applicatif | `/opt/racinepoir` |
 | WEB-08 | `DONE` | Créer l’environnement privé | `/opt/racinepoir/.env`, mode `600` |
@@ -207,8 +207,8 @@ applicatif `WEB-08` à `WEB-11`.
 | DB-01 | `DONE` | Choisir DB actuelle ou DB prod séparée | Base séparée `racinepoir_ludotheque_prod` sur SQL01 |
 | DB-02 | `DONE` | Créer le rôle production | Rôle `racinepoir_prod` opérationnel |
 | DB-03 | `DONE` | Créer la base production | `racinepoir_ludotheque_prod` opérationnelle |
-| DB-04 | `DONE` | Restreindre `pg_hba.conf` | WEB01 autorisé |
-| DB-05 | `DONE` | Tester TLS PostgreSQL | `sslmode=require` validé |
+| DB-04 | `VERIFY` | Adapter `pg_hba.conf` à la nouvelle source WEB01 | Règle `/32` correspondant à la source observée après routage |
+| DB-05 | `VERIFY` | Revalider TLS PostgreSQL après segmentation | `sslmode=require` depuis WEB01 réussit |
 | DB-06 | `DONE` | Appliquer les migrations | Head `b7c3d4e5f6a7` appliqué |
 | DB-07 | `NEXT` | Créer le premier admin prod | Mot de passe non journalisé |
 | DB-08 | `NEXT` | Créer le premier dump prod | Fichier vérifié |
@@ -218,7 +218,7 @@ Recommandation :
 ```text
 DB : racinepoir_ludotheque_prod
 Rôle : racinepoir_prod
-Source autorisée : 192.168.18.38/32
+Source transitoire attendue : 10.10.20.10/32, à confirmer côté SQL01
 ```
 
 Ordre de passage vers WEB01 :

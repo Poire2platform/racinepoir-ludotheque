@@ -1,7 +1,7 @@
 # RacinePoir Ludothèque — infrastructure
 
 Ce document est la source de vérité courte pour l’infrastructure. Il décrit
-l’état validé le 5 août 2026 et distingue cet état de la segmentation cible.
+l’état vérifié le 9 août 2026 et distingue cet état de la segmentation cible.
 
 ## Clarification importante
 
@@ -10,8 +10,7 @@ l’état validé le 5 août 2026 et distingue cet état de la segmentation cibl
 - `pmax-host` est la machine Ubuntu Desktop de développement et l’hôte
   QEMU/KVM + libvirt.
 - `Poire1_PROX` est la VM imbriquée qui héberge Proxmox.
-- `WEB01` est la VM applicative dédiée actuellement fonctionnelle sur le LAN
-  historique.
+- `WEB01` est la VM applicative dédiée, déplacée dans la DMZ le 9 août 2026.
 - `SQL01` est la VM PostgreSQL séparée (VMID `101`).
 
 Le code est développé et testé sur `pmax-host`. L’administration de Proxmox,
@@ -28,7 +27,7 @@ effectuée par Maxime.
 | PostgreSQL | VM `101`, `SQL01` | `192.168.18.30` | Fonctionnel; pas encore déplacé |
 | DNS local | VM `102`, `poire1-dns` | `192.168.18.34` | Fonctionnel |
 | Portail | VM `103`, `poire1-portal` | `192.168.18.35` | Fonctionnel |
-| Application | VM `104`, `WEB01` | `192.168.18.38` | Déploiement LAN fonctionnel |
+| Application | VM `104`, `WEB01` | `10.10.20.10` | Caddy et Gunicorn actifs; accès DB bloqué |
 
 La zone DNS locale est `home.arpa`. Un nom local possible pour l’application
 est `ludotheque.home.arpa`.
@@ -51,8 +50,11 @@ est `ludotheque.home.arpa`.
 - DMZ, APP et DB n’ont encore aucune règle d’autorisation; leur blocage
   implicite est donc actif.
 
-Important : WEB01 fonctionne actuellement sur le LAN historique. Les règles
-applicatives interzones et la publication Internet ne sont pas encore déployées.
+Important : WEB01 est maintenant dans la DMZ. Son ancienne adresse
+`192.168.18.38` n’est plus configurée. Le 9 août, les connexions TCP depuis
+WEB01 vers SQL01 à `192.168.18.30:5432` et vers l’adresse DB candidate
+`10.10.40.10:5432` expiraient. Les règles applicatives interzones et la
+publication Internet ne sont donc pas encore validées.
 
 ## Administration pfSense
 
@@ -105,21 +107,33 @@ Internet
   -> PostgreSQL dans DB sur TCP 5432
 ```
 
-Caddy est installé sur WEB01 en HTTP LAN. Le domaine public envisagé est
-`ludotheque.filsdepoire.ca`, avec DNS public probablement géré par Cloudflare.
+Caddy est installé sur WEB01 et écoute actuellement sur toutes ses interfaces
+au port 80. Gunicorn écoute seulement sur `127.0.0.1:8000`; ce couple convient
+à l’état transitoire où proxy et application partagent WEB01 dans la DMZ. Le
+domaine public envisagé est `ludotheque.filsdepoire.ca`, avec DNS public
+probablement géré par Cloudflare.
+
+Dans la cible segmentée, le reverse proxy demeure dans la DMZ et l’application
+est déplacée dans APP. À ce moment seulement, Gunicorn devra écouter l’adresse
+APP de la machine applicative plutôt que `127.0.0.1`, Caddy devra joindre cette
+adresse sur TCP 8000, et pfSense devra limiter ce flux à la seule source du
+proxy. Le port 8000 ne doit jamais être exposé au WAN.
 
 Le déploiement LAN validé est détaillé dans `docs/WEB01_DEPLOYMENT.md`.
 
 ## Prochaine phase
 
-Ne pas déplacer SQL01 immédiatement. Préparer et valider les règles minimales :
+Rétablir d’abord le chemin contrôlé entre WEB01 et SQL01, puis préparer et
+valider les règles minimales :
 
 1. MGMT vers les interfaces d’administration nécessaires;
 2. WAN TCP 443 vers le futur reverse proxy en DMZ;
 3. reverse proxy DMZ vers l’application dans APP;
-4. application APP vers PostgreSQL sur TCP 5432;
-5. refus de toute autre communication interzone;
-6. décision ultérieure : conserver temporairement SQL01 sur `192.168.18.30`
+4. état transitoire : WEB01 `10.10.20.10` vers SQL01 `192.168.18.30` sur TCP
+   5432, avec une règle `pg_hba.conf` limitée à la source réellement observée;
+5. cible : application APP vers PostgreSQL dans DB sur TCP 5432;
+6. refus de toute autre communication interzone;
+7. décision ultérieure : conserver temporairement SQL01 sur `192.168.18.30`
    ou le migrer dans DB.
 
 Ces opérations d’infrastructure précèdent le passage à l’architecture segmentée

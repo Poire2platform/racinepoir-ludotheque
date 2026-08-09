@@ -8,7 +8,7 @@ contient aucun secret et ne remplace pas les fichiers privés du serveur.
 | Élément | Valeur |
 |---|---|
 | Serveur | `WEB01` / `poire1-ludoweb` |
-| Adresse LAN | `192.168.18.38` |
+| Adresse actuelle | `10.10.20.10/24` dans DMZ, passerelle `10.10.20.1` |
 | Répertoire | `/opt/racinepoir` |
 | Branche | `repair/manual-stabilization-2026-07-29` |
 | Dépôt | `Poire2platform/racinepoir-ludotheque` |
@@ -44,6 +44,23 @@ locaux suivants ne sont pas encore poussés ni déployés : documentation du
 déploiement LAN, scan direct sans confirmation, commande contrôlée de création
 d’administrateur et artefacts d’accès WEB01.
 
+## Effet de la segmentation sur Caddy et Gunicorn
+
+La configuration active reste correcte pour l’état transitoire : Caddy écoute
+sur le port 80 de WEB01 et transmet à Gunicorn sur `127.0.0.1:8000`. Le contrôle
+du 9 août a obtenu HTTP 302 directement auprès des deux services. Leur liaison
+locale n’explique donc pas la panne de `/healthz`.
+
+Si le proxy et l’application sont séparés conformément à l’architecture cible,
+ne pas réutiliser cette configuration telle quelle :
+
+- placer Caddy dans DMZ et Gunicorn dans APP;
+- faire écouter Gunicorn sur l’adresse APP prévue, jamais sur une adresse WAN;
+- remplacer la cible locale de `reverse_proxy` par l’adresse APP de Gunicorn;
+- n’autoriser dans pfSense que le proxy DMZ vers ce port TCP 8000;
+- valider Caddy, `/healthz`, les en-têtes de proxy et les cookies sécurisés avant
+  la publication HTTPS.
+
 Après copie contrôlée sur WEB01 :
 
 ```bash
@@ -71,11 +88,13 @@ Caddy -> Gunicorn -> Flask -> PostgreSQL
 - `http://192.168.18.38/healthz` retourne HTTP 200.
 - `/healthz` rapporte `status: ok` et `database: ok`.
 
-Ces résultats décrivent la validation initiale du 4 août. Lors du contrôle du
-9 août, Gunicorn et Caddy étaient toujours actifs et leurs ports écoutaient,
-mais `/healthz` n’a pas répondu avant le timeout. Les journaux Gunicorn
-montraient des workers arrêtés puis relancés après timeout. Cette anomalie doit
-être diagnostiquée avant un redéploiement ou une nouvelle affirmation de santé.
+Ces résultats décrivent la validation initiale du 4 août à l’ancienne adresse
+`192.168.18.38`. Lors du contrôle du 9 août, WEB01 avait été déplacée vers
+`10.10.20.10` dans la DMZ. Gunicorn et Caddy répondaient toujours localement,
+mais les connexions TCP vers PostgreSQL à `192.168.18.30:5432` et vers
+`10.10.40.10:5432` expiraient. `/healthz` bloquait et les journaux Gunicorn
+montraient des workers arrêtés puis relancés après timeout. Rétablir et limiter
+le flux PostgreSQL avant tout redéploiement ou nouvelle affirmation de santé.
 
 ## Vérifications après un redéploiement
 

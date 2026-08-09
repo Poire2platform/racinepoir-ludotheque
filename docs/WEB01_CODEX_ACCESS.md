@@ -7,7 +7,7 @@ opération d’infrastructure sous son contrôle.
 ## État vérifié le 9 août 2026
 
 - l’alias SSH `web01-racinepoir` ouvre une session avec le compte dédié
-  `deploy-racinepoir`;
+  `deploy-racinepoir` vers `10.10.20.10`;
 - `/opt/racinepoir` est monté en lecture-écriture par SSHFS dans
   `/home/pmax/web01-racinepoir` sur `pmax-host`;
 - ce montage est ajouté comme deuxième dossier du workspace Codex;
@@ -72,7 +72,7 @@ stat -c '%U:%G %a %n' /opt/racinepoir /opt/racinepoir/.env
 sudo systemctl status racinepoir.service --no-pager
 ```
 
-Résultats attendus : WEB01 est `poire1-ludoweb` à `192.168.18.38`, le checkout
+Résultats attendus : WEB01 est `poire1-ludoweb` à `10.10.20.10`, le checkout
 est propre, et `.env` appartient à `pmax`, en mode `600`. Arrêter si ces faits
 ne correspondent pas à l’état réel.
 

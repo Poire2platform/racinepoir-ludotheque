@@ -1,5 +1,5 @@
 Host web01-racinepoir
-    HostName 192.168.18.38
+    HostName 10.10.20.10
     User deploy-racinepoir
     IdentityFile ~/.ssh/id_ed25519_web01_racinepoir
     IdentitiesOnly yes

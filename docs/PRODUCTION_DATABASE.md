@@ -8,7 +8,7 @@ La production utilise une base séparée sur SQL01 :
 Serveur : SQL01 / 192.168.18.30
 Base : racinepoir_ludotheque_prod
 Rôle applicatif : racinepoir_prod
-Client applicatif autorisé : WEB01 / 192.168.18.38
+Client applicatif actuel : WEB01 / 10.10.20.10
 ```
 
 La base de développement `racinepoir_ludotheque` et son rôle ne sont pas
@@ -48,10 +48,13 @@ Le rôle doit avoir `false` pour superuser, création de base et création de r�
 
 ## 3. Restreindre l’accès réseau
 
-Dans le fichier retourné par `SHOW hba_file;`, ajouter une règle ciblée :
+Depuis le déplacement de WEB01 dans la DMZ, confirmer d’abord dans les journaux
+PostgreSQL l’adresse source réellement reçue après routage. Si elle est bien
+`10.10.20.10`, remplacer l’ancienne autorisation `192.168.18.38/32` par la règle
+ciblée suivante :
 
 ```text
-hostssl  racinepoir_ludotheque_prod  racinepoir_prod  192.168.18.38/32  scram-sha-256
+hostssl  racinepoir_ludotheque_prod  racinepoir_prod  10.10.20.10/32  scram-sha-256
 ```
 
 Ne pas ajouter de règle publique ou de sous-réseau plus large. Valider puis
@@ -73,6 +76,12 @@ PGSSLMODE=require psql --host=192.168.18.30 --username=racinepoir_prod --dbname=
 
 La connexion doit annoncer SSL. Une connexion depuis une autre machine ne doit
 pas être autorisée par une règle plus large.
+
+Au contrôle du 9 août, TCP 5432 expirait avant d’atteindre PostgreSQL. La règle
+pfSense entre DMZ et SQL01 doit donc être créée ou corrigée avant de conclure à
+un problème `pg_hba.conf`. Si SQL01 est ensuite déplacé dans le réseau DB,
+mettre simultanément à jour son adresse, la règle pfSense, `pg_hba.conf` et
+`DATABASE_URL`, puis refaire ce test.
 
 ## 5. Configuration privée de WEB01
 
