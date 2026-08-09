@@ -106,10 +106,15 @@ Après préparation de WEB01 et de son environnement privé :
 
 Le head attendu est `b7c3d4e5f6a7`.
 
-## 7. Créer le premier administrateur
+## 7. Vérifier ou créer le premier administrateur
 
-À exécuter par Maxime sur WEB01 depuis `/opt/racinepoir`, après avoir confirmé
-que l’environnement privé vise bien `racinepoir_ludotheque_prod` :
+Le compte `admin` connu dans l’environnement de développement ne prouve pas
+qu’un administrateur existe dans `racinepoir_ludotheque_prod`. Vérifier d’abord
+la base de production par une méthode en lecture seule ou tenter la connexion
+avec le compte attendu, sans exposer de secret.
+
+S’il est absent, exécuter ceci sur WEB01 depuis `/opt/racinepoir`, après avoir
+confirmé que l’environnement privé vise bien `racinepoir_ludotheque_prod` :
 
 ```bash
 .venv/bin/flask create-admin \

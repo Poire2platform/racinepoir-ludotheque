@@ -39,10 +39,12 @@ la documentation ou les journaux.
 - `docs/WEB01_CODEX_ACCESS.md` et `deploy/web01-access/` décrivent l’accès SSH
   en écriture dédié installé le 9 août 2026 et ses limites.
 
-Le checkout déployé demeure propre au commit `c3711c2`. Les quatre commits
-locaux suivants ne sont pas encore poussés ni déployés : documentation du
-déploiement LAN, scan direct sans confirmation, commande contrôlée de création
-d’administrateur et artefacts d’accès WEB01.
+Le checkout WEB01 demeure propre au commit `c3711c2`. Le dépôt de développement
+et sa branche distante sont synchronisés au commit `b012a0c`; les six commits de
+`e444c30` à `b012a0c` sont poussés, mais ne sont pas encore déployés sur WEB01.
+Ils couvrent la documentation du déploiement LAN, le scan direct sans
+confirmation, la commande contrôlée de création d’administrateur, les artefacts
+d’accès WEB01, l’activation du montage SSHFS et la réconciliation de l’état DMZ.
 
 ## Effet de la segmentation sur Caddy et Gunicorn
 
@@ -109,16 +111,18 @@ Effectuer ensuite la checklist fonctionnelle de `docs/SMOKE_TEST.md`.
 
 ## Suite
 
-1. créer le premier administrateur avec la commande interactive `flask
-   create-admin` documentée dans `docs/PRODUCTION_DATABASE.md`, sans journaliser
-   le mot de passe;
-2. produire et vérifier une première sauvegarde PostgreSQL;
-3. ajouter `ludotheque.home.arpa` au DNS local;
-4. exécuter le smoke test fonctionnel complet;
-5. préparer HTTPS, puis seulement alors activer
+1. rétablir le flux TCP 5432 minimal de WEB01 vers SQL01 et obtenir un
+   `/healthz` réussi;
+2. vérifier si le premier administrateur production existe déjà, puis utiliser
+   au besoin la commande interactive `flask create-admin` documentée dans
+   `docs/PRODUCTION_DATABASE.md`, sans journaliser le mot de passe;
+3. produire et vérifier une première sauvegarde PostgreSQL;
+4. ajouter `ludotheque.home.arpa` au DNS local;
+5. exécuter le smoke test fonctionnel complet;
+6. préparer HTTPS, puis seulement alors activer
    `SESSION_COOKIE_SECURE=true`, `REMEMBER_COOKIE_SECURE=true` et
    `TRUST_PROXY_HEADERS=true`;
-6. fusionner la branche de stabilisation vers `main` après validation.
+7. fusionner la branche de stabilisation vers `main` après validation.
 
 Le service demeure en HTTP LAN. Il ne doit pas être présenté comme une
 publication Internet ou un déploiement HTTPS.

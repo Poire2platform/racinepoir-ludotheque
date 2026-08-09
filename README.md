@@ -4,13 +4,15 @@ RacinePoir Ludothèque
 Private Flask app for managing a small shared board game library.
 
 Infrastructure note: the development machine is separate from production.
-WEB01 currently serves the application over the historical LAN and uses the
-production database on SQL01. This working deployment and its reproducible
-service files are documented in
+WEB01 was validated on the historical LAN, then moved to the DMZ at
+`10.10.20.10` on August 9, 2026. Caddy and Gunicorn remain active, but the
+DMZ-to-SQL01 PostgreSQL path is currently blocked, so the deployed application
+must not be considered healthy until `/healthz` succeeds again. The deployment
+history and reproducible service files are documented in
 [`docs/WEB01_DEPLOYMENT.md`](docs/WEB01_DEPLOYMENT.md).
 
-The final segmented network and public HTTPS publication are not deployed yet.
-Their target architecture is documented in
+The inter-zone firewall rules, final segmented network, and public HTTPS
+publication are not complete. Their target architecture is documented in
 [`docs/infra-plan.md`](docs/infra-plan.md).
 
 Core Concepts
@@ -37,6 +39,8 @@ Current Features
 - Lost/active lifecycle actions for owner/admin.
 - Reference game pages with linked boxes.
 - BoardGameGeek recognition/enrichment flow.
+- Informational game interests and dedicated held/owned/interested box views.
+- Per-user game ratings with catalogue and game-page medians.
 - Play session logging with registered users or guest player profiles.
 - First player stats pages with played games, high scores, and frequent teammates.
 
@@ -228,7 +232,7 @@ Good next hardening steps:
 - Move rate limiting to shared storage, such as Redis, if running multiple workers.
 - Add richer structured app logs for important security events.
 - Add an automated database backup script.
-- Add a production service file, such as systemd, once the server path is known.
+- Add monitoring and a tested rollback procedure for the existing systemd deployment.
 
 QR Labels
 ---------

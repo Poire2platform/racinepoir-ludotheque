@@ -56,7 +56,7 @@ Règles :
 | Branche de réparation | `repair/manual-stabilization-2026-07-29` |
 | Schéma PostgreSQL | Reconstruit |
 | Migration courante | `b7c3d4e5f6a7` |
-| Compte `admin` (`Maxime`) | Présent, admin actif |
+| Compte `admin` de développement (`Maxime`) | Présent, admin actif; compte production à vérifier/créer séparément |
 | Token BGG | Configuré hors dépôt |
 | Anciennes données | Non récupérées |
 | Données de démonstration | Seed non destructif exécuté deux fois et vérifié |
@@ -77,10 +77,11 @@ Règles :
 | REPO-05 | `DONE` | Récupérer ou recréer les premiers tests critiques | 50 tests relus, adaptés et réussis |
 | REPO-06 | `DONE` | Créer un checkpoint d’hygiène ciblé | Diff vérifié et commit sans `git add -A` aveugle |
 
-Constats du 29 juillet 2026 :
+Checkpoint historique du 29 juillet 2026 :
 
-- les changements locaux concernent le token BGG et le seed non destructif;
-- le seed a été inspecté statiquement, mais n’a pas encore été exécuté;
+- les changements locaux concernaient le token BGG et le seed non destructif;
+- le seed était alors inspecté statiquement; il a depuis été exécuté deux fois et
+  vérifié par `STAB-08`;
 - `tests/test_public_signup.py` existe dans `rescue/unstable-2026-07-22` et doit être
   relu avant toute récupération sélective; ses scénarios utiles ont été recréés
   proprement plutôt que de restaurer le fichier tel quel;
@@ -88,13 +89,8 @@ Constats du 29 juillet 2026 :
 - les tests utilisent SQLite en mémoire et ne touchent pas SQL01;
 - les avertissements Flask-Login et SQLAlchemy sur des API dépréciées sont une
   dette technique non bloquante;
-- le déploiement demeure en pause jusqu’au checkpoint stable.
-
-Ordre recommandé :
-
-```text
-STAB-08
-```
+- le déploiement était alors en pause jusqu’au checkpoint stable, maintenant
+  terminé.
 
 ---
 
@@ -116,11 +112,7 @@ STAB-08
 | STAB-12 | `DONE` | Committer le checkpoint stable | Branche propre, commit nommé et `logthis` |
 | STAB-13 | `LATER` | Examiner la branche de sauvetage | Récupérer seulement les changements utiles |
 
-Ordre recommandé :
-
-```text
-STAB-12
-```
+La phase de stabilisation est terminée. `STAB-13` demeure volontairement reportée.
 
 ---
 
@@ -332,75 +324,23 @@ directement exposés. Le montage SSHFS est disponible dans
 
 # 5. Prochain sprint recommandé
 
-## Sprint Hygiène et stabilisation
+## Sprint Rétablir WEB01 après segmentation
 
-### Carte 1 — Infrastructure de test (`DONE`)
+Une seule carte `NEXT` ou `VERIFY` doit être traitée à la fois, avec preuve,
+checkpoint et séparation stricte entre infrastructure et code.
 
-```text
-Créer requirements-dev.txt.
-Installer pytest dans le venv de développement.
-Revoir le test récupérable dans la branche de sauvetage.
-Ajouter les premiers tests critiques.
-```
+1. `DB-04` — confirmer l’adresse source reçue par SQL01 et limiter
+   `pg_hba.conf` à cette source.
+2. `DB-05` / `WEB-05` — autoriser le flux minimal TCP 5432 dans pfSense, puis
+   vérifier TLS PostgreSQL et `/healthz` depuis WEB01.
+3. `WEB-16` — terminer la validation de l’accès dédié par un test de santé et un
+   essai contrôlé de révocation.
+4. `DB-07` — vérifier si un administrateur existe déjà dans la base de production;
+   le créer interactivement seulement s’il est absent.
+5. `DB-08` — produire et vérifier le premier dump de production.
+6. `WEB-02` puis `WEB-03` — activer l’autostart et prendre un snapshot propre.
 
-### Carte 2 — Checkpoint d’hygiène (`DONE`)
-
-```text
-Vérifier chaque fichier modifié.
-Exclure les caches et artefacts.
-Créer un commit précis sans git add -A aveugle.
-```
-
-### Carte 3 — Données de démonstration (`DONE`)
-
-```text
-Exécuter python -m scripts.seed_sample_data sur la base de développement seulement.
-Confirmer que le compte `admin` de Maxime reste admin.
-Confirmer qu’une seconde exécution ne crée pas de doublons.
-```
-
-### Carte 4 — Test de fumée
-
-```text
-/login
-/games
-/boxes
-fiche jeu
-fiche boîte
-ajout jeu
-ajout boîte
-scan
-demande
-annulation
-Chez moi
-Mes boîtes
-/healthz
-```
-
-### Carte 5 — Ajout manuel sans BGG
-
-```text
-Vérifier que BGG enrichit un jeu, mais ne bloque jamais la création manuelle.
-```
-
-### Carte 6 — Checkpoint stable
-
-```bash
-git status
-# Ajouter explicitement seulement les fichiers vérifiés.
-git add <fichiers-vérifiés>
-git commit -m "Stabilize development application"
-logthis "Ludothèque: schéma DB reconstruit et environnement de développement stabilisé"
-```
-
-### Carte 7 — Revenir au déploiement
-
-```text
-DB-01 → DB-05
-→ WEB-01 → WEB-10
-→ WEB-11 / DB-06
-→ WEB-12 → WEB-15
-```
+Après ce sprint, décider `D-02` avant d’entamer `PUB-02` à `PUB-10`.
 
 ---
 
@@ -430,8 +370,8 @@ changements sur l’infrastructure.
 - [ ] branche stable et propre;
 - [x] migrations reproductibles;
 - [x] admin créable sans seed destructif avec `flask create-admin`;
-- [ ] login, jeux, boîtes, scan et demandes fonctionnent;
-- [ ] ajout manuel indépendant de BGG;
+- [x] login, jeux, boîtes, scan et intérêts fonctionnent dans la suite automatisée;
+- [x] ajout manuel indépendant de BGG vérifié automatiquement;
 - [x] application sur WEB01 avec Gunicorn/systemd;
 - [x] Caddy fonctionne sur le LAN en HTTP;
 - [x] base prod séparée créée et migrée;
@@ -439,7 +379,8 @@ changements sur l’infrastructure.
 - [ ] QR avec domaine public;
 - [ ] backup créé;
 - [ ] restauration testée;
-- [ ] redémarrage complet validé;
+- [x] redémarrage applicatif automatisé validé sur base isolée;
+- [ ] redémarrage complet WEB01 et SQL01 validé en production;
 - [ ] test externe hors Wi-Fi.
 
 ---
