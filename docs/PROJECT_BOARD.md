@@ -2,7 +2,7 @@
 ## RacinePoir — Ludothèque distribuée
 
 **Rôle du document :** tableau de suivi opérationnel du projet.  
-**Dernière mise à jour :** 3 août 2026
+**Dernière mise à jour :** 9 août 2026
 **Sources complémentaires :**
 - `docs/infra-plan.md`
 - `docs/PRODUCTION_DATABASE.md`
@@ -44,7 +44,7 @@ Règles :
 | PostgreSQL `SQL01` — VM `101` — `192.168.18.30` | Base prod séparée fonctionnelle; migrations appliquées |
 | DNS `poire1-dns` — `192.168.18.34` | Fonctionnel |
 | Portal — `http://poire1-portal.home.arpa/` | Fonctionnel |
-| WEB01 `poire1-ludoweb` — VM `104` — `192.168.18.38` | Déploiement LAN fonctionnel; HTTP seulement |
+| WEB01 `poire1-ludoweb` — VM `104` — `192.168.18.38` | Services actifs en HTTP LAN; `/healthz` à diagnostiquer depuis le contrôle du 9 août |
 | Domaine public prévu | `ludotheque.filsdepoire.ca` |
 | Publication Internet | Non configurée |
 
@@ -193,7 +193,7 @@ de l’administration système.
 | WEB-13 | `DONE` | Créer le service systemd | Activé et actif |
 | WEB-14 | `DONE` | Installer et configurer Caddy | Reverse proxy HTTP validé |
 | WEB-15 | `DONE` | Tester depuis le LAN | `/` et `/healthz` accessibles depuis Windows |
-| WEB-16 | `NEXT` | Installer l’accès SSH de déploiement dédié | Écriture limitée à RacinePoir, secrets protégés et révocation testée |
+| WEB-16 | `VERIFY` | Valider l’accès SSH de déploiement dédié | SSHFS en écriture et secrets protégés vérifiés; santé et révocation à tester |
 
 ---
 
@@ -320,10 +320,12 @@ n’est ajouté. L’historique demeure visible sur la fiche de la boîte.
 
 ## D-05 — Accès Codex à WEB01 (`CLOSED`)
 
-Décision : préparer un compte SSH dédié avec écriture sur le checkout
-RacinePoir et des commandes d’exploitation limitées. Les secrets, l’environnement
-Python et l’administration générale du serveur ne sont pas directement exposés.
-L’installation demeure sous le contrôle de Maxime et suit
+Décision : utiliser le compte SSH dédié `deploy-racinepoir`, installé et
+autorisé par Maxime le 9 août 2026, avec écriture sur le seul checkout
+RacinePoir et des commandes d’exploitation limitées. Les secrets,
+l’environnement Python et l’administration générale du serveur ne sont pas
+directement exposés. Le montage SSHFS est disponible dans
+`/home/pmax/web01-racinepoir`; la santé et la révocation restent à valider selon
 `docs/WEB01_CODEX_ACCESS.md`.
 
 ---

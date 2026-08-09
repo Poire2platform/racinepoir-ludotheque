@@ -1,8 +1,28 @@
 # Accès de déploiement à WEB01
 
-Ce document prépare un accès SSH en écriture à WEB01 depuis `pmax-host`. Il ne
-signifie pas que l’accès est déjà installé. L’installation et la révocation
-restent des opérations d’infrastructure exécutées ou autorisées par Maxime.
+Ce document décrit l’accès SSH en écriture à WEB01 depuis `pmax-host`. Maxime a
+installé puis autorisé cet accès le 9 août 2026. La révocation demeure une
+opération d’infrastructure sous son contrôle.
+
+## État vérifié le 9 août 2026
+
+- l’alias SSH `web01-racinepoir` ouvre une session avec le compte dédié
+  `deploy-racinepoir`;
+- `/opt/racinepoir` est monté en lecture-écriture par SSHFS dans
+  `/home/pmax/web01-racinepoir` sur `pmax-host`;
+- ce montage est ajouté comme deuxième dossier du workspace Codex;
+- le checkout WEB01 est propre au commit `c3711c2` sur la branche
+  `repair/manual-stabilization-2026-07-29`;
+- `/opt/racinepoir` appartient à `pmax:racinepoir-deploy`, est en mode `3775`,
+  et `.env` demeure protégé sous `pmax:pmax` en mode `600`;
+- `/usr/local/sbin/racinepoir-ops` et sa règle `sudoers` limitée sont installés;
+- `racinepoir-ops status` fonctionne et confirme que Gunicorn et Caddy sont
+  actifs;
+- la commande `racinepoir-ops health` n’a pas terminé dans le délai de contrôle.
+  Les journaux montraient des redémarrages de workers Gunicorn après timeout.
+
+L’accès en écriture est donc opérationnel, mais sa validation reste incomplète
+tant que le test de santé et un essai contrôlé de révocation n’ont pas réussi.
 
 ## Portée retenue
 
@@ -39,7 +59,7 @@ d’un commit précis, migration, redémarrage et test de santé.
 
 Aucune clé privée ou publique réelle n’est versionnée.
 
-## 1. Vérifications préalables
+## 1. Vérifications préalables et réutilisables
 
 Sur WEB01, Maxime vérifie d’abord :
 
@@ -56,7 +76,7 @@ Résultats attendus : WEB01 est `poire1-ludoweb` à `192.168.18.38`, le checkout
 est propre, et `.env` appartient à `pmax`, en mode `600`. Arrêter si ces faits
 ne correspondent pas à l’état réel.
 
-## 2. Créer la clé sur pmax-host
+## 2. Recréer la clé sur pmax-host au besoin
 
 À exécuter par Maxime sur `pmax-host` :
 
@@ -69,7 +89,7 @@ ssh-keygen -t ed25519 \
 La clé privée ne doit jamais être copiée dans Git, WEB01, une conversation ou
 un journal. Seul le fichier terminé par `.pub` est transmis à WEB01.
 
-## 3. Installer l’accès sur WEB01
+## 3. Réinstaller l’accès sur WEB01 au besoin
 
 Après avoir poussé puis placé sur WEB01 le commit contenant ces fichiers,
 transférer seulement la clé publique dans un fichier temporaire. Depuis

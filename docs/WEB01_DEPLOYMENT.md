@@ -36,9 +36,13 @@ la documentation ou les journaux.
 - `requirements-production.txt` ajoute Gunicorn aux dépendances applicatives.
 - `deploy/racinepoir.service` représente le service systemd validé.
 - `deploy/Caddyfile` représente le reverse proxy LAN actuel.
-- `docs/WEB01_CODEX_ACCESS.md` et `deploy/web01-access/` préparent un accès SSH
-  en écriture dédié; cet accès n’est pas installé tant que Maxime n’a pas
-  exécuté et validé la procédure sur WEB01.
+- `docs/WEB01_CODEX_ACCESS.md` et `deploy/web01-access/` décrivent l’accès SSH
+  en écriture dédié installé le 9 août 2026 et ses limites.
+
+Le checkout déployé demeure propre au commit `c3711c2`. Les quatre commits
+locaux suivants ne sont pas encore poussés ni déployés : documentation du
+déploiement LAN, scan direct sans confirmation, commande contrôlée de création
+d’administrateur et artefacts d’accès WEB01.
 
 Après copie contrôlée sur WEB01 :
 
@@ -66,6 +70,12 @@ Caddy -> Gunicorn -> Flask -> PostgreSQL
 - `http://192.168.18.38/` est accessible depuis Windows.
 - `http://192.168.18.38/healthz` retourne HTTP 200.
 - `/healthz` rapporte `status: ok` et `database: ok`.
+
+Ces résultats décrivent la validation initiale du 4 août. Lors du contrôle du
+9 août, Gunicorn et Caddy étaient toujours actifs et leurs ports écoutaient,
+mais `/healthz` n’a pas répondu avant le timeout. Les journaux Gunicorn
+montraient des workers arrêtés puis relancés après timeout. Cette anomalie doit
+être diagnostiquée avant un redéploiement ou une nouvelle affirmation de santé.
 
 ## Vérifications après un redéploiement
 
