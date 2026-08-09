@@ -146,14 +146,14 @@ Base de données privée</code></pre>
         </thead>
         <tbody>
             <tr>
-                <td>Une visite ne doit pas modifier les données</td>
+                <td>Une requête de lecture ne doit pas modifier les données</td>
                 <td>Les actions importantes utilisent POST au lieu de GET.</td>
-                <td>Un lien, un robot, un aperçu de navigateur ou un QR scanné ne devrait pas changer la DB par accident.</td>
+                <td>Un robot ou un aperçu de lien qui charge seulement une URL ne devrait pas changer la DB par accident.</td>
             </tr>
             <tr>
-                <td>Confirmation avant mutation</td>
-                <td>Le scan QR affiche une page de confirmation avant de changer le détenteur.</td>
-                <td>Le scan devient une intention explicite, pas juste une visite d’URL.</td>
+                <td>Scan comme intention explicite</td>
+                <td>Après la connexion, la page du QR déclenche automatiquement un POST protégé et affiche le résultat.</td>
+                <td>Le scan transfère la boîte sans imposer un deuxième geste de confirmation.</td>
             </tr>
             <tr>
                 <td>Protection des formulaires</td>
@@ -182,7 +182,7 @@ Base de données privée</code></pre>
             </tr>
             <tr>
                 <td>Ralentir l’attaque en ligne</td>
-                <td>Le login et la confirmation de scan ont des limites par fenêtre de temps.</td>
+                <td>Le login et le transfert par scan ont des limites par fenêtre de temps.</td>
                 <td>Simon peut encore essayer, mais il ne peut plus marteler l’app à pleine vitesse.</td>
             </tr>
             <tr>

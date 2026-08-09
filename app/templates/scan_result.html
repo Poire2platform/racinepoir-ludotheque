@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% block title %}Scan confirmé — {{ box.display_label }}{% endblock %}
+{% block title %}Boîte scannée — {{ box.display_label }}{% endblock %}
 {% block content %}
-<h2>✅ Scan confirmé</h2>
+<h2>✅ Boîte scannée</h2>
 
 <p>
     <strong>{{ box.display_label }}</strong>
@@ -16,7 +16,7 @@
 {% endif %}
 
 {% if already_holder %}
-    <p>Tu étais déjà indiqué comme détenteur. Le scan a confirmé l’état actuel.</p>
+    <p>Tu étais déjà indiqué comme détenteur. Le scan a conservé l’état actuel.</p>
 {% endif %}
 
 {% if fulfilled_interest %}

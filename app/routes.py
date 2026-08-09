@@ -1048,35 +1048,35 @@ def claim_box_for_current_user(box):
 @login_required
 def scan_box(token):
     box = Box.query.filter_by(qr_code_token=token).first_or_404()
-    return render_template("scan_confirm.html", box=box)
+    return render_template("scan_process.html", box=box)
 
 
-@main.route("/scan/<token>/confirm", methods=["POST"])
+@main.route("/scan/<token>/complete", methods=["POST"])
 @login_required
-def confirm_scan_box(token):
+def complete_scan_box(token):
     box = Box.query.filter_by(qr_code_token=token).first_or_404()
-    limit = env_int("SCAN_CONFIRM_RATE_LIMIT_ATTEMPTS", 20)
-    window = env_int("SCAN_CONFIRM_RATE_LIMIT_WINDOW_SECONDS", 300)
+    limit = env_int("SCAN_RATE_LIMIT_ATTEMPTS", 20)
+    window = env_int("SCAN_RATE_LIMIT_WINDOW_SECONDS", 300)
     limited, retry_after = is_rate_limited(
-        rate_limit_key("scan_confirm", token),
+        rate_limit_key("scan", token),
         limit=limit,
         window_seconds=window,
     )
 
     if limited:
         security_event(
-            "scan_confirm_rate_limited",
+            "scan_rate_limited",
             ip=request_ip(),
             user_id=current_user.id,
             box_id=box.id,
             retry_after_seconds=retry_after,
         )
-        return f"Trop de confirmations de scan. Réessaie dans environ {retry_after} secondes.", 429
+        return f"Trop de scans rapprochés. Réessaie dans environ {retry_after} secondes.", 429
 
     old_holder, fulfilled_interest, already_holder = claim_box_for_current_user(box)
     db.session.commit()
     security_event(
-        "scan_confirmed",
+        "scan_completed",
         ip=request_ip(),
         user_id=current_user.id,
         box_id=box.id,

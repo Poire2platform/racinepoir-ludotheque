@@ -6,8 +6,12 @@ Le parcours principal est volontairement direct :
 
 1. une personne scanne le QR d’une boîte;
 2. elle se connecte si nécessaire;
-3. elle confirme avoir la boîte;
-4. la boîte change immédiatement de détenteur et l’historique est écrit.
+3. l’application reprend automatiquement le scan;
+4. la boîte change de détenteur, l’historique est écrit et le résultat s’affiche.
+
+Aucune confirmation humaine supplémentaire n’est demandée après la connexion.
+La modification demeure une requête `POST` protégée, déclenchée automatiquement
+par l’application.
 
 Le bouton **I would like** ajoute seulement un marqueur de souhait. Il ne réserve
 pas la boîte, ne crée aucun rang, ne bloque pas un transfert et ne propose pas
@@ -23,7 +27,7 @@ souhait et note en pourcentage d’un jeu.
 | Accès | Écrans |
 |---|---|
 | Public | Connexion, inscription, catalogue des jeux, fiche jeu, liste des boîtes, fiche boîte, sécurité pédagogique, santé technique |
-| Membre | Accueil, profil, Chez moi, Mes boîtes, ajout de boîte, scan et confirmation, résultat du scan, parties, nouvelle partie, fiche partie, joueurs et fiche joueur |
+| Membre | Accueil, profil, Chez moi, Mes boîtes, ajout de boîte, traitement automatique du scan, résultat du scan, parties, nouvelle partie, fiche partie, joueurs et fiche joueur |
 | Propriétaire ou admin | Modification de boîte, transfert manuel, état perdue/active, étiquette et image QR |
 | Admin | Utilisateurs, création/modification d’utilisateur, activation et code d’inscription |
 

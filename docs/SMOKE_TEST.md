@@ -36,7 +36,7 @@ Ces parcours sont en lecture et ne doivent pas modifier SQL01 :
 - [x] `/`;
 - [x] fiche d’un jeu;
 - [x] fiche d’une boîte;
-- [x] scan `GET` et écran de confirmation;
+- [x] scan `GET`, déclenchement automatique du `POST` protégé et résultat;
 - [x] `/me/held-boxes`;
 - [x] `/me/owned-boxes`;
 - [x] `/sessions`;

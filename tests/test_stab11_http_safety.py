@@ -20,7 +20,7 @@ from app.models import (
     (
         "/logout",
         "/boxes/1/transfer",
-        "/scan/test-box-token/confirm",
+        "/scan/test-box-token/complete",
         "/boxes/1/request",
         "/boxes/1/mark-lost",
         "/boxes/1/mark-active",
@@ -56,7 +56,7 @@ def test_mutation_only_routes_reject_get(
         "/boxes/new",
         "/boxes/1/edit",
         "/boxes/1/transfer",
-        "/scan/test-box-token/confirm",
+        "/scan/test-box-token/complete",
         "/boxes/1/request",
         "/boxes/1/mark-lost",
         "/boxes/1/mark-active",

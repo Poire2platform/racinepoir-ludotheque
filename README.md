@@ -213,8 +213,9 @@ Security notes already enforced by the app:
 
 - POST forms require a session CSRF token.
 - Logout and box state changes use POST instead of GET.
-- Visiting a scan URL shows a confirmation page before changing the holder.
-- Login and scan confirmation routes have simple in-memory rate limits for playtesting.
+- Visiting a scan URL starts a CSRF-protected POST automatically after login; no
+  confirmation button is shown before changing the holder.
+- Login and scan routes have simple in-memory rate limits for playtesting.
 - Login and scan security events are written through the `racinepoir.security` logger.
 - `/healthz` returns a small JSON health check and verifies database connectivity.
 - Session cookies are `HttpOnly`.

@@ -137,7 +137,7 @@ STAB-12
 | MVP-07 | `DONE` | Modifier une boîte | Propriétaire/admin contrôlés; champs, validation et historique testés |
 | MVP-08 | `DONE` | Détail d’une boîte | Propriétaire, détenteur, statut, historique et absence testés |
 | MVP-09 | `DONE` | Génération et affichage du QR | Token stable, URL publique et image PNG testés |
-| MVP-10 | `DONE` | Scan direct | Confirmation, changement de détenteur et événement testés |
+| MVP-10 | `DONE` | Scan direct | Transfert automatique après login, changement de détenteur et événement testés |
 | MVP-11 | `DONE` | Retour au scan après login | Retour local au scan et rejet des redirections externes testés |
 | MVP-12 | `DONE` | Indicateur “I would like” | Note sans priorité, doublon ni impact sur le scan |
 | MVP-13 | `CANCELLED` | Annulation d’une demande | Sans objet : l’indicateur n’est pas une réservation |
@@ -272,7 +272,7 @@ DB-01 → DB-05
 |---|---|---|---|
 | UX-01 | `DONE` | Mettre à jour le mandat UX/UI | Scan direct et intérêt informatif documentés |
 | UX-02 | `DONE` | Inventorier les écrans actuels | Écrans publics, membres et admin recensés |
-| UX-03 | `DONE` | Améliorer la navigation mobile | Navigation flexible et confirmation scan tactile |
+| UX-03 | `DONE` | Améliorer la navigation mobile | Navigation flexible et scan sans confirmation humaine |
 | UX-04 | `DONE` | Harmoniser badges et statuts | Libellés français et badges cohérents sur les vues de boîtes |
 | UX-05 | `DONE` | États vides et erreurs | Pages 400/404/500 et listes vides expliquées avec une action utile |
 | UX-06 | `DONE` | Accessibilité de base | Focus visible, accès direct au contenu, labels et tableaux descriptifs |
@@ -304,9 +304,10 @@ C. Accès privé seulement
 
 ## D-03 — Scan direct (`CLOSED`)
 
-Décision MVP : la confirmation tactile transfère directement la boîte. Aucun
-mécanisme d’annulation ou de réservation n’est ajouté. L’historique demeure
-visible sur la fiche de la boîte.
+Décision MVP : après l’authentification, l’application reprend automatiquement
+le scan, transfère la boîte et affiche le résultat. Aucune confirmation humaine
+supplémentaire n’est demandée. Aucun mécanisme d’annulation ou de réservation
+n’est ajouté. L’historique demeure visible sur la fiche de la boîte.
 
 ## D-04 — Données initiales
 

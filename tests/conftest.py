@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash
 os.environ["DATABASE_URL"] = "sqlite:///:memory:"
 os.environ["SECRET_KEY"] = "test-secret"
 os.environ["LOGIN_RATE_LIMIT_ATTEMPTS"] = "1000"
-os.environ["SCAN_CONFIRM_RATE_LIMIT_ATTEMPTS"] = "1000"
+os.environ["SCAN_RATE_LIMIT_ATTEMPTS"] = "1000"
 
 from app import create_app
 from app.extensions import db

@@ -87,7 +87,8 @@ def test_login_accepts_valid_credentials(client, make_user, csrf_token):
     assert response.headers["Location"] == "/"
 
 
-def test_login_returns_anonymous_scanner_to_scan_confirmation(
+def test_login_returns_anonymous_scanner_to_automatic_scan(
+    app,
     client,
     make_user,
     make_box,
@@ -95,7 +96,7 @@ def test_login_returns_anonymous_scanner_to_scan_confirmation(
 ):
     owner = make_user("owner")
     scanner = make_user("scanner")
-    make_box(owner, token="return-to-scan")
+    box = make_box(owner, token="return-to-scan")
 
     anonymous_response = client.get("/scan/return-to-scan")
 
@@ -116,10 +117,23 @@ def test_login_returns_anonymous_scanner_to_scan_confirmation(
 
     assert login_response.status_code == 302
     assert login_response.headers["Location"] == "/scan/return-to-scan"
-    confirmation_response = client.get(login_response.headers["Location"])
-    assert confirmation_response.status_code == 200
-    assert b"Confirmer le scan" in confirmation_response.data
-    assert b"Owner" in confirmation_response.data
+    scan_response = client.get(login_response.headers["Location"])
+    assert scan_response.status_code == 200
+    assert b"Scan en cours" in scan_response.data
+    assert b"Confirmer le scan" not in scan_response.data
+    assert b'action="/scan/return-to-scan/complete"' in scan_response.data
+    assert b'document.getElementById("scan-process").requestSubmit();' in scan_response.data
+
+    result_response = client.post(
+        "/scan/return-to-scan/complete",
+        data={"_csrf_token": csrf_token},
+    )
+
+    assert result_response.status_code == 200
+    assert "Boîte scannée".encode() in result_response.data
+    with app.app_context():
+        refreshed_box = db.session.get(Box, box.id)
+        assert refreshed_box.current_holder_user_id == scanner.id
 
 
 def test_login_rejects_external_next_redirect(client, make_user, csrf_token):
@@ -977,12 +991,17 @@ def test_direct_scan_changes_holder_and_records_history(
     box = make_box(owner, token="direct-scan")
     login_as(scanner)
 
-    confirmation_page = client.get("/scan/direct-scan")
-    assert confirmation_page.status_code == 200
-    assert b"Owner" in confirmation_page.data
+    process_page = client.get("/scan/direct-scan")
+    assert process_page.status_code == 200
+    assert b"Scan en cours" in process_page.data
+    assert b"Confirmer" not in process_page.data
+    assert b'action="/scan/direct-scan/complete"' in process_page.data
+
+    with app.app_context():
+        assert db.session.get(Box, box.id).current_holder_user_id == owner.id
 
     response = client.post(
-        "/scan/direct-scan/confirm",
+        "/scan/direct-scan/complete",
         data={"_csrf_token": csrf_token},
     )
 
@@ -1028,7 +1047,7 @@ def test_scan_changes_holder_and_completes_interest_flag(
     login_as(requester)
 
     response = client.post(
-        "/scan/scan-me/confirm",
+        "/scan/scan-me/complete",
         data={"_csrf_token": csrf_token},
     )
 
@@ -1062,26 +1081,26 @@ def test_scan_rate_limit_blocks_repeat_without_second_mutation(
     scanner = make_user("scanner")
     box = make_box(owner, token="limited-scan")
     login_as(scanner)
-    monkeypatch.setenv("SCAN_CONFIRM_RATE_LIMIT_ATTEMPTS", "1")
-    monkeypatch.setenv("SCAN_CONFIRM_RATE_LIMIT_WINDOW_SECONDS", "300")
+    monkeypatch.setenv("SCAN_RATE_LIMIT_ATTEMPTS", "1")
+    monkeypatch.setenv("SCAN_RATE_LIMIT_WINDOW_SECONDS", "300")
 
     with patch("app.routes.security_event") as security_log:
         first_response = client.post(
-            "/scan/limited-scan/confirm",
+            "/scan/limited-scan/complete",
             data={"_csrf_token": csrf_token},
         )
         with app.app_context():
             event_count_after_first_scan = BoxEvent.query.filter_by(box_id=box.id).count()
 
         blocked_response = client.post(
-            "/scan/limited-scan/confirm",
+            "/scan/limited-scan/complete",
             data={"_csrf_token": csrf_token},
         )
 
     assert first_response.status_code == 200
     assert blocked_response.status_code == 429
-    assert "Trop de confirmations de scan.".encode() in blocked_response.data
-    assert "scan_confirm_rate_limited" in [call.args[0] for call in security_log.call_args_list]
+    assert "Trop de scans rapprochés.".encode() in blocked_response.data
+    assert "scan_rate_limited" in [call.args[0] for call in security_log.call_args_list]
     with app.app_context():
         refreshed_box = db.session.get(Box, box.id)
         assert refreshed_box.current_holder_user_id == scanner.id
@@ -1119,7 +1138,7 @@ def test_authenticated_navigation_smoke(
         assert response.status_code == 200, path
 
 
-def test_mobile_navigation_structure_and_scan_primary_action(
+def test_mobile_navigation_structure_and_automatic_scan_process(
     client,
     make_user,
     make_box,
@@ -1148,8 +1167,9 @@ def test_mobile_navigation_structure_and_scan_primary_action(
     assert b'href="/me/held-boxes"' in home_response.data
     assert b'href="/me/interested-boxes"' in home_response.data
     assert scan_response.status_code == 200
-    assert b'class="scan-action"' in scan_response.data
-    assert b'class="primary-action"' in scan_response.data
+    assert b'id="scan-process"' in scan_response.data
+    assert b'action="/scan/mobile-scan/complete"' in scan_response.data
+    assert b'class="primary-action"' not in scan_response.data
 
 
 def test_accessibility_foundations_are_present(

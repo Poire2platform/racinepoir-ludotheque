@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Scan en cours — {{ box.display_label }}{% endblock %}
+{% block content %}
+<h2>Scan en cours</h2>
+
+<p role="status">
+    Nous enregistrons automatiquement que
+    <strong>{{ box.display_label }}</strong>
+    est maintenant entre tes mains.
+</p>
+
+<form id="scan-process" method="post" action="/scan/{{ box.qr_code_token }}/complete">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+</form>
+
+<noscript>
+    <p>Le scan automatique nécessite JavaScript. Active-le, puis scanne de nouveau le code QR.</p>
+</noscript>
+
+<script>
+    document.getElementById("scan-process").requestSubmit();
+</script>
+{% endblock %}
