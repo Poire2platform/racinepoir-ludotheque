@@ -1,7 +1,9 @@
 # Rapport de relève pour BowserCod
 
-**Projet :** RacinePoir Ludothèque  
-**État vérifié :** 10 août 2026  
+**Projet :** RacinePoir Ludothèque
+
+**État vérifié :** 10 août 2026
+
 **Branche :** `repair/manual-stabilization-2026-07-29`
 
 ## Résumé exécutif
