@@ -1,4 +1,6 @@
 import secrets
+import hashlib
+import hmac
 from collections import Counter
 from datetime import date
 from io import BytesIO
@@ -45,18 +47,25 @@ def admin_required():
 
 def current_registration_invite():
     today = date.today().strftime("%Y-%m-%d")
+    if not current_app.config.get("REGISTRATION_INVITE_ENABLED", False):
+        return None, None
     code = current_app.config.get("REGISTRATION_INVITE_CODE")
     invite_day = current_app.config.get("REGISTRATION_INVITE_DAY")
 
     if invite_day != today or not code:
-        return None, None
+        return generate_registration_invite()
 
     return code, invite_day
 
 
 def generate_registration_invite():
     today = date.today().strftime("%Y-%m-%d")
-    code = f"RACINEPOIR-{today}-{secrets.token_hex(3).upper()}"
+    digest = hmac.new(
+        current_app.config["SECRET_KEY"].encode("utf-8"),
+        f"registration-invite:{today}".encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()[:8].upper()
+    code = f"RACINEPOIR-{today}-{digest}"
     current_app.config["REGISTRATION_INVITE_CODE"] = code
     current_app.config["REGISTRATION_INVITE_DAY"] = today
     return code, today

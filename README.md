@@ -44,6 +44,10 @@ Current Features
 - Per-user game ratings with catalogue and game-page medians.
 - Play session logging with registered users or guest player profiles.
 - First player stats pages with played games, high scores, and frequent teammates.
+- Controlled self-registration with a daily invitation code shared by all
+  production workers when `REGISTRATION_INVITE_ENABLED=true`.
+- Preview-first, idempotent import of the official 97-box collection; see
+  [`docs/COLLECTION_IMPORT_RUNBOOK.md`](docs/COLLECTION_IMPORT_RUNBOOK.md).
 
 Development Setup
 -----------------

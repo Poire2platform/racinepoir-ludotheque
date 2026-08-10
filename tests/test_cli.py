@@ -81,3 +81,23 @@ def test_create_admin_does_not_accept_password_on_command_line(app):
     assert result.exit_code == 2
     assert "No such option '--password'" in result.output
     assert User.query.count() == 0
+
+
+def test_show_registration_invite_requires_enabled_setting(app):
+    app.config["REGISTRATION_INVITE_ENABLED"] = False
+    result = app.test_cli_runner().invoke(args=["show-registration-invite"])
+
+    assert result.exit_code == 1
+    assert "L'inscription est désactivée" in result.output
+
+
+def test_show_registration_invite_is_stable_and_not_empty(app):
+    app.config["REGISTRATION_INVITE_ENABLED"] = True
+    runner = app.test_cli_runner()
+
+    first = runner.invoke(args=["show-registration-invite"])
+    second = runner.invoke(args=["show-registration-invite"])
+
+    assert first.exit_code == 0
+    assert first.output == second.output
+    assert "RACINEPOIR-" in first.output

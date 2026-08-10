@@ -60,7 +60,7 @@ Règles :
 | Token BGG | Configuré hors dépôt |
 | Anciennes données | Non récupérées |
 | Données de démonstration | Seed non destructif exécuté deux fois et vérifié |
-| Tests automatisés actifs | 97 tests `pytest` réussis sur SQLite isolée |
+| Tests automatisés actifs | 102 tests `pytest` réussis sur SQLite isolée |
 
 ---
 
@@ -151,12 +151,12 @@ La phase de stabilisation est terminée. `STAB-13` demeure volontairement report
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
 | QA-01 | `DONE` | Créer une checklist de test manuel | `docs/SMOKE_TEST.md` |
-| QA-02 | `DONE` | Ajouter des tests automatisés critiques | 97 tests couvrent login, utilisateurs, création d’admin, jeux, notes, boîtes, filtres, scan, demandes, CSRF, permissions, accessibilité et artefacts d’accès WEB01/Cloudflare |
+| QA-02 | `DONE` | Ajouter des tests automatisés critiques | 102 tests couvrent login, utilisateurs, invitations, import officiel idempotent, jeux, notes, boîtes, filtres, scan, demandes, CSRF, permissions, accessibilité et artefacts WEB01/Cloudflare |
 | QA-03 | `DONE` | Vérifier les migrations sur une DB vide | SQLite vide migrée jusqu’à `b7c3d4e5f6a7` |
 | QA-04 | `DONE` | Tester un redémarrage de l’application | Données, login, catalogue, boîtes et santé vérifiés après recréation |
 | QA-05 | `DONE` | Vérifier les erreurs utilisateur | Réponses 404/500 sans traceback ni détail interne |
 | QA-06 | `DONE` | Vérifier les secrets Git | Fichiers suivis et historique contrôlés sans secret détecté |
-| QA-07 | `DONE` | Vérifier `requirements.txt` | Venv neuf et imports vérifiés; suite courante de 97 tests réussie |
+| QA-07 | `DONE` | Vérifier `requirements.txt` | Venv neuf et imports vérifiés; suite courante de 102 tests réussie |
 | QA-08 | `DONE` | Préparer un tag de déploiement | Checkpoint QA identifié par `mvp-2026-08-03` |
 | QA-09 | `DONE` | Revalider après la passe UX | 89 tests, head Alembic et tag `mvp-2026-08-03-ux` vérifiés |
 
