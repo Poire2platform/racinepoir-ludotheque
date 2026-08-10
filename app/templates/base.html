@@ -559,6 +559,9 @@ body.anika-love::before {
     <a href="/boxes">Boîtes</a>
     <a href="/games">Jeux de référence</a>
     <a href="/security">Sécurité</a>
+    {% if current_user.is_authenticated %}
+        <a href="/members">Membres</a>
+    {% endif %}
     {% if current_user.is_authenticated and current_user.role == "admin" %}
         <a href="/users">Utilisateurs</a>
     {% endif %}
@@ -572,7 +575,6 @@ body.anika-love::before {
 {% endif %}
 <nav class="member-nav" aria-label="Navigation du compte">
 {% if current_user.is_authenticated %}
-    <a href="/members">Membres</a>
     <a href="/me/held-boxes">Chez moi</a>
     <a href="/me/owned-boxes">Mes boîtes</a>
     <a href="/me/interested-boxes">I would like</a>

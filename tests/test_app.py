@@ -1163,9 +1163,12 @@ def test_mobile_navigation_structure_and_automatic_scan_process(
     assert b'aria-label="Navigation principale"' in home_response.data
     assert b'aria-label="Carnet de pointage"' in home_response.data
     primary_navigation = home_response.data.split(b'<nav class="primary-nav"', 1)[1].split(b"</nav>", 1)[0]
+    member_navigation = home_response.data.split(b'<nav class="member-nav"', 1)[1].split(b"</nav>", 1)[0]
     scorebook_navigation = home_response.data.split(b'<nav class="scorebook-nav"', 1)[1].split(b"</nav>", 1)[0]
     assert b'href="/sessions"' not in primary_navigation
     assert b'href="/players"' not in primary_navigation
+    assert b'href="/members"' in primary_navigation
+    assert b'href="/members"' not in member_navigation
     assert b'href="/sessions"' in scorebook_navigation
     assert b'href="/players"' in scorebook_navigation
     assert b'href="/me/held-boxes"' in home_response.data
