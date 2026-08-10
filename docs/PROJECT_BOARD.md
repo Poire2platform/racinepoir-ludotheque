@@ -59,7 +59,8 @@ Règles :
 | Comptes `admin` (`Maxime`) | Développement et production présents; admin production actif et connexion validée le 10 août 2026 |
 | Token BGG | Configuré hors dépôt |
 | Anciennes données | Non récupérées |
-| Données de démonstration | Seed non destructif exécuté deux fois et vérifié |
+| Collection officielle | 97 jeux et 97 boîtes importés en production le 10 août 2026; seconde exécution sans doublon |
+| Données de démonstration | Seed non destructif validé en développement; non utilisé pour l’import officiel |
 | Tests automatisés actifs | 102 tests `pytest` réussis sur SQLite isolée |
 
 ---
@@ -313,6 +314,10 @@ n’est ajouté. L’historique demeure visible sur la fiche de la boîte.
 - données de démonstration;
 - aucune donnée préchargée.
 ```
+
+**Décision : données réelles.** La collection officielle de 97 jeux et 97
+boîtes a été importée le 10 août 2026 selon
+`docs/COLLECTION_IMPORT_RUNBOOK.md`, après sauvegarde et aperçu sans écriture.
 
 ## D-05 — Accès Codex à WEB01 (`CLOSED`)
 

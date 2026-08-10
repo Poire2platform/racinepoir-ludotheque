@@ -12,13 +12,13 @@ Elle réutilise les jeux dont le titre existe déjà et identifie chaque boîte 
 la collection par un jeton stable; une seconde exécution ne crée donc aucun
 doublon.
 
-## Correspondances à valider
+## Correspondances validées
 
 ```text
-Anouk  -> anouk
-Maxika -> maxika
-Anika  -> anika
-Maxime -> admin
+Anouk  -> Anouk
+Maxika -> Maxika
+Anika  -> Maxika
+Maxime -> Maxika
 détenteur vide -> admin
 Anouk et Maxika -> Anouk
 ```
@@ -32,10 +32,10 @@ compte manque.
 ```bash
 flask import-official-collection \
   --source /chemin/prive/Anouk.html \
-  --user-map Anouk=anouk \
-  --user-map Maxika=maxika \
-  --user-map Anika=anika \
-  --user-map Maxime=admin \
+  --user-map Anouk=Anouk \
+  --user-map Maxika=Maxika \
+  --user-map Anika=Maxika \
+  --user-map Maxime=Maxika \
   --default-holder admin
 ```
 
@@ -50,3 +50,15 @@ même commande avec `--apply`. Relancer ensuite l’aperçu : il doit annoncer
 
 Ne jamais mettre la source, un mot de passe, un code d’invitation ou le contenu
 de `.env` dans Git, une capture ou un journal.
+
+## Exécution production du 10 août 2026
+
+- sauvegarde préalable :
+  `racinepoir_ludotheque_prod-pre-import-20260810T194144Z.dump`;
+- SHA-256 :
+  `e91ffd525902c49dc21ccbd0277f30ba3a2c8da5c1739cf34fcff28b18ad2441`;
+- archive vérifiée lisible, `postgres:postgres`, mode `0600`, 39 265 octets;
+- aperçu : 97 jeux et 97 boîtes à créer, aucune anomalie;
+- import appliqué : 97 jeux et 97 boîtes créés;
+- second aperçu : 0 création, 97 jeux et 97 boîtes existants;
+- `/healthz` local et public : `status: ok`, `database: ok` après l’import.
