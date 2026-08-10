@@ -48,6 +48,8 @@ Current Features
   production workers when `REGISTRATION_INVITE_ENABLED=true`.
 - Preview-first, idempotent import of the official 97-box collection; see
   [`docs/COLLECTION_IMPORT_RUNBOOK.md`](docs/COLLECTION_IMPORT_RUNBOOK.md).
+- Rate-limited BGG batch preview that automatically enriches only unique exact
+  title matches; see [`docs/BGG_BULK_ENRICHMENT.md`](docs/BGG_BULK_ENRICHMENT.md).
 
 Development Setup
 -----------------

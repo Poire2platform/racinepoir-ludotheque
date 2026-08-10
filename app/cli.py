@@ -1,3 +1,5 @@
+import json
+
 import click
 from flask import current_app
 from sqlalchemy.exc import IntegrityError
@@ -7,9 +9,46 @@ from .extensions import db
 from .models import User
 from .collection_import import import_collection
 from .routes import current_registration_invite
+from .bgg_bulk import apply_preview, build_preview
 
 
 def register_commands(app):
+    @app.cli.command("preview-bgg-enrichment")
+    @click.option("--output", type=click.Path(dir_okay=False), required=True)
+    @click.option("--delay", type=click.FloatRange(min=0.0), default=2.0, show_default=True)
+    @click.option("--limit", type=click.IntRange(min=1), default=None)
+    def preview_bgg_enrichment(output, delay, limit):
+        """Recherche les correspondances BGG sans modifier la base."""
+        manifest = build_preview(output, delay_seconds=delay, limit=limit)
+        counts = {}
+        for item in manifest["items"]:
+            counts[item["status"]] = counts.get(item["status"], 0) + 1
+        click.echo(f"Jeux inspectés : {len(manifest['items'])}")
+        click.echo(f"Correspondances exactes uniques : {counts.get('exact_unique', 0)}")
+        click.echo(f"Titres exacts ambigus : {counts.get('exact_ambiguous', 0)}")
+        click.echo(f"Sans correspondance exacte : {counts.get('no_exact', 0)}")
+        click.echo(f"Erreurs BGG : {counts.get('error', 0)}")
+        click.echo(f"Manifeste écrit : {output}")
+        click.echo("Aucune écriture en base.")
+
+    @app.cli.command("apply-bgg-enrichment")
+    @click.option("--manifest", type=click.Path(exists=True, dir_okay=False), required=True)
+    @click.option("--delay", type=click.FloatRange(min=0.0), default=2.0, show_default=True)
+    @click.option("--apply", is_flag=True, help="Confirme l'enrichissement des exacts uniques.")
+    def apply_bgg_enrichment(manifest, delay, apply):
+        """Applique uniquement les correspondances exactes uniques du manifeste."""
+        if not apply:
+            raise click.ClickException("Ajouter --apply après sauvegarde et validation du manifeste.")
+        try:
+            report = apply_preview(manifest, delay_seconds=delay)
+        except (OSError, ValueError, json.JSONDecodeError) as error:
+            raise click.ClickException(str(error)) from error
+        click.echo(f"Jeux enrichis : {report['enriched']}")
+        click.echo(f"Jeux ignorés : {report['skipped']}")
+        click.echo(f"Erreurs : {len(report['errors'])}")
+        for error in report["errors"]:
+            click.echo(f"- {error}")
+
     @app.cli.command("show-registration-invite")
     def show_registration_invite():
         """Affiche le code quotidien seulement si les inscriptions sont activées."""
