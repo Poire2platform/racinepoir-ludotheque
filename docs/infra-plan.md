@@ -97,8 +97,9 @@ surveillée et aucun nouveau surprovisionnement ne doit être banalisé.
 ## Stockage Poire1-Proxmox
 
 - Le disque virtuel de `Poire1_PROX` est passé de 80 Gio à 200 Gio.
-- `local-lvm` / `pve-data` : 129,93 Gio, utilisé à 24,56 %.
-- Métadonnées du thin-pool : 2,74 %.
+- `local-lvm` / `pve-data` : 129,93 Gio, utilisé à 40,73 % après les snapshots
+  du 10 août 2026; environ 76,96 Gio demeurent disponibles.
+- Métadonnées du thin-pool : 3,50 %.
 - Espace libre restant dans le volume group `pve` : environ 29,88 Gio.
 - Le thin-pool est surveillé par `lvm2-monitor`.
 - Autoextension : `thin_pool_autoextend_threshold = 80` et

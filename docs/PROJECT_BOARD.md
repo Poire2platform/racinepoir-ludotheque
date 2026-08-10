@@ -331,7 +331,8 @@ checkpoint et séparation stricte entre infrastructure et code.
 
 1. `WEB-16` — terminer la validation de l’accès dédié par un essai contrôlé de
    révocation; le test de santé est maintenant réussi.
-2. surveiller la capacité du thin-pool signalée par Proxmox lors du snapshot.
+2. surveiller la capacité du thin-pool signalée par Proxmox lors du snapshot;
+   référence du 10 août : données `40,73 %`, métadonnées `3,50 %`, monitor actif.
 
 Après ce sprint, décider `D-02` avant d’entamer `PUB-02` à `PUB-10`.
 
