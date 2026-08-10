@@ -2,6 +2,10 @@
 
 Cette checklist valide le MVP sans utiliser le seed destructif.
 
+Pour déléguer un test manuel sur WEB01 à une personne qui ne doit pas utiliser
+le terminal ou administrer l’infrastructure, remettre plutôt
+[`INTERN_PRODUCTION_SMOKE_TEST.md`](INTERN_PRODUCTION_SMOKE_TEST.md).
+
 ## Vérification automatisée
 
 Depuis la racine du projet :

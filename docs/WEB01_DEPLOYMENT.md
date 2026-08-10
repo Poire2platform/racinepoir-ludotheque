@@ -116,7 +116,9 @@ curl --fail --silent http://127.0.0.1:8000/healthz
 curl --fail --silent http://127.0.0.1/healthz
 ```
 
-Effectuer ensuite la checklist fonctionnelle de `docs/SMOKE_TEST.md`.
+Effectuer ensuite la checklist fonctionnelle de `docs/SMOKE_TEST.md`. Pour une
+exécution déléguée sans accès serveur, utiliser le guide autonome
+`docs/INTERN_PRODUCTION_SMOKE_TEST.md`.
 
 ## Suite
 
