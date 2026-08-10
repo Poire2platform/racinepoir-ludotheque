@@ -185,7 +185,7 @@ de l’administration système.
 | WEB-13 | `DONE` | Créer le service systemd | Activé et actif |
 | WEB-14 | `DONE` | Installer et configurer Caddy | Reverse proxy HTTP validé |
 | WEB-15 | `DONE` | Tester depuis le LAN | `/` et `/healthz` accessibles depuis Windows |
-| WEB-16 | `VERIFY` | Valider l’accès SSH de déploiement dédié | SSHFS en écriture et secrets protégés vérifiés; santé et révocation à tester |
+| WEB-16 | `DONE` | Valider l’accès SSH de déploiement dédié | Écriture, secrets, santé, révocation et restauration contrôlées vérifiés |
 
 ---
 
@@ -317,24 +317,23 @@ autorisé par Maxime le 9 août 2026, avec écriture sur le seul checkout
 RacinePoir et des commandes d’exploitation limitées. Les secrets,
 l’environnement Python et l’administration générale du serveur ne sont pas
 directement exposés. Le montage SSHFS est disponible dans
-`/home/pmax/web01-racinepoir`; la santé et la révocation restent à valider selon
-`docs/WEB01_CODEX_ACCESS.md`.
+`/home/pmax/web01-racinepoir`; la santé, la révocation et la restauration ont été
+validées le 10 août 2026 selon `docs/WEB01_CODEX_ACCESS.md`.
 
 ---
 
 # 5. Prochain sprint recommandé
 
-## Sprint Finaliser WEB01 après rétablissement de la base
+## Sprint Finaliser WEB01 après rétablissement de la base (`DONE`)
 
 Une seule carte `NEXT` ou `VERIFY` doit être traitée à la fois, avec preuve,
 checkpoint et séparation stricte entre infrastructure et code.
 
-1. `WEB-16` — terminer la validation de l’accès dédié par un essai contrôlé de
-   révocation; le test de santé est maintenant réussi.
-2. surveiller la capacité du thin-pool signalée par Proxmox lors du snapshot;
-   référence du 10 août : données `40,73 %`, métadonnées `3,50 %`, monitor actif.
+Résultats : accès dédié et révocation validés, administrateur production créé,
+premier dump vérifié, autostart activé, snapshot propre créé et thin-pool vérifié
+à `40,73 %` de données et `3,50 %` de métadonnées avec monitor actif.
 
-Après ce sprint, décider `D-02` avant d’entamer `PUB-02` à `PUB-10`.
+Prochaine étape : décider `D-02` avant d’entamer `PUB-02` à `PUB-10`.
 
 ---
 

@@ -21,8 +21,11 @@ opération d’infrastructure sous son contrôle.
 - après rétablissement du flux PostgreSQL le 9 août, `racinepoir-ops health`
   réussit et rapporte `status: ok` et `database: ok` par Gunicorn et Caddy.
 
-L’accès en écriture et le test de santé sont donc opérationnels. Sa validation
-reste incomplète tant qu’un essai contrôlé de révocation n’a pas réussi.
+L’accès en écriture et le test de santé sont opérationnels. Le 10 août 2026, la
+clé a été déplacée vers `authorized_keys.disabled`; une nouvelle connexion SSH a
+été refusée avec le code 255. Après restauration de la clé avec son propriétaire
+et son mode `600`, une nouvelle connexion, la commande de santé contrôlée et le
+montage SSHFS en lecture-écriture ont tous été validés. WEB-16 est donc terminé.
 
 ## Portée retenue
 
