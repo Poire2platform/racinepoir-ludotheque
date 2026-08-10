@@ -25,14 +25,26 @@ Références officielles :
 - <https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/configure-tunnels/tunnel-with-firewall/>
 - <https://pkg.cloudflare.com/>
 
-## État préalable vérifié le 10 août 2026
+## État de production vérifié le 10 août 2026
 
 - Caddy sert l’origine locale sur `http://127.0.0.1:80`.
 - Gunicorn et Caddy retournent `/healthz` avec `status: ok` et `database: ok`.
-- `cloudflared` n’est pas installé.
-- DNS résout `region1.v2.argotunnel.com`.
-- TCP 7844 vers Cloudflare et TCP 443 vers `api.cloudflare.com` expirent; les
-  règles de sortie DMZ doivent être ajoutées avant l’installation.
+- pfSense autorise WEB01 vers les deux endpoints Cloudflare en TCP/UDP 7844 et
+  les sorties TCP 80/443 nécessaires aux dépôts signés et à l’API.
+- `cloudflared` 2026.7.3 est installé; le service durci est actif, activé au
+  démarrage et connecté en QUIC avec zéro redémarrage lors de la validation.
+- Le tunnel distant `racinepoir-web01` est **Healthy** avec une réplique.
+- Le token appartient à `root:cloudflared`, mode `0640`, hors dépôt.
+- Le DNS public résout le hostname; le certificat HTTPS est valide.
+- `/healthz` public retourne HTTP 200 avec `status: ok` et `database: ok`.
+- La racine publique redirige vers la connexion et le cookie de session observé
+  porte `Secure`, `HttpOnly` et `SameSite=Lax`.
+- `APP_BASE_URL`, les cookies sécurisés et la confiance des en-têtes proxy ont
+  été appliqués dans l’environnement privé de WEB01.
+
+Les avertissements de démarrage relatifs au proxy ICMP et à la taille du tampon
+UDP n’empêchent pas cette publication HTTP. Aucune modification noyau n’a été
+faite pour les masquer.
 
 ## 1. Autoriser uniquement les sorties nécessaires
 

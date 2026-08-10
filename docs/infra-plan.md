@@ -1,7 +1,7 @@
 # RacinePoir Ludothèque — infrastructure
 
 Ce document est la source de vérité courte pour l’infrastructure. Il décrit
-l’état vérifié le 9 août 2026 et distingue cet état de la segmentation cible.
+l’état vérifié le 10 août 2026 et distingue cet état de la segmentation cible.
 
 ## Clarification importante
 
@@ -28,7 +28,7 @@ effectuée par Maxime.
 | PostgreSQL | VM `101`, `SQL01` | `192.168.18.30` | Fonctionnel; pas encore déplacé |
 | DNS local | VM `102`, `poire1-dns` | `192.168.18.34` | Fonctionnel |
 | Portail | VM `103`, `poire1-portal` | `192.168.18.35` | Fonctionnel |
-| Application | VMID `104`, VM `WEB01`, hostname `poire1-ludoweb` | `10.10.20.10` | Caddy, Gunicorn et accès DB fonctionnels; `/healthz` validé |
+| Application | VMID `104`, VM `WEB01`, hostname `poire1-ludoweb` | `10.10.20.10` | Caddy, Gunicorn, accès DB et Cloudflare Tunnel fonctionnels; `/healthz` public validé |
 
 La zone DNS locale est `home.arpa`. Un nom local possible pour l’application
 est `ludotheque.home.arpa`.
@@ -48,16 +48,17 @@ est `ludotheque.home.arpa`.
 - DNS pfSense : `192.168.18.34` et `1.1.1.1`.
 - Internet, NAT et résolution DNS : validés.
 - MGMT conserve temporairement les règles LAN par défaut.
-- DMZ possède uniquement la règle ciblée WEB01 vers SQL01:5432; APP et DB n’ont
-  encore aucune règle d’autorisation et leur blocage implicite demeure actif.
+- DMZ possède la règle ciblée WEB01 vers SQL01:5432, les sorties Cloudflare
+  TCP/UDP 7844 et les sorties de mise à jour TCP 80/443. APP et DB n’ont encore
+  aucune règle d’autorisation et leur blocage implicite demeure actif.
 
 Important : WEB01 est maintenant dans la DMZ. Son ancienne adresse
 `192.168.18.38` n’est plus configurée. Le 9 août, une règle pfSense limitée à
 WEB01 `10.10.20.10` vers SQL01 `192.168.18.30:5432` a rétabli le transport.
 Le NAT sortant présente temporairement la source `192.168.18.41` à PostgreSQL;
-la règle HBA `/32` correspondante est active et `/healthz` réussit par Gunicorn
-et Caddy. Les autres règles interzones et la publication Internet ne sont pas
-encore validées.
+la règle HBA `/32` correspondante est active et `/healthz` réussit par Gunicorn,
+Caddy et le hostname HTTPS public. Les autres règles de la segmentation cible
+ne sont pas encore validées.
 
 ## Administration pfSense
 
@@ -156,7 +157,7 @@ valider ensuite les autres règles minimales :
 7. décision ultérieure : conserver temporairement SQL01 sur `192.168.18.30`
    ou le migrer dans DB.
 
-Ces opérations d’infrastructure précèdent le passage à l’architecture segmentée
-et la publication Internet; elles ne remettent pas en cause le déploiement LAN
-déjà fonctionnel. Elles ne nécessitent aucun changement au code Flask, aux
-migrations ni au schéma PostgreSQL.
+Ces opérations d’infrastructure précèdent le passage à l’architecture segmentée.
+La publication Internet transitoire par tunnel sortant est déjà fonctionnelle;
+elle ne remet pas en cause le déploiement LAN. Les prochaines étapes ne
+nécessitent aucun changement au schéma PostgreSQL.

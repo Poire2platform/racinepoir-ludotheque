@@ -2,7 +2,7 @@
 ## RacinePoir — Ludothèque distribuée
 
 **Rôle du document :** tableau de suivi opérationnel du projet.  
-**Dernière mise à jour :** 9 août 2026
+**Dernière mise à jour :** 10 août 2026
 **Sources complémentaires :**
 - `docs/infra-plan.md`
 - `docs/PRODUCTION_DATABASE.md`
@@ -40,13 +40,13 @@ Règles :
 |---|---|
 | Proxmox `Poire1` — `192.168.18.100` | Fonctionnel |
 | Développement `pmax-host` — `192.168.18.18` | Fonctionnel |
-| pfSense CE 2.8.1 — VM `100` | WAN, NAT, DNS et réseaux MGMT/DMZ/APP/DB validés; règles applicatives à faire |
+| pfSense CE 2.8.1 — VM `100` | WAN, NAT, DNS et réseaux MGMT/DMZ/APP/DB validés; sorties Cloudflare de WEB01 et accès PostgreSQL ciblé actifs |
 | PostgreSQL `SQL01` — VM `101` — `192.168.18.30` | Base prod séparée fonctionnelle; migrations appliquées |
 | DNS `poire1-dns` — `192.168.18.34` | Fonctionnel |
 | Portal — `http://poire1-portal.home.arpa/` | Fonctionnel |
 | VM `WEB01` — VMID `104` — hostname `poire1-ludoweb` — `10.10.20.10` | DMZ; Caddy, Gunicorn et accès PostgreSQL fonctionnels; `/healthz` validé |
-| Domaine public prévu | `ludotheque.filsdepoire.ca` |
-| Publication Internet | Non configurée |
+| Domaine public | `https://ludotheque.filsdepoire.ca` |
+| Publication Internet | Cloudflare Tunnel `racinepoir-web01` sain; HTTPS et `/healthz` validés le 10 août 2026 |
 
 ## Récupération
 
@@ -60,7 +60,7 @@ Règles :
 | Token BGG | Configuré hors dépôt |
 | Anciennes données | Non récupérées |
 | Données de démonstration | Seed non destructif exécuté deux fois et vérifié |
-| Tests automatisés actifs | 96 tests `pytest` réussis sur SQLite isolée |
+| Tests automatisés actifs | 97 tests `pytest` réussis sur SQLite isolée |
 
 ---
 
@@ -151,12 +151,12 @@ La phase de stabilisation est terminée. `STAB-13` demeure volontairement report
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
 | QA-01 | `DONE` | Créer une checklist de test manuel | `docs/SMOKE_TEST.md` |
-| QA-02 | `DONE` | Ajouter des tests automatisés critiques | 96 tests couvrent login, utilisateurs, création d’admin, jeux, notes, boîtes, filtres, scan, demandes, CSRF, permissions, accessibilité et artefacts d’accès WEB01 |
+| QA-02 | `DONE` | Ajouter des tests automatisés critiques | 97 tests couvrent login, utilisateurs, création d’admin, jeux, notes, boîtes, filtres, scan, demandes, CSRF, permissions, accessibilité et artefacts d’accès WEB01/Cloudflare |
 | QA-03 | `DONE` | Vérifier les migrations sur une DB vide | SQLite vide migrée jusqu’à `b7c3d4e5f6a7` |
 | QA-04 | `DONE` | Tester un redémarrage de l’application | Données, login, catalogue, boîtes et santé vérifiés après recréation |
 | QA-05 | `DONE` | Vérifier les erreurs utilisateur | Réponses 404/500 sans traceback ni détail interne |
 | QA-06 | `DONE` | Vérifier les secrets Git | Fichiers suivis et historique contrôlés sans secret détecté |
-| QA-07 | `DONE` | Vérifier `requirements.txt` | Venv neuf et imports vérifiés; suite courante de 96 tests réussie |
+| QA-07 | `DONE` | Vérifier `requirements.txt` | Venv neuf et imports vérifiés; suite courante de 97 tests réussie |
 | QA-08 | `DONE` | Préparer un tag de déploiement | Checkpoint QA identifié par `mvp-2026-08-03` |
 | QA-09 | `DONE` | Revalider après la passe UX | 89 tests, head Alembic et tag `mvp-2026-08-03-ux` vérifiés |
 
@@ -230,10 +230,10 @@ DB-01 → DB-05
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
 | PUB-01 | `DONE` | Choisir la méthode d’exposition | Cloudflare Tunnel retenu par D-02 |
-| PUB-02 | `NEXT` | Configurer le DNS public | Domaine résolu |
-| PUB-03 | `NEXT` | Configurer HTTPS | Certificat valide |
-| PUB-04 | `NEXT` | Configurer les cookies production | Secure, HttpOnly, SameSite |
-| PUB-05 | `NEXT` | Configurer l’URL publique | `APP_BASE_URL` correcte |
+| PUB-02 | `DONE` | Configurer le DNS public | `ludotheque.filsdepoire.ca` résout publiquement via Cloudflare |
+| PUB-03 | `DONE` | Configurer HTTPS | Certificat valide et `/healthz` HTTP 200 via Cloudflare |
+| PUB-04 | `DONE` | Configurer les cookies production | Cookie observé `Secure`, `HttpOnly`, `SameSite=Lax` |
+| PUB-05 | `DONE` | Configurer l’URL publique | `APP_BASE_URL=https://ludotheque.filsdepoire.ca` appliquée sur WEB01 |
 | PUB-06 | `NEXT` | Préparer les QR définitifs | URL publique, tokens stables |
 | PUB-07 | `NEXT` | Tester hors Wi-Fi | Accès LTE/5G |
 | PUB-08 | `NEXT` | Vérifier les ports exposés | Pas de 5432 ni 8000 publics |
@@ -337,7 +337,8 @@ Résultats : accès dédié et révocation validés, administrateur production c
 premier dump vérifié, autostart activé, snapshot propre créé et thin-pool vérifié
 à `40,73 %` de données et `3,50 %` de métadonnées avec monitor actif.
 
-Prochaine étape : décider `D-02` avant d’entamer `PUB-02` à `PUB-10`.
+Prochaine étape : valider `PUB-06` à `PUB-09` dans l'ordre avant de créer le
+tag et le journal de première publication `PUB-10`.
 
 ---
 

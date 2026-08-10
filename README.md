@@ -11,9 +11,10 @@ entry were then updated, and both Gunicorn and Caddy `/healthz` checks returned
 service files are documented in
 [`docs/WEB01_DEPLOYMENT.md`](docs/WEB01_DEPLOYMENT.md).
 
-The inter-zone firewall rules, final segmented network, and public HTTPS
-publication are not complete. Their target architecture is documented in
-[`docs/infra-plan.md`](docs/infra-plan.md).
+Public HTTPS publication was validated on August 10, 2026 at
+`https://ludotheque.filsdepoire.ca` through an outbound-only Cloudflare Tunnel.
+The final APP/DB segmentation remains incomplete; its target architecture is
+documented in [`docs/infra-plan.md`](docs/infra-plan.md).
 
 Core Concepts
 -------------
