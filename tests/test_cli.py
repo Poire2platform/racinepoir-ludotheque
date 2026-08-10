@@ -47,6 +47,26 @@ def test_create_admin_refuses_existing_username_without_mutation(app, make_user)
     assert User.query.count() == 1
 
 
+def test_create_admin_accepts_missing_email(app):
+    runner = app.test_cli_runner()
+
+    result = runner.invoke(
+        args=[
+            "create-admin",
+            "--username", "sanscourriel",
+            "--email", "",
+            "--display-name", "Sans courriel",
+        ],
+        input="mot-de-passe-test\nmot-de-passe-test\n",
+    )
+
+    assert result.exit_code == 0
+    user = db.session.execute(
+        db.select(User).filter_by(username="sanscourriel")
+    ).scalar_one()
+    assert user.email is None
+
+
 def test_create_admin_refuses_mismatched_passwords(app):
     runner = app.test_cli_runner()
 

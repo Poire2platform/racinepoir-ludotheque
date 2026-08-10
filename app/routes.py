@@ -353,7 +353,7 @@ def register():
 
     if request.method == "POST":
         username = (request.form.get("username") or "").strip()
-        email = (request.form.get("email") or "").strip()
+        email = (request.form.get("email") or "").strip() or None
         display_name = (request.form.get("display_name") or "").strip()
         password = request.form.get("password") or ""
         confirm_password = request.form.get("confirm_password") or ""
@@ -429,15 +429,15 @@ def logout():
 @login_required
 def my_profile():
     if request.method == "POST":
-        email = (request.form.get("email") or "").strip()
+        email = (request.form.get("email") or "").strip() or None
         display_name = (request.form.get("display_name") or "").strip()
         current_password = request.form.get("current_password") or ""
         new_password = request.form.get("new_password") or ""
 
-        if not email or not display_name:
-            return render_template("my_profile.html", error="Nom affiché et email sont obligatoires.", form=request.form)
+        if not display_name:
+            return render_template("my_profile.html", error="Le nom affiché est obligatoire.", form=request.form)
 
-        existing_email = User.query.filter_by(email=email).first()
+        existing_email = User.query.filter_by(email=email).first() if email else None
         if existing_email and existing_email.id != current_user.id:
             return render_template("my_profile.html", error="Cet email est déjà utilisé.", form=request.form)
 
@@ -515,14 +515,14 @@ def new_user():
 
     if request.method == "POST":
         username = (request.form.get("username") or "").strip()
-        email = (request.form.get("email") or "").strip()
+        email = (request.form.get("email") or "").strip() or None
         display_name = (request.form.get("display_name") or "").strip()
         password = request.form.get("password") or ""
         confirm_password = request.form.get("confirm_password") or ""
         role = request.form.get("role") or "member"
         is_active = request.form.get("is_active") == "yes"
 
-        if not username or not email or not display_name or not password:
+        if not username or not display_name or not password:
             return render_template("user_form.html", error="Tous les champs principaux sont obligatoires.", form=request.form, roles=USER_ROLES)
 
         if password != confirm_password:
@@ -544,7 +544,7 @@ def new_user():
         if User.query.filter_by(username=username).first():
             return render_template("user_form.html", error="Ce username existe déjà.", form=request.form, roles=USER_ROLES)
 
-        if User.query.filter_by(email=email).first():
+        if email and User.query.filter_by(email=email).first():
             return render_template("user_form.html", error="Cet email existe déjà.", form=request.form, roles=USER_ROLES)
 
         user = User(
@@ -573,15 +573,15 @@ def edit_user(user_id):
 
     if request.method == "POST":
         username = (request.form.get("username") or "").strip()
-        email = (request.form.get("email") or "").strip()
+        email = (request.form.get("email") or "").strip() or None
         display_name = (request.form.get("display_name") or "").strip()
         password = request.form.get("password") or ""
         confirm_password = request.form.get("confirm_password") or ""
         role = request.form.get("role") or "member"
         is_active = request.form.get("is_active") == "yes"
 
-        if not username or not email or not display_name:
-            return render_template("user_form.html", user=user, error="Username, email et nom affiché sont obligatoires.", form=request.form, roles=USER_ROLES, mode="edit")
+        if not username or not display_name:
+            return render_template("user_form.html", user=user, error="Username et nom affiché sont obligatoires.", form=request.form, roles=USER_ROLES, mode="edit")
 
         if password and password != confirm_password:
             return render_template(
@@ -607,7 +607,7 @@ def edit_user(user_id):
         if existing_username and existing_username.id != user.id:
             return render_template("user_form.html", user=user, error="Ce username existe déjà.", form=request.form, roles=USER_ROLES, mode="edit")
 
-        existing_email = User.query.filter_by(email=email).first()
+        existing_email = User.query.filter_by(email=email).first() if email else None
         if existing_email and existing_email.id != user.id:
             return render_template("user_form.html", user=user, error="Cet email existe déjà.", form=request.form, roles=USER_ROLES, mode="edit")
 

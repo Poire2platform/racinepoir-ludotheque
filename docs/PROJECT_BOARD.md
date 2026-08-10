@@ -55,13 +55,13 @@ Règles :
 | Branche de sauvegarde Codex | `rescue/unstable-2026-07-22` |
 | Branche de réparation | `repair/manual-stabilization-2026-07-29` |
 | Schéma PostgreSQL | Reconstruit |
-| Migration courante | `b7c3d4e5f6a7` |
+| Migration courante | `c8d4e5f6a7b8` |
 | Comptes `admin` (`Maxime`) | Développement et production présents; admin production actif et connexion validée le 10 août 2026 |
 | Token BGG | Configuré hors dépôt |
 | Anciennes données | Non récupérées |
 | Collection officielle | 97 jeux et 97 boîtes importés en production le 10 août 2026; seconde exécution sans doublon |
 | Données de démonstration | Seed non destructif validé en développement; non utilisé pour l’import officiel |
-| Tests automatisés actifs | 109 tests `pytest` réussis sur SQLite isolée |
+| Tests automatisés actifs | 112 tests `pytest` réussis sur SQLite isolée |
 
 ---
 
@@ -152,12 +152,12 @@ La phase de stabilisation est terminée. `STAB-13` demeure volontairement report
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
 | QA-01 | `DONE` | Créer une checklist de test manuel | `docs/SMOKE_TEST.md` |
-| QA-02 | `DONE` | Ajouter des tests automatisés critiques | 109 tests couvrent login, annuaire des membres, utilisateurs, invitations, imports officiel/BGG contrôlés, jeux, notes, boîtes, filtres, scan, demandes, CSRF, permissions, accessibilité et artefacts WEB01/Cloudflare |
-| QA-03 | `DONE` | Vérifier les migrations sur une DB vide | SQLite vide migrée jusqu’à `b7c3d4e5f6a7` |
+| QA-02 | `DONE` | Ajouter des tests automatisés critiques | 112 tests couvrent login, courriel facultatif, annuaire des membres, utilisateurs, invitations, imports officiel/BGG contrôlés, jeux, notes, boîtes, filtres, scan, demandes, CSRF, permissions, accessibilité et artefacts WEB01/Cloudflare |
+| QA-03 | `DONE` | Vérifier les migrations sur une DB vide | SQLite vide migrée jusqu’à `c8d4e5f6a7b8` |
 | QA-04 | `DONE` | Tester un redémarrage de l’application | Données, login, catalogue, boîtes et santé vérifiés après recréation |
 | QA-05 | `DONE` | Vérifier les erreurs utilisateur | Réponses 404/500 sans traceback ni détail interne |
 | QA-06 | `DONE` | Vérifier les secrets Git | Fichiers suivis et historique contrôlés sans secret détecté |
-| QA-07 | `DONE` | Vérifier `requirements.txt` | Venv neuf et imports vérifiés; suite courante de 109 tests réussie |
+| QA-07 | `DONE` | Vérifier `requirements.txt` | Venv neuf et imports vérifiés; suite courante de 112 tests réussie |
 | QA-08 | `DONE` | Préparer un tag de déploiement | Checkpoint QA identifié par `mvp-2026-08-03` |
 | QA-09 | `DONE` | Revalider après la passe UX | 89 tests, head Alembic et tag `mvp-2026-08-03-ux` vérifiés |
 

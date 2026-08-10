@@ -87,6 +87,57 @@ def test_login_accepts_valid_credentials(client, make_user, csrf_token):
     assert response.headers["Location"] == "/"
 
 
+def test_multiple_members_can_register_without_email(app):
+    app.config["REGISTRATION_INVITE_ENABLED"] = True
+    from app.routes import current_registration_invite
+
+    invite_code, _ = current_registration_invite()
+    registration_client = app.test_client()
+    registration_client.get("/login")
+    with registration_client.session_transaction() as session:
+        token = session["_csrf_token"]
+
+    for username in ("anouk", "maxika"):
+        response = registration_client.post(
+            "/register",
+            data={
+                "_csrf_token": token,
+                "username": username,
+                "email": "",
+                "display_name": username.title(),
+                "password": "mot-de-passe-test",
+                "confirm_password": "mot-de-passe-test",
+                "temporary_password": invite_code,
+            },
+        )
+        assert response.status_code == 302
+        assert response.headers["Location"] == "/"
+        registration_client.post("/logout", data={"_csrf_token": token})
+
+    users = User.query.order_by(User.username).all()
+    assert [user.username for user in users] == ["anouk", "maxika"]
+    assert [user.email for user in users] == [None, None]
+
+
+def test_member_can_remove_email_from_profile(client, make_user, login_as, csrf_token):
+    member = make_user("member")
+    login_as(member)
+
+    response = client.post(
+        "/me/profile",
+        data={
+            "_csrf_token": csrf_token,
+            "display_name": member.display_name,
+            "email": "",
+            "current_password": "",
+            "new_password": "",
+        },
+    )
+
+    assert response.status_code == 302
+    assert db.session.get(User, member.id).email is None
+
+
 def test_login_returns_anonymous_scanner_to_automatic_scan(
     app,
     client,

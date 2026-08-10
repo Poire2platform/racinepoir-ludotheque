@@ -27,7 +27,7 @@
             <tr>
                 <td>{{ user.display_name }}</td>
                 <td>{{ user.username }}</td>
-                <td>{{ user.email }}</td>
+                <td>{{ user.email or '—' }}</td>
                 <td>{{ user.role }}</td>
                 <td>{% if user.is_active %}oui{% else %}non{% endif %}</td>
                 <td>{{ user.owned_boxes|length }}</td>
