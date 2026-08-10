@@ -39,7 +39,8 @@ Références officielles :
 Dans pfSense, autoriser depuis WEB01 `10.10.20.10/32` :
 
 - TCP et UDP 7844 vers les destinations Cloudflare Tunnel officielles;
-- TCP 443 pour le dépôt signé `pkg.cloudflare.com`, l’API et les mises à jour;
+- TCP 80/443 pour les miroirs Ubuntu configurés, le dépôt signé
+  `pkg.cloudflare.com`, l’API et les mises à jour;
 - DNS vers le résolveur déjà retenu par l’infrastructure.
 
 Ne créer aucune règle WAN entrante pour le tunnel. Si pfSense utilise des alias

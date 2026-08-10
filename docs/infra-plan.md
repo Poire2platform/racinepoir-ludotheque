@@ -145,8 +145,8 @@ Le chemin contrôlé transitoire entre WEB01 et SQL01 est rétabli. Préparer et
 valider ensuite les autres règles minimales :
 
 1. MGMT vers les interfaces d’administration nécessaires;
-2. sorties WEB01 TCP/UDP 7844 vers Cloudflare Tunnel et TCP 443 pour le dépôt et
-   l’API Cloudflare; aucune redirection WAN entrante 80/443;
+2. sorties WEB01 TCP/UDP 7844 vers Cloudflare Tunnel et TCP 80/443 pour les
+   dépôts signés et l’API Cloudflare; aucune redirection WAN entrante 80/443;
 3. reverse proxy DMZ vers l’application dans APP;
 4. état transitoire validé : WEB01 `10.10.20.10` vers SQL01 `192.168.18.30` sur
    TCP 5432, avec `pg_hba.conf` limité à la source NAT observée
