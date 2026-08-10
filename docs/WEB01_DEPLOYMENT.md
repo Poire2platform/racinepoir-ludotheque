@@ -122,13 +122,12 @@ exécution déléguée sans accès serveur, utiliser le guide autonome
 
 ## Suite
 
-1. produire et vérifier une première sauvegarde PostgreSQL;
-2. ajouter `ludotheque.home.arpa` au DNS local;
-3. exécuter le smoke test fonctionnel complet;
-4. préparer HTTPS, puis seulement alors activer
+1. ajouter `ludotheque.home.arpa` au DNS local;
+2. exécuter le smoke test fonctionnel complet;
+3. préparer HTTPS, puis seulement alors activer
    `SESSION_COOKIE_SECURE=true`, `REMEMBER_COOKIE_SECURE=true` et
    `TRUST_PROXY_HEADERS=true`;
-5. fusionner la branche de stabilisation vers `main` après validation.
+4. fusionner la branche de stabilisation vers `main` après validation.
 
 Le service demeure en HTTP LAN. Il ne doit pas être présenté comme une
 publication Internet ou un déploiement HTTPS.

@@ -203,7 +203,7 @@ applicatif `WEB-08` à `WEB-11`.
 | DB-05 | `DONE` | Revalider TLS PostgreSQL après segmentation | Connexion SSL et `/healthz` avec `database: ok` depuis WEB01 |
 | DB-06 | `DONE` | Appliquer les migrations | Head `b7c3d4e5f6a7` appliqué |
 | DB-07 | `DONE` | Créer le premier admin prod | `admin` actif, lecture SQL et connexion réelle validées; mot de passe non journalisé |
-| DB-08 | `NEXT` | Créer le premier dump prod | Fichier vérifié |
+| DB-08 | `DONE` | Créer le premier dump prod | Archive custom lisible, non vide, propriétaire `postgres`, mode `600`, SHA-256 enregistré |
 
 Recommandation :
 
@@ -331,8 +331,7 @@ checkpoint et séparation stricte entre infrastructure et code.
 
 1. `WEB-16` — terminer la validation de l’accès dédié par un essai contrôlé de
    révocation; le test de santé est maintenant réussi.
-2. `DB-08` — produire et vérifier le premier dump de production.
-3. `WEB-02` puis `WEB-03` — activer l’autostart et prendre un snapshot propre.
+2. `WEB-02` puis `WEB-03` — activer l’autostart et prendre un snapshot propre.
 
 Après ce sprint, décider `D-02` avant d’entamer `PUB-02` à `PUB-10`.
 
@@ -371,7 +370,7 @@ changements sur l’infrastructure.
 - [x] base prod séparée créée et migrée;
 - [ ] HTTPS public;
 - [ ] QR avec domaine public;
-- [ ] backup créé;
+- [x] premier dump production créé et vérifié;
 - [ ] restauration testée;
 - [x] redémarrage applicatif automatisé validé sur base isolée;
 - [ ] redémarrage complet WEB01 et SQL01 validé en production;

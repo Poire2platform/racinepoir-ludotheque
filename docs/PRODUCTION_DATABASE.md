@@ -137,4 +137,21 @@ mettre le mot de passe dans la commande, le terminal, `logthis` ou un document.
 Elle refuse un nom d’utilisateur ou une adresse courriel déjà présents et ne
 modifie aucun compte existant.
 
-Le prochain checkpoint est le premier dump vérifié décrit par `DB-08`.
+## 8. Premier dump vérifié
+
+Le 10 août 2026, le premier dump de `racinepoir_ludotheque_prod` a été créé sur
+SQL01 au format custom de PostgreSQL. L’archive est non vide, appartient à
+`postgres:postgres`, est protégée en mode `600` et sa table des matières est
+lisible par `pg_restore --list`.
+
+Preuve enregistrée :
+
+```text
+Fichier : racinepoir_ludotheque_prod-20260810T165707Z.dump
+Taille : 38232 octets
+SHA-256 : 44f77b63bcbd4f181a4a8ba2334341da17f29aa0c9d98c41707f28339085af38
+```
+
+Ce dump local constitue le checkpoint `DB-08`; il ne remplace pas encore la
+sauvegarde automatisée, la copie hors SQL01 ni le test de restauration prévus
+par `OPS-01` à `OPS-04`.
