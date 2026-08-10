@@ -178,7 +178,7 @@ de l’administration système.
 | WEB-06 | `DONE` | Choisir l’utilisateur système | Service sous `pmax`, sans root |
 | WEB-07 | `DONE` | Créer le répertoire applicatif | `/opt/racinepoir` |
 | WEB-08 | `DONE` | Créer l’environnement privé | `/opt/racinepoir/.env`, mode `600` |
-| WEB-09 | `DONE` | Déployer le code | Branche de stabilisation déployée |
+| WEB-09 | `DONE` | Déployer le code | Commit `4329325` déployé; checkout propre, migration et redémarrage validés |
 | WEB-10 | `DONE` | Créer le venv de production | `/opt/racinepoir/.venv` fonctionnel |
 | WEB-11 | `DONE` | Appliquer les migrations | Head `b7c3d4e5f6a7` appliqué |
 | WEB-12 | `DONE` | Tester Gunicorn | Répond sur `127.0.0.1:8000` |

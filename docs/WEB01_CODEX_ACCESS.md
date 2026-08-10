@@ -11,7 +11,7 @@ opération d’infrastructure sous son contrôle.
 - `/opt/racinepoir` est monté en lecture-écriture par SSHFS dans
   `/home/pmax/web01-racinepoir` sur `pmax-host`;
 - ce montage est ajouté comme deuxième dossier du workspace Codex;
-- le checkout WEB01 est propre au commit `c3711c2` sur la branche
+- le checkout WEB01 est propre au commit `4329325` sur la branche
   `repair/manual-stabilization-2026-07-29`;
 - `/opt/racinepoir` appartient à `pmax:racinepoir-deploy`, est en mode `3775`,
   et `.env` demeure protégé sous `pmax:pmax` en mode `600`;

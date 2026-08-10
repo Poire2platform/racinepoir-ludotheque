@@ -39,12 +39,16 @@ la documentation ou les journaux.
 - `docs/WEB01_CODEX_ACCESS.md` et `deploy/web01-access/` décrivent l’accès SSH
   en écriture dédié installé le 9 août 2026 et ses limites.
 
-Le checkout WEB01 demeure propre au commit `c3711c2`. La branche distante de
-développement contient des commits plus récents qui ne sont pas encore déployés
-sur WEB01. Ils couvrent notamment la documentation du déploiement LAN, le scan
-direct sans confirmation, la commande contrôlée de création d’administrateur,
-les artefacts d’accès WEB01, l’activation du montage SSHFS et les réconciliations
-de l’état DMZ. Toujours comparer les SHA avant un déploiement.
+Le checkout WEB01 est propre au commit `4329325`, déployé le 9 août 2026. Le
+déploiement a été effectué par fast-forward depuis `c3711c2`, suivi de la
+vérification Alembic au head `b7c3d4e5f6a7`, d’un redémarrage contrôlé et de
+contrôles `/healthz` réussis par Gunicorn et Caddy.
+
+Le compte dédié ne pouvait pas terminer un `git fetch` HTTPS non interactif.
+Les objets du commit exact ont donc été transférés dans un bundle Git vérifié
+par SSH, puis le fast-forward a été exécuté par `pmax`, propriétaire des fichiers
+du checkout. Toujours comparer les SHA et exiger un fast-forward avant un futur
+déploiement; ne pas contourner le sticky bit ou exposer des identifiants GitHub.
 
 ## Effet de la segmentation sur Caddy et Gunicorn
 
