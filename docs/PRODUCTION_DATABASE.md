@@ -113,15 +113,17 @@ Après préparation de WEB01 et de son environnement privé :
 
 Le head attendu est `b7c3d4e5f6a7`.
 
-## 7. Vérifier ou créer le premier administrateur
+## 7. Premier administrateur vérifié
 
-Le compte `admin` connu dans l’environnement de développement ne prouve pas
-qu’un administrateur existe dans `racinepoir_ludotheque_prod`. Vérifier d’abord
-la base de production par une méthode en lecture seule ou tenter la connexion
-avec le compte attendu, sans exposer de secret.
+Le 10 août 2026, une lecture SQL a d’abord confirmé l’absence d’administrateur
+dans `racinepoir_ludotheque_prod`. Le compte production `admin`, affiché comme
+`Maxime`, a ensuite été créé avec la commande interactive contrôlée. Une seconde
+lecture SQL a confirmé son rôle administrateur et son état actif, puis une
+connexion réelle a réussi. Le mot de passe n’a été ni journalisé ni documenté.
 
-S’il est absent, exécuter ceci sur WEB01 depuis `/opt/racinepoir`, après avoir
-confirmé que l’environnement privé vise bien `racinepoir_ludotheque_prod` :
+Pour une future installation où l’administrateur est absent, exécuter ceci sur
+WEB01 depuis `/opt/racinepoir`, après avoir confirmé que l’environnement privé
+vise bien `racinepoir_ludotheque_prod` :
 
 ```bash
 .venv/bin/flask create-admin \
@@ -135,5 +137,4 @@ mettre le mot de passe dans la commande, le terminal, `logthis` ou un document.
 Elle refuse un nom d’utilisateur ou une adresse courriel déjà présents et ne
 modifie aucun compte existant.
 
-Après validation de la connexion de cet administrateur, produire immédiatement
-le premier dump vérifié décrit par `DB-08`.
+Le prochain checkpoint est le premier dump vérifié décrit par `DB-08`.

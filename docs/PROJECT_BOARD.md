@@ -56,7 +56,7 @@ Règles :
 | Branche de réparation | `repair/manual-stabilization-2026-07-29` |
 | Schéma PostgreSQL | Reconstruit |
 | Migration courante | `b7c3d4e5f6a7` |
-| Compte `admin` de développement (`Maxime`) | Présent, admin actif; compte production à vérifier/créer séparément |
+| Comptes `admin` (`Maxime`) | Développement et production présents; admin production actif et connexion validée le 10 août 2026 |
 | Token BGG | Configuré hors dépôt |
 | Anciennes données | Non récupérées |
 | Données de démonstration | Seed non destructif exécuté deux fois et vérifié |
@@ -202,7 +202,7 @@ applicatif `WEB-08` à `WEB-11`.
 | DB-04 | `DONE` | Adapter `pg_hba.conf` à la nouvelle source WEB01 | Source NAT observée `192.168.18.41/32`; règle HBA ciblée et rechargée |
 | DB-05 | `DONE` | Revalider TLS PostgreSQL après segmentation | Connexion SSL et `/healthz` avec `database: ok` depuis WEB01 |
 | DB-06 | `DONE` | Appliquer les migrations | Head `b7c3d4e5f6a7` appliqué |
-| DB-07 | `NEXT` | Créer le premier admin prod | Mot de passe non journalisé |
+| DB-07 | `DONE` | Créer le premier admin prod | `admin` actif, lecture SQL et connexion réelle validées; mot de passe non journalisé |
 | DB-08 | `NEXT` | Créer le premier dump prod | Fichier vérifié |
 
 Recommandation :
@@ -331,10 +331,8 @@ checkpoint et séparation stricte entre infrastructure et code.
 
 1. `WEB-16` — terminer la validation de l’accès dédié par un essai contrôlé de
    révocation; le test de santé est maintenant réussi.
-2. `DB-07` — vérifier si un administrateur existe déjà dans la base de production;
-   le créer interactivement seulement s’il est absent.
-3. `DB-08` — produire et vérifier le premier dump de production.
-4. `WEB-02` puis `WEB-03` — activer l’autostart et prendre un snapshot propre.
+2. `DB-08` — produire et vérifier le premier dump de production.
+3. `WEB-02` puis `WEB-03` — activer l’autostart et prendre un snapshot propre.
 
 Après ce sprint, décider `D-02` avant d’entamer `PUB-02` à `PUB-10`.
 

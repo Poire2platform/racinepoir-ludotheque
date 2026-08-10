@@ -122,16 +122,13 @@ exécution déléguée sans accès serveur, utiliser le guide autonome
 
 ## Suite
 
-1. vérifier si le premier administrateur production existe déjà, puis utiliser
-   au besoin la commande interactive `flask create-admin` documentée dans
-   `docs/PRODUCTION_DATABASE.md`, sans journaliser le mot de passe;
-2. produire et vérifier une première sauvegarde PostgreSQL;
-3. ajouter `ludotheque.home.arpa` au DNS local;
-4. exécuter le smoke test fonctionnel complet;
-5. préparer HTTPS, puis seulement alors activer
+1. produire et vérifier une première sauvegarde PostgreSQL;
+2. ajouter `ludotheque.home.arpa` au DNS local;
+3. exécuter le smoke test fonctionnel complet;
+4. préparer HTTPS, puis seulement alors activer
    `SESSION_COOKIE_SECURE=true`, `REMEMBER_COOKIE_SECURE=true` et
    `TRUST_PROXY_HEADERS=true`;
-6. fusionner la branche de stabilisation vers `main` après validation.
+5. fusionner la branche de stabilisation vers `main` après validation.
 
 Le service demeure en HTTP LAN. Il ne doit pas être présenté comme une
 publication Internet ou un déploiement HTTPS.
