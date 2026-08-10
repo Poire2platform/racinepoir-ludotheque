@@ -8,8 +8,8 @@
     {% endif %}
     <div class="game-card__content">
         <h3><a href="/boxes/{{ box.id }}">{{ box.display_label }}</a></h3>
-        <p><strong>Propriétaire :</strong> {{ box.owner.display_name }}</p>
-        <p><strong>Détenteur :</strong> {% if box.current_holder %}{{ box.current_holder.display_name }}{% else %}Inconnu{% endif %}</p>
+        <p><strong>Propriétaire :</strong> <a href="/members/{{ box.owner.id }}">{{ box.owner.display_name }}</a></p>
+        <p><strong>Détenteur :</strong> {% if box.current_holder %}<a href="/members/{{ box.current_holder.id }}">{{ box.current_holder.display_name }}</a>{% else %}Inconnu{% endif %}</p>
         {% if current_user.is_authenticated %}
             <p><a href="/scan/{{ box.qr_code_token }}">J’ai cette boîte</a> — {% include "partials/interest_button.html" %}</p>
             {% if current_user.role == "admin" or box.owner_user_id == current_user.id %}

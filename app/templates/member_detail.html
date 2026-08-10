@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}{{ member.display_name }} — RacinePoir{% endblock %}
+
+{% block content %}
+<h2>{{ member.display_name }}</h2>
+
+{% if member.id == current_user.id %}
+    <p>C’est ta page publique. <a href="/me/profile">Modifier ton profil</a></p>
+{% endif %}
+
+{% if member.player_profile %}
+    <p><a href="/players/{{ member.player_profile.id }}">Voir ses parties et ses statistiques</a></p>
+{% endif %}
+
+<section aria-labelledby="member-owned-title">
+    <h3 id="member-owned-title">Ses boîtes</h3>
+    {% if owned_boxes %}
+        <ul>
+            {% for box in owned_boxes %}
+                <li>
+                    <a href="/boxes/{{ box.id }}">{{ box.display_label }}</a>
+                    {% if box.current_holder_user_id == member.id %}— chez {{ member.display_name }}{% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Aucune boîte enregistrée.</p>
+    {% endif %}
+</section>
+
+<section aria-labelledby="member-held-title">
+    <h3 id="member-held-title">Boîtes chez {{ member.display_name }}</h3>
+    {% if held_boxes %}
+        <ul>
+            {% for box in held_boxes %}
+                <li><a href="/boxes/{{ box.id }}">{{ box.display_label }}</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Aucune boîte chez cette personne.</p>
+    {% endif %}
+</section>
+
+<section aria-labelledby="member-interests-title">
+    <h3 id="member-interests-title">Jeux qui l’intéressent</h3>
+    {% if interested_boxes %}
+        <ul>
+            {% for box in interested_boxes %}
+                <li><a href="/boxes/{{ box.id }}">{{ box.display_label }}</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Aucun intérêt actif.</p>
+    {% endif %}
+</section>
+
+<p><a href="/members">Retour aux membres</a></p>
+{% endblock %}

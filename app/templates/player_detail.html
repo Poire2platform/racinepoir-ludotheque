@@ -5,7 +5,7 @@
 {% block content %}
 <h2>{{ player.display_name }}</h2>
 
-<p><strong>Compte lié :</strong> {% if player.linked_user %}{{ player.linked_user.username }}{% else %}—{% endif %}</p>
+<p><strong>Membre lié :</strong> {% if player.linked_user and player.linked_user.is_active %}<a href="/members/{{ player.linked_user.id }}">{{ player.linked_user.display_name }}</a>{% else %}—{% endif %}</p>
 <p><strong>Parties jouées :</strong> {{ entries|length }}</p>
 
 <hr>

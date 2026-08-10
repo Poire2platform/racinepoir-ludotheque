@@ -572,6 +572,7 @@ body.anika-love::before {
 {% endif %}
 <nav class="member-nav" aria-label="Navigation du compte">
 {% if current_user.is_authenticated %}
+    <a href="/members">Membres</a>
     <a href="/me/held-boxes">Chez moi</a>
     <a href="/me/owned-boxes">Mes boîtes</a>
     <a href="/me/interested-boxes">I would like</a>
@@ -585,8 +586,6 @@ body.anika-love::before {
 {% if current_user.is_authenticated %}
 <p>
     Connecté comme : <strong>{{ current_user.display_name }}</strong>
-    — username: <code>{{ current_user.username }}</code>
-    — rôle: <code>{{ current_user.role }}</code>
 </p>
 <form class="logout-form" method="post" action="/logout">
     <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">

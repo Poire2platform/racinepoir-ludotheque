@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Membres — RacinePoir{% endblock %}
+
+{% block content %}
+<h2>Membres</h2>
+
+<p>Les personnes qui partagent la ludothèque.</p>
+
+{% if members %}
+    <ul class="member-directory">
+        {% for member in members %}
+            <li>
+                <a href="/members/{{ member.id }}"><strong>{{ member.display_name }}</strong></a>
+                — {{ member.owned_boxes|length }} boîte(s)
+                — {{ member.held_boxes|length }} chez soi
+                {% if member.player_profile %}
+                    — {{ member.player_profile.session_entries|length }} partie(s)
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <section class="empty-state">
+        <h3>Aucun membre actif</h3>
+    </section>
+{% endif %}
+{% endblock %}

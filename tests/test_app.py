@@ -245,7 +245,8 @@ def test_authenticated_session_remains_active_across_requests(
 
     assert first_response.status_code == 200
     assert second_response.status_code == 200
-    assert b"username: <code>member</code>" in first_response.data
+    assert "Connecté comme : <strong>Member</strong>".encode() in first_response.data
+    assert b"username:" not in first_response.data
 
 
 def test_logout_ends_authenticated_session(
@@ -946,7 +947,9 @@ def test_interest_flag_is_available_without_priority_or_duplicates(
     detail_response = client.get(f"/boxes/{box.id}")
     assert detail_response.status_code == 200
     assert b"<h3>Int" in detail_response.data
-    assert "Interested — toi".encode() in detail_response.data
+    assert f'href="/members/{interested.id}"'.encode() in detail_response.data
+    assert interested.display_name.encode() in detail_response.data
+    assert "— toi".encode() in detail_response.data
     assert b'<span class="badge badge--warning">I would like</span>' in detail_response.data
     assert "file d’attente".encode() not in detail_response.data
     assert b"Tu es #" not in detail_response.data
@@ -1126,6 +1129,7 @@ def test_authenticated_navigation_smoke(
         "/me/held-boxes",
         "/me/owned-boxes",
         "/me/interested-boxes",
+        "/members",
         "/sessions",
         "/players",
         "/users",
@@ -1166,10 +1170,77 @@ def test_mobile_navigation_structure_and_automatic_scan_process(
     assert b'href="/players"' in scorebook_navigation
     assert b'href="/me/held-boxes"' in home_response.data
     assert b'href="/me/interested-boxes"' in home_response.data
+    assert b'href="/members"' in home_response.data
     assert scan_response.status_code == 200
     assert b'id="scan-process"' in scan_response.data
     assert b'action="/scan/mobile-scan/complete"' in scan_response.data
     assert b'class="primary-action"' not in scan_response.data
+
+
+def test_member_directory_lists_active_members_without_private_account_data(
+    client,
+    make_user,
+    make_box,
+    login_as,
+):
+    viewer = make_user("viewer")
+    visible = make_user("visible")
+    hidden = make_user("hidden", is_active=False)
+    make_box(visible, title="Carcassonne", token="member-directory-box")
+    login_as(viewer)
+
+    response = client.get("/members")
+
+    assert response.status_code == 200
+    assert visible.display_name.encode() in response.data
+    assert f'/members/{visible.id}'.encode() in response.data
+    assert hidden.display_name.encode() not in response.data
+    assert visible.email.encode() not in response.data
+    assert b"username:" not in response.data
+    assert "rôle:".encode() not in response.data
+    assert b"Carcassonne" not in response.data
+
+
+def test_member_profile_shows_collection_and_interests_without_private_data(
+    app,
+    client,
+    make_user,
+    make_box,
+    login_as,
+):
+    viewer = make_user("viewer")
+    member = make_user("anouk")
+    owned_box = make_box(member, title="Azul", token="member-owned-box")
+    interested_box = make_box(viewer, title="Cascadia", token="member-interest-box")
+    db.session.add(BoxRequest(box=interested_box, requester=member, status="active"))
+    db.session.commit()
+    login_as(viewer)
+
+    response = client.get(f"/members/{member.id}")
+
+    assert response.status_code == 200
+    assert member.display_name.encode() in response.data
+    assert owned_box.display_label.encode() in response.data
+    assert interested_box.display_label.encode() in response.data
+    assert member.email.encode() not in response.data
+    assert member.username.encode() not in response.data
+
+
+def test_member_directory_requires_login_and_hides_inactive_profiles(
+    client,
+    make_user,
+    login_as,
+):
+    inactive = make_user("inactive", is_active=False)
+
+    response = client.get("/members")
+    assert response.status_code == 302
+    assert "/login" in response.headers["Location"]
+
+    active = make_user("active")
+    login_as(active)
+    response = client.get(f"/members/{inactive.id}")
+    assert response.status_code == 404
 
 
 def test_accessibility_foundations_are_present(
@@ -1289,7 +1360,8 @@ def test_my_owned_boxes_filters_by_owner_and_displays_current_holder(
     assert home_label in response.data
     assert borrowed_box.display_label.encode() not in response.data
     assert response.data.index(away_label) < response.data.index(home_label)
-    assert "détenteur :\n                \n                    Other".encode() in response.data
+    assert f'href="/members/{other.id}"'.encode() in response.data
+    assert other.display_name.encode() in response.data
     assert "1 intéressé(s)".encode() in response.data
     assert b"/edit" in response.data
     assert b"/label" in response.data

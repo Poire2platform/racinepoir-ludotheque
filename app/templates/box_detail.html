@@ -3,8 +3,8 @@
 {% block content %}
 <h2>{{ box.display_label }}</h2>
 <p><strong>Jeu référencé :</strong> {% if box.game %}<a href="/games/{{ box.game.id }}">{{ box.game.title }}</a>{% if box.game.is_bgg_recognized %} <strong>[BGG]</strong>{% endif %}{% else %}—{% endif %}</p>
-<p><strong>Propriétaire :</strong> {{ box.owner.display_name }}</p>
-<p><strong>Détenteur actuel :</strong> {% if box.current_holder %}{{ box.current_holder.display_name }}{% else %}—{% endif %}</p>
+<p><strong>Propriétaire :</strong> <a href="/members/{{ box.owner.id }}">{{ box.owner.display_name }}</a></p>
+<p><strong>Détenteur actuel :</strong> {% if box.current_holder %}<a href="/members/{{ box.current_holder.id }}">{{ box.current_holder.display_name }}</a>{% else %}—{% endif %}</p>
 {% if box.notes %}<p><strong>Notes :</strong> {{ box.notes }}</p>{% endif %}
 {% if current_user.is_authenticated and (current_user.role == "admin" or box.owner_user_id == current_user.id) %}
 <p><a href="/boxes/{{ box.id }}/edit">Modifier cette boîte</a></p>
@@ -46,7 +46,7 @@
 {% if box.interest_flags %}
 <ul>
 {% for flag in box.interest_flags %}
-<li>{{ flag.requester.display_name }}{% if current_user.is_authenticated and flag.requester.id == current_user.id %} — toi{% endif %}</li>
+<li><a href="/members/{{ flag.requester.id }}">{{ flag.requester.display_name }}</a>{% if current_user.is_authenticated and flag.requester.id == current_user.id %} — toi{% endif %}</li>
 {% endfor %}
 </ul>
 {% else %}<p>Personne n’a signalé son intérêt.</p>{% endif %}

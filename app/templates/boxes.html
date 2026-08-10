@@ -51,8 +51,8 @@
 {% for box in boxes %}
 <tr>
 <td><a href="/boxes/{{ box.id }}">{{ box.display_label }}</a></td>
-<td>{{ box.owner.display_name }}</td>
-<td>{% if box.current_holder %}{{ box.current_holder.display_name }}{% else %}—{% endif %}</td>
+<td><a href="/members/{{ box.owner.id }}">{{ box.owner.display_name }}</a></td>
+<td>{% if box.current_holder %}<a href="/members/{{ box.current_holder.id }}">{{ box.current_holder.display_name }}</a>{% else %}—{% endif %}</td>
 <td>{% include "partials/interest_button.html" %}{% if box.interest_flags %} <small>{{ box.interest_flags|length }} personne(s)</small>{% endif %}</td>
 <td>{% if current_user.is_authenticated %}<a href="/scan/{{ box.qr_code_token }}">J’ai cette boîte</a>{% else %}<a href="/login">Connexion</a>{% endif %}</td>
 </tr>

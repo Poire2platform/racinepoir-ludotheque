@@ -20,7 +20,7 @@
                 —
                 détenteur :
                 {% if box.current_holder %}
-                    {{ box.current_holder.display_name }}
+                    <a href="/members/{{ box.current_holder.id }}">{{ box.current_holder.display_name }}</a>
                 {% else %}
                     inconnu
                 {% endif %}

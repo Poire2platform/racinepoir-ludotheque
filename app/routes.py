@@ -471,6 +471,41 @@ def users():
     return render_template("users.html", users=users)
 
 
+@main.route("/members")
+@login_required
+def members():
+    members = User.query.filter_by(is_active=True).order_by(
+        User.display_name.asc(),
+        User.id.asc(),
+    ).all()
+    return render_template("members.html", members=members)
+
+
+@main.route("/members/<int:user_id>")
+@login_required
+def member_detail(user_id):
+    member = User.query.filter_by(id=user_id, is_active=True).first_or_404()
+    owned_boxes = Box.query.filter_by(owner_user_id=member.id).order_by(
+        Box.display_name.asc(),
+        Box.id.asc(),
+    ).all()
+    held_boxes = Box.query.filter_by(current_holder_user_id=member.id).order_by(
+        Box.display_name.asc(),
+        Box.id.asc(),
+    ).all()
+    interests = BoxRequest.query.filter_by(
+        requester_user_id=member.id,
+        status="active",
+    ).order_by(BoxRequest.created_at.desc(), BoxRequest.id.desc()).all()
+    return render_template(
+        "member_detail.html",
+        member=member,
+        owned_boxes=owned_boxes,
+        held_boxes=held_boxes,
+        interested_boxes=[interest.box for interest in interests],
+    )
+
+
 @main.route("/users/new", methods=["GET", "POST"])
 @login_required
 def new_user():
