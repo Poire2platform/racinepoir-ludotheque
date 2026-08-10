@@ -7,7 +7,8 @@ contient aucun secret et ne remplace pas les fichiers privés du serveur.
 
 | Élément | Valeur |
 |---|---|
-| Serveur | `WEB01` / `poire1-ludoweb` |
+| VM Proxmox | `WEB01`, VMID `104` |
+| Hostname invité | `poire1-ludoweb` |
 | Adresse actuelle | `10.10.20.10/24` dans DMZ, passerelle `10.10.20.1` |
 | Répertoire | `/opt/racinepoir` |
 | Branche | `repair/manual-stabilization-2026-07-29` |

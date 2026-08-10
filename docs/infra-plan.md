@@ -10,7 +10,8 @@ l’état vérifié le 9 août 2026 et distingue cet état de la segmentation ci
 - `pmax-host` est la machine Ubuntu Desktop de développement et l’hôte
   QEMU/KVM + libvirt.
 - `Poire1_PROX` est la VM imbriquée qui héberge Proxmox.
-- `WEB01` est la VM applicative dédiée, déplacée dans la DMZ le 9 août 2026.
+- `WEB01` est le nom Proxmox de la VM applicative dédiée; son hostname invité
+  est `poire1-ludoweb`. Elle a été déplacée dans la DMZ le 9 août 2026.
 - `SQL01` est la VM PostgreSQL séparée (VMID `101`).
 
 Le code est développé et testé sur `pmax-host`. L’administration de Proxmox,
@@ -27,7 +28,7 @@ effectuée par Maxime.
 | PostgreSQL | VM `101`, `SQL01` | `192.168.18.30` | Fonctionnel; pas encore déplacé |
 | DNS local | VM `102`, `poire1-dns` | `192.168.18.34` | Fonctionnel |
 | Portail | VM `103`, `poire1-portal` | `192.168.18.35` | Fonctionnel |
-| Application | VM `104`, `WEB01` | `10.10.20.10` | Caddy, Gunicorn et accès DB fonctionnels; `/healthz` validé |
+| Application | VMID `104`, VM `WEB01`, hostname `poire1-ludoweb` | `10.10.20.10` | Caddy, Gunicorn et accès DB fonctionnels; `/healthz` validé |
 
 La zone DNS locale est `home.arpa`. Un nom local possible pour l’application
 est `ludotheque.home.arpa`.

@@ -44,7 +44,7 @@ Règles :
 | PostgreSQL `SQL01` — VM `101` — `192.168.18.30` | Base prod séparée fonctionnelle; migrations appliquées |
 | DNS `poire1-dns` — `192.168.18.34` | Fonctionnel |
 | Portal — `http://poire1-portal.home.arpa/` | Fonctionnel |
-| WEB01 `poire1-ludoweb` — VM `104` — `10.10.20.10` | DMZ; Caddy, Gunicorn et accès PostgreSQL fonctionnels; `/healthz` validé |
+| VM `WEB01` — VMID `104` — hostname `poire1-ludoweb` — `10.10.20.10` | DMZ; Caddy, Gunicorn et accès PostgreSQL fonctionnels; `/healthz` validé |
 | Domaine public prévu | `ludotheque.filsdepoire.ca` |
 | Publication Internet | Non configurée |
 
@@ -171,7 +171,7 @@ de l’administration système.
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
 | WEB-01 | `DONE` | Confirmer le VMID de WEB01 | VM `104` |
-| WEB-02 | `NEXT` | Activer le démarrage automatique de la VM | `onboot: 1` dans Proxmox |
+| WEB-02 | `DONE` | Activer le démarrage automatique de la VM | VM `WEB01` (104), `onboot: 1` vérifié dans Proxmox |
 | WEB-03 | `NEXT` | Prendre un snapshot propre | Snapshot visible |
 | WEB-04 | `DONE` | Installer les paquets système | Déploiement opérationnel |
 | WEB-05 | `DONE` | Rétablir et tester WEB01 → SQL01 après segmentation | TCP 5432, Gunicorn `/healthz` et Caddy `/healthz` réussis depuis WEB01 |
@@ -331,7 +331,7 @@ checkpoint et séparation stricte entre infrastructure et code.
 
 1. `WEB-16` — terminer la validation de l’accès dédié par un essai contrôlé de
    révocation; le test de santé est maintenant réussi.
-2. `WEB-02` puis `WEB-03` — activer l’autostart et prendre un snapshot propre.
+2. `WEB-03` — prendre un snapshot propre de la VM `WEB01`.
 
 Après ce sprint, décider `D-02` avant d’entamer `PUB-02` à `PUB-10`.
 
