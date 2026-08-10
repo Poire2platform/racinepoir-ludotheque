@@ -27,7 +27,7 @@ effectuée par Maxime.
 | PostgreSQL | VM `101`, `SQL01` | `192.168.18.30` | Fonctionnel; pas encore déplacé |
 | DNS local | VM `102`, `poire1-dns` | `192.168.18.34` | Fonctionnel |
 | Portail | VM `103`, `poire1-portal` | `192.168.18.35` | Fonctionnel |
-| Application | VM `104`, `WEB01` | `10.10.20.10` | Caddy et Gunicorn actifs; accès DB bloqué |
+| Application | VM `104`, `WEB01` | `10.10.20.10` | Caddy, Gunicorn et accès DB fonctionnels; `/healthz` validé |
 
 La zone DNS locale est `home.arpa`. Un nom local possible pour l’application
 est `ludotheque.home.arpa`.
@@ -47,14 +47,16 @@ est `ludotheque.home.arpa`.
 - DNS pfSense : `192.168.18.34` et `1.1.1.1`.
 - Internet, NAT et résolution DNS : validés.
 - MGMT conserve temporairement les règles LAN par défaut.
-- DMZ, APP et DB n’ont encore aucune règle d’autorisation; leur blocage
-  implicite est donc actif.
+- DMZ possède uniquement la règle ciblée WEB01 vers SQL01:5432; APP et DB n’ont
+  encore aucune règle d’autorisation et leur blocage implicite demeure actif.
 
 Important : WEB01 est maintenant dans la DMZ. Son ancienne adresse
-`192.168.18.38` n’est plus configurée. Le 9 août, les connexions TCP depuis
-WEB01 vers SQL01 à `192.168.18.30:5432` et vers l’adresse DB candidate
-`10.10.40.10:5432` expiraient. Les règles applicatives interzones et la
-publication Internet ne sont donc pas encore validées.
+`192.168.18.38` n’est plus configurée. Le 9 août, une règle pfSense limitée à
+WEB01 `10.10.20.10` vers SQL01 `192.168.18.30:5432` a rétabli le transport.
+Le NAT sortant présente temporairement la source `192.168.18.41` à PostgreSQL;
+la règle HBA `/32` correspondante est active et `/healthz` réussit par Gunicorn
+et Caddy. Les autres règles interzones et la publication Internet ne sont pas
+encore validées.
 
 ## Administration pfSense
 
@@ -123,14 +125,15 @@ Le déploiement LAN validé est détaillé dans `docs/WEB01_DEPLOYMENT.md`.
 
 ## Prochaine phase
 
-Rétablir d’abord le chemin contrôlé entre WEB01 et SQL01, puis préparer et
-valider les règles minimales :
+Le chemin contrôlé transitoire entre WEB01 et SQL01 est rétabli. Préparer et
+valider ensuite les autres règles minimales :
 
 1. MGMT vers les interfaces d’administration nécessaires;
 2. WAN TCP 443 vers le futur reverse proxy en DMZ;
 3. reverse proxy DMZ vers l’application dans APP;
-4. état transitoire : WEB01 `10.10.20.10` vers SQL01 `192.168.18.30` sur TCP
-   5432, avec une règle `pg_hba.conf` limitée à la source réellement observée;
+4. état transitoire validé : WEB01 `10.10.20.10` vers SQL01 `192.168.18.30` sur
+   TCP 5432, avec `pg_hba.conf` limité à la source NAT observée
+   `192.168.18.41/32`;
 5. cible : application APP vers PostgreSQL dans DB sur TCP 5432;
 6. refus de toute autre communication interzone;
 7. décision ultérieure : conserver temporairement SQL01 sur `192.168.18.30`

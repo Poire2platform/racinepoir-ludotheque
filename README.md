@@ -5,10 +5,10 @@ Private Flask app for managing a small shared board game library.
 
 Infrastructure note: the development machine is separate from production.
 WEB01 was validated on the historical LAN, then moved to the DMZ at
-`10.10.20.10` on August 9, 2026. Caddy and Gunicorn remain active, but the
-DMZ-to-SQL01 PostgreSQL path is currently blocked, so the deployed application
-must not be considered healthy until `/healthz` succeeds again. The deployment
-history and reproducible service files are documented in
+`10.10.20.10` on August 9, 2026. The controlled pfSense rule and PostgreSQL HBA
+entry were then updated, and both Gunicorn and Caddy `/healthz` checks returned
+`status: ok` with `database: ok`. The deployment history and reproducible
+service files are documented in
 [`docs/WEB01_DEPLOYMENT.md`](docs/WEB01_DEPLOYMENT.md).
 
 The inter-zone firewall rules, final segmented network, and public HTTPS

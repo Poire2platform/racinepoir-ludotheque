@@ -18,11 +18,11 @@ opération d’infrastructure sous son contrôle.
 - `/usr/local/sbin/racinepoir-ops` et sa règle `sudoers` limitée sont installés;
 - `racinepoir-ops status` fonctionne et confirme que Gunicorn et Caddy sont
   actifs;
-- la commande `racinepoir-ops health` n’a pas terminé dans le délai de contrôle.
-  Les journaux montraient des redémarrages de workers Gunicorn après timeout.
+- après rétablissement du flux PostgreSQL le 9 août, `racinepoir-ops health`
+  réussit et rapporte `status: ok` et `database: ok` par Gunicorn et Caddy.
 
-L’accès en écriture est donc opérationnel, mais sa validation reste incomplète
-tant que le test de santé et un essai contrôlé de révocation n’ont pas réussi.
+L’accès en écriture et le test de santé sont donc opérationnels. Sa validation
+reste incomplète tant qu’un essai contrôlé de révocation n’a pas réussi.
 
 ## Portée retenue
 

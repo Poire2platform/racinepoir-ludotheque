@@ -39,19 +39,19 @@ la documentation ou les journaux.
 - `docs/WEB01_CODEX_ACCESS.md` et `deploy/web01-access/` décrivent l’accès SSH
   en écriture dédié installé le 9 août 2026 et ses limites.
 
-Le checkout WEB01 demeure propre au commit `c3711c2`. Le dépôt de développement
-et sa branche distante sont synchronisés au commit `b012a0c`; les six commits de
-`e444c30` à `b012a0c` sont poussés, mais ne sont pas encore déployés sur WEB01.
-Ils couvrent la documentation du déploiement LAN, le scan direct sans
-confirmation, la commande contrôlée de création d’administrateur, les artefacts
-d’accès WEB01, l’activation du montage SSHFS et la réconciliation de l’état DMZ.
+Le checkout WEB01 demeure propre au commit `c3711c2`. La branche distante de
+développement contient des commits plus récents qui ne sont pas encore déployés
+sur WEB01. Ils couvrent notamment la documentation du déploiement LAN, le scan
+direct sans confirmation, la commande contrôlée de création d’administrateur,
+les artefacts d’accès WEB01, l’activation du montage SSHFS et les réconciliations
+de l’état DMZ. Toujours comparer les SHA avant un déploiement.
 
 ## Effet de la segmentation sur Caddy et Gunicorn
 
 La configuration active reste correcte pour l’état transitoire : Caddy écoute
 sur le port 80 de WEB01 et transmet à Gunicorn sur `127.0.0.1:8000`. Le contrôle
 du 9 août a obtenu HTTP 302 directement auprès des deux services. Leur liaison
-locale n’explique donc pas la panne de `/healthz`.
+locale n’expliquait donc pas la panne initiale de `/healthz`.
 
 Si le proxy et l’application sont séparés conformément à l’architecture cible,
 ne pas réutiliser cette configuration telle quelle :
@@ -95,8 +95,13 @@ Ces résultats décrivent la validation initiale du 4 août à l’ancienne adre
 `10.10.20.10` dans la DMZ. Gunicorn et Caddy répondaient toujours localement,
 mais les connexions TCP vers PostgreSQL à `192.168.18.30:5432` et vers
 `10.10.40.10:5432` expiraient. `/healthz` bloquait et les journaux Gunicorn
-montraient des workers arrêtés puis relancés après timeout. Rétablir et limiter
-le flux PostgreSQL avant tout redéploiement ou nouvelle affirmation de santé.
+montraient des workers arrêtés puis relancés après timeout.
+
+Plus tard le 9 août, une règle pfSense limitée de WEB01 `10.10.20.10` vers
+SQL01 `192.168.18.30:5432` a rétabli le transport. PostgreSQL observait la source
+NAT `192.168.18.41`; après mise à jour et rechargement de la règle HBA `/32`, les
+contrôles TCP 5432, Gunicorn `/healthz` et Caddy `/healthz` ont tous réussi. Les
+deux réponses de santé rapportaient `status: ok` et `database: ok`.
 
 ## Vérifications après un redéploiement
 
@@ -111,18 +116,16 @@ Effectuer ensuite la checklist fonctionnelle de `docs/SMOKE_TEST.md`.
 
 ## Suite
 
-1. rétablir le flux TCP 5432 minimal de WEB01 vers SQL01 et obtenir un
-   `/healthz` réussi;
-2. vérifier si le premier administrateur production existe déjà, puis utiliser
+1. vérifier si le premier administrateur production existe déjà, puis utiliser
    au besoin la commande interactive `flask create-admin` documentée dans
    `docs/PRODUCTION_DATABASE.md`, sans journaliser le mot de passe;
-3. produire et vérifier une première sauvegarde PostgreSQL;
-4. ajouter `ludotheque.home.arpa` au DNS local;
-5. exécuter le smoke test fonctionnel complet;
-6. préparer HTTPS, puis seulement alors activer
+2. produire et vérifier une première sauvegarde PostgreSQL;
+3. ajouter `ludotheque.home.arpa` au DNS local;
+4. exécuter le smoke test fonctionnel complet;
+5. préparer HTTPS, puis seulement alors activer
    `SESSION_COOKIE_SECURE=true`, `REMEMBER_COOKIE_SECURE=true` et
    `TRUST_PROXY_HEADERS=true`;
-7. fusionner la branche de stabilisation vers `main` après validation.
+6. fusionner la branche de stabilisation vers `main` après validation.
 
 Le service demeure en HTTP LAN. Il ne doit pas être présenté comme une
 publication Internet ou un déploiement HTTPS.

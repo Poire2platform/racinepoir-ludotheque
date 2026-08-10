@@ -48,14 +48,19 @@ Le rôle doit avoir `false` pour superuser, création de base et création de r�
 
 ## 3. Restreindre l’accès réseau
 
-Depuis le déplacement de WEB01 dans la DMZ, confirmer d’abord dans les journaux
-PostgreSQL l’adresse source réellement reçue après routage. Si elle est bien
-`10.10.20.10`, remplacer l’ancienne autorisation `192.168.18.38/32` par la règle
-ciblée suivante :
+Depuis le déplacement de WEB01 dans la DMZ, les journaux PostgreSQL ont confirmé
+que le NAT sortant pfSense présente temporairement la source `192.168.18.41`, et
+non l’adresse propre de WEB01 `10.10.20.10`. L’ancienne autorisation
+`192.168.18.38/32` a donc été remplacée par la règle ciblée suivante :
 
 ```text
-hostssl  racinepoir_ludotheque_prod  racinepoir_prod  10.10.20.10/32  scram-sha-256
+hostssl  racinepoir_ludotheque_prod  racinepoir_prod  192.168.18.41/32  scram-sha-256
 ```
+
+Cette source NAT demeure acceptable pour l’état transitoire seulement parce que
+la règle pfSense limite TCP 5432 à WEB01 `10.10.20.10` vers SQL01
+`192.168.18.30`. Si le NAT est retiré, remettre simultanément la règle HBA à
+`10.10.20.10/32` après confirmation dans les journaux PostgreSQL.
 
 Ne pas ajouter de règle publique ou de sous-réseau plus large. Valider puis
 recharger la configuration :
@@ -77,9 +82,11 @@ PGSSLMODE=require psql --host=192.168.18.30 --username=racinepoir_prod --dbname=
 La connexion doit annoncer SSL. Une connexion depuis une autre machine ne doit
 pas être autorisée par une règle plus large.
 
-Au contrôle du 9 août, TCP 5432 expirait avant d’atteindre PostgreSQL. La règle
-pfSense entre DMZ et SQL01 doit donc être créée ou corrigée avant de conclure à
-un problème `pg_hba.conf`. Si SQL01 est ensuite déplacé dans le réseau DB,
+Au premier contrôle du 9 août, TCP 5432 expirait avant d’atteindre PostgreSQL.
+Une règle pfSense limitée à WEB01 vers SQL01:5432 a ensuite rétabli le transport;
+les journaux PostgreSQL ont révélé la source NAT `192.168.18.41`, puis la règle
+HBA corrigée et rechargée a permis à `/healthz` de retourner `database: ok`. Si
+SQL01 est ensuite déplacé dans le réseau DB,
 mettre simultanément à jour son adresse, la règle pfSense, `pg_hba.conf` et
 `DATABASE_URL`, puis refaire ce test.
 
