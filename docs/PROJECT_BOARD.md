@@ -172,7 +172,7 @@ de l’administration système.
 |---|---|---|---|
 | WEB-01 | `DONE` | Confirmer le VMID de WEB01 | VM `104` |
 | WEB-02 | `DONE` | Activer le démarrage automatique de la VM | VM `WEB01` (104), `onboot: 1` vérifié dans Proxmox |
-| WEB-03 | `NEXT` | Prendre un snapshot propre | Snapshot visible |
+| WEB-03 | `DONE` | Prendre un snapshot propre | `web01-post-deploy-20260810` visible; santé confirmée après création |
 | WEB-04 | `DONE` | Installer les paquets système | Déploiement opérationnel |
 | WEB-05 | `DONE` | Rétablir et tester WEB01 → SQL01 après segmentation | TCP 5432, Gunicorn `/healthz` et Caddy `/healthz` réussis depuis WEB01 |
 | WEB-06 | `DONE` | Choisir l’utilisateur système | Service sous `pmax`, sans root |
@@ -331,7 +331,7 @@ checkpoint et séparation stricte entre infrastructure et code.
 
 1. `WEB-16` — terminer la validation de l’accès dédié par un essai contrôlé de
    révocation; le test de santé est maintenant réussi.
-2. `WEB-03` — prendre un snapshot propre de la VM `WEB01`.
+2. surveiller la capacité du thin-pool signalée par Proxmox lors du snapshot.
 
 Après ce sprint, décider `D-02` avant d’entamer `PUB-02` à `PUB-10`.
 

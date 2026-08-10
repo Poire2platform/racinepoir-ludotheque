@@ -45,6 +45,10 @@ déploiement a été effectué par fast-forward depuis `c3711c2`, suivi de la
 vérification Alembic au head `b7c3d4e5f6a7`, d’un redémarrage contrôlé et de
 contrôles `/healthz` réussis par Gunicorn et Caddy.
 
+Le snapshot Proxmox `web01-post-deploy-20260810` a été créé le 10 août sans état
+RAM, après le premier dump production vérifié. WEB01 est demeurée active et
+`/healthz` a de nouveau rapporté `status: ok` et `database: ok` après sa création.
+
 Le compte dédié ne pouvait pas terminer un `git fetch` HTTPS non interactif.
 Les objets du commit exact ont donc été transférés dans un bundle Git vérifié
 par SSH, puis le fast-forward a été exécuté par `pmax`, propriétaire des fichiers

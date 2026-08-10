@@ -82,6 +82,18 @@ La VM `100` possède le snapshot `pfsense-bootstrap-stable`. Il correspond à
 l’état fonctionnel après installation, bootstrap et validation du WAN, du NAT
 et du DNS.
 
+## Snapshot WEB01
+
+La VM `WEB01` (104) possède le snapshot `web01-post-deploy-20260810`, créé sans
+état RAM après le déploiement du commit `4329325`, la validation Alembic, la
+création de l’administrateur production et le premier dump vérifié. La santé de
+l’application et de la base a été confirmée après le snapshot.
+
+Proxmox a averti que la somme des tailles virtuelles des volumes thin
+surprovisionnés dépasse la capacité physique du thin-pool et du volume group.
+Le snapshot a réussi, mais la consommation réelle de `local-lvm` doit demeurer
+surveillée et aucun nouveau surprovisionnement ne doit être banalisé.
+
 ## Stockage Poire1-Proxmox
 
 - Le disque virtuel de `Poire1_PROX` est passé de 80 Gio à 200 Gio.
