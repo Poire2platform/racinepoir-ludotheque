@@ -113,12 +113,13 @@ temporairement avec `ip`. Elle n’est pas persistante dans
 
 ## Cible applicative
 
-Le flux prévu après configuration des règles est :
+Le flux public retenu après configuration des règles est :
 
 ```text
 Internet
-  -> WAN TCP 443
-  -> reverse proxy dans DMZ
+  -> Cloudflare HTTPS
+  -> tunnel sortant cloudflared sur WEB01
+  -> Caddy dans DMZ
   -> application Flask / Gunicorn dans APP
   -> PostgreSQL dans DB sur TCP 5432
 ```
@@ -126,8 +127,9 @@ Internet
 Caddy est installé sur WEB01 et écoute actuellement sur toutes ses interfaces
 au port 80. Gunicorn écoute seulement sur `127.0.0.1:8000`; ce couple convient
 à l’état transitoire où proxy et application partagent WEB01 dans la DMZ. Le
-domaine public envisagé est `ludotheque.filsdepoire.ca`, avec DNS public
-probablement géré par Cloudflare.
+domaine public retenu est `ludotheque.filsdepoire.ca`, avec DNS public et tunnel
+gérés dans Cloudflare. La procédure est versionnée dans
+`docs/CLOUDFLARE_TUNNEL.md`.
 
 Dans la cible segmentée, le reverse proxy demeure dans la DMZ et l’application
 est déplacée dans APP. À ce moment seulement, Gunicorn devra écouter l’adresse
@@ -143,7 +145,8 @@ Le chemin contrôlé transitoire entre WEB01 et SQL01 est rétabli. Préparer et
 valider ensuite les autres règles minimales :
 
 1. MGMT vers les interfaces d’administration nécessaires;
-2. WAN TCP 443 vers le futur reverse proxy en DMZ;
+2. sorties WEB01 TCP/UDP 7844 vers Cloudflare Tunnel et TCP 443 pour le dépôt et
+   l’API Cloudflare; aucune redirection WAN entrante 80/443;
 3. reverse proxy DMZ vers l’application dans APP;
 4. état transitoire validé : WEB01 `10.10.20.10` vers SQL01 `192.168.18.30` sur
    TCP 5432, avec `pg_hba.conf` limité à la source NAT observée

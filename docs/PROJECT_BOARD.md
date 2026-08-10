@@ -229,7 +229,7 @@ DB-01 → DB-05
 
 | ID | Statut | Tâche | Critère d’acceptation |
 |---|---|---|---|
-| PUB-01 | `BLOCKED` | Choisir la méthode d’exposition | Tunnel ou redirection |
+| PUB-01 | `DONE` | Choisir la méthode d’exposition | Cloudflare Tunnel retenu par D-02 |
 | PUB-02 | `NEXT` | Configurer le DNS public | Domaine résolu |
 | PUB-03 | `NEXT` | Configurer HTTPS | Certificat valide |
 | PUB-04 | `NEXT` | Configurer les cookies production | Secure, HttpOnly, SameSite |
@@ -294,6 +294,10 @@ A. Redirection 80/443
 B. Cloudflare Tunnel
 C. Accès privé seulement
 ```
+
+**Décision : B — Cloudflare Tunnel vers Caddy sur WEB01.** Aucun port entrant
+80/443 ne sera redirigé vers WEB01. Le token demeure privé hors dépôt selon
+`docs/CLOUDFLARE_TUNNEL.md`.
 
 ## D-03 — Scan direct (`CLOSED`)
 

@@ -4,6 +4,7 @@ from pathlib import Path
 
 
 ACCESS_DIR = Path(__file__).parents[1] / "deploy" / "web01-access"
+CLOUDFLARED_SERVICE = Path(__file__).parents[1] / "deploy" / "cloudflared.service"
 
 
 def test_web01_access_scripts_are_executable_and_valid_bash():
@@ -39,3 +40,14 @@ def test_installation_preserves_private_environment_and_python_environment():
     assert 'no-agent-forwarding,no-port-forwarding,no-X11-forwarding,no-user-rc' in installer
     assert '-path "$APP_DIR/.env" -o -path "$APP_DIR/.venv"' in installer
     assert '/usr/bin/chmod 0600 "$APP_DIR/.env"' in installer
+
+
+def test_cloudflared_service_uses_a_private_token_file():
+    service = CLOUDFLARED_SERVICE.read_text()
+
+    assert "User=cloudflared" in service
+    assert "--token-file /etc/cloudflared/tunnel-token" in service
+    assert "--token " not in service
+    assert "Environment=" not in service
+    assert "NoNewPrivileges=true" in service
+    assert "ProtectSystem=strict" in service
