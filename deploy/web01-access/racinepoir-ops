@@ -6,6 +6,8 @@ APP_USER=pmax
 DEPLOY_USER=deploy-racinepoir
 SERVICE_NAME=racinepoir.service
 COLLECTION_SOURCE=/var/tmp/racinepoir-official-collection.html
+PRIVATE_IMPORT_DIR=/var/lib/racinepoir-import
+PRIVATE_COLLECTION_SOURCE=$PRIVATE_IMPORT_DIR/Anouk.html
 BACKUP_DIR=/var/backups/racinepoir
 
 fail() {
@@ -113,10 +115,14 @@ case "$command_name" in
         [[ $(/usr/bin/stat -c %a "$COLLECTION_SOURCE") == 600 ]] || \
             fail "la source doit être protégée en mode 600"
         /usr/bin/install --directory --owner "$APP_USER" --group "$APP_USER" \
+            --mode 0700 "$PRIVATE_IMPORT_DIR"
+        /usr/bin/install --owner "$APP_USER" --group "$APP_USER" --mode 0600 \
+            "$COLLECTION_SOURCE" "$PRIVATE_COLLECTION_SOURCE"
+        /usr/bin/install --directory --owner "$APP_USER" --group "$APP_USER" \
             --mode 0700 "$BACKUP_DIR"
         /usr/bin/systemctl stop "$SERVICE_NAME"
         if ! run_as_app "$APP_DIR/.venv/bin/flask" replace-official-collection \
-            --source "$COLLECTION_SOURCE" \
+            --source "$PRIVATE_COLLECTION_SOURCE" \
             --backup-dir "$BACKUP_DIR" \
             --confirm REMPLACER-LA-COLLECTION-OFFICIELLE; then
             /usr/bin/systemctl start "$SERVICE_NAME"
