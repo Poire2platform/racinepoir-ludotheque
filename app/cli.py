@@ -21,8 +21,9 @@ def register_commands(app):
     @app.cli.command("replace-official-collection")
     @click.option("--source", type=click.Path(exists=True, dir_okay=False), required=True)
     @click.option("--backup-dir", type=click.Path(file_okay=False), required=True)
+    @click.option("--existing-backup-reference", default=None, metavar="REFERENCE")
     @click.option("--confirm", required=True, metavar="PHRASE")
-    def replace_official_collection(source, backup_dir, confirm):
+    def replace_official_collection(source, backup_dir, existing_backup_reference, confirm):
         """Sauvegarde puis remplace la collection officielle en conservant les comptes."""
         if confirm != "REMPLACER-LA-COLLECTION-OFFICIELLE":
             raise click.ClickException("Phrase de confirmation invalide.")
@@ -32,32 +33,36 @@ def register_commands(app):
         if parsed.scheme not in {"postgresql", "postgresql+psycopg2"}:
             raise click.ClickException("Cette commande exige PostgreSQL.")
 
-        backup_path = Path(backup_dir)
-        backup_path.mkdir(mode=0o700, parents=True, exist_ok=True)
-        timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-        dump_path = backup_path / f"racinepoir_ludotheque_prod-before-replace-{timestamp}.dump"
-        dump_env = os.environ.copy()
-        dump_env.update({
-            "PGHOST": parsed.hostname or "",
-            "PGPORT": str(parsed.port or 5432),
-            "PGUSER": unquote(parsed.username or ""),
-            "PGPASSWORD": unquote(parsed.password or ""),
-            "PGDATABASE": parsed.path.lstrip("/"),
-            "PGSSLMODE": "require",
-        })
-        try:
-            subprocess.run(
-                ["pg_dump", "--format=custom", "--file", str(dump_path)],
-                env=dump_env,
-                check=True,
-            )
-        except (OSError, subprocess.CalledProcessError) as error:
-            dump_path.unlink(missing_ok=True)
-            raise click.ClickException("La sauvegarde a échoué; aucune donnée supprimée.") from error
-        if not dump_path.is_file() or dump_path.stat().st_size == 0:
-            dump_path.unlink(missing_ok=True)
-            raise click.ClickException("La sauvegarde est vide; aucune donnée supprimée.")
-        dump_path.chmod(0o600)
+        if existing_backup_reference:
+            dump_description = f"sauvegarde existante confirmée : {existing_backup_reference}"
+        else:
+            backup_path = Path(backup_dir)
+            backup_path.mkdir(mode=0o700, parents=True, exist_ok=True)
+            timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+            dump_path = backup_path / f"racinepoir_ludotheque_prod-before-replace-{timestamp}.dump"
+            dump_env = os.environ.copy()
+            dump_env.update({
+                "PGHOST": parsed.hostname or "",
+                "PGPORT": str(parsed.port or 5432),
+                "PGUSER": unquote(parsed.username or ""),
+                "PGPASSWORD": unquote(parsed.password or ""),
+                "PGDATABASE": parsed.path.lstrip("/"),
+                "PGSSLMODE": "require",
+            })
+            try:
+                subprocess.run(
+                    ["pg_dump", "--format=custom", "--file", str(dump_path)],
+                    env=dump_env,
+                    check=True,
+                )
+            except (OSError, subprocess.CalledProcessError) as error:
+                dump_path.unlink(missing_ok=True)
+                raise click.ClickException("La sauvegarde a échoué; aucune donnée supprimée.") from error
+            if not dump_path.is_file() or dump_path.stat().st_size == 0:
+                dump_path.unlink(missing_ok=True)
+                raise click.ClickException("La sauvegarde est vide; aucune donnée supprimée.")
+            dump_path.chmod(0o600)
+            dump_description = str(dump_path)
 
         mapping = {
             "Admin": "admin",
@@ -72,7 +77,7 @@ def register_commands(app):
             raise click.ClickException(
                 "Prérequis incomplets après sauvegarde; aucune donnée supprimée."
             )
-        click.echo(f"Sauvegarde : {dump_path}")
+        click.echo(f"Sauvegarde : {dump_description}")
         click.echo(f"Lignes importées : {report['rows']}")
         click.echo(f"Jeux créés : {report['new_games']}")
         click.echo(f"Boîtes créées : {report['new_boxes']}")

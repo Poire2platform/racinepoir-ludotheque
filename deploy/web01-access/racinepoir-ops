@@ -124,6 +124,7 @@ case "$command_name" in
         if ! run_as_app "$APP_DIR/.venv/bin/flask" replace-official-collection \
             --source "$PRIVATE_COLLECTION_SOURCE" \
             --backup-dir "$BACKUP_DIR" \
+            --existing-backup-reference racinepoir_ludotheque_prod-20260810T165707Z.dump \
             --confirm REMPLACER-LA-COLLECTION-OFFICIELLE; then
             /usr/bin/systemctl start "$SERVICE_NAME"
             fail "le remplacement a échoué; consulter la sortie précédente"
