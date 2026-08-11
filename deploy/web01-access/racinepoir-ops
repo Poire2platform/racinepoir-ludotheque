@@ -3,7 +3,10 @@ set -euo pipefail
 
 APP_DIR=/opt/racinepoir
 APP_USER=pmax
+DEPLOY_USER=deploy-racinepoir
 SERVICE_NAME=racinepoir.service
+COLLECTION_SOURCE=/var/tmp/racinepoir-official-collection.html
+BACKUP_DIR=/var/backups/racinepoir
 
 fail() {
     printf 'Erreur: %s\n' "$*" >&2
@@ -58,6 +61,7 @@ Usage:
   sudo /usr/local/sbin/racinepoir-ops restart
   sudo /usr/local/sbin/racinepoir-ops migrate
   sudo /usr/local/sbin/racinepoir-ops create-admin [options non secrètes]
+  sudo /usr/local/sbin/racinepoir-ops replace-official-collection
 EOF
 }
 
@@ -98,6 +102,28 @@ case "$command_name" in
         shift
         require_clean_checkout
         run_as_app "$APP_DIR/.venv/bin/flask" create-admin "$@"
+        ;;
+    replace-official-collection)
+        require_argument_count 1 "$#"
+        require_clean_checkout
+        [[ -f "$COLLECTION_SOURCE" && ! -L "$COLLECTION_SOURCE" ]] || \
+            fail "source d’import absente ou invalide"
+        [[ $(/usr/bin/stat -c %U "$COLLECTION_SOURCE") == "$DEPLOY_USER" ]] || \
+            fail "la source doit appartenir à $DEPLOY_USER"
+        [[ $(/usr/bin/stat -c %a "$COLLECTION_SOURCE") == 600 ]] || \
+            fail "la source doit être protégée en mode 600"
+        /usr/bin/install --directory --owner "$APP_USER" --group "$APP_USER" \
+            --mode 0700 "$BACKUP_DIR"
+        /usr/bin/systemctl stop "$SERVICE_NAME"
+        if ! run_as_app "$APP_DIR/.venv/bin/flask" replace-official-collection \
+            --source "$COLLECTION_SOURCE" \
+            --backup-dir "$BACKUP_DIR" \
+            --confirm REMPLACER-LA-COLLECTION-OFFICIELLE; then
+            /usr/bin/systemctl start "$SERVICE_NAME"
+            fail "le remplacement a échoué; consulter la sortie précédente"
+        fi
+        /usr/bin/systemctl start "$SERVICE_NAME"
+        check_health
         ;;
     help|-h|--help)
         usage

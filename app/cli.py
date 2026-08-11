@@ -1,4 +1,9 @@
 import json
+import os
+import subprocess
+from datetime import datetime, timezone
+from pathlib import Path
+from urllib.parse import unquote, urlsplit
 
 import click
 from flask import current_app
@@ -7,12 +12,71 @@ from werkzeug.security import generate_password_hash
 
 from .extensions import db
 from .models import User
-from .collection_import import import_collection
+from .collection_import import import_collection, replace_collection
 from .routes import current_registration_invite
 from .bgg_bulk import apply_preview, build_preview
 
 
 def register_commands(app):
+    @app.cli.command("replace-official-collection")
+    @click.option("--source", type=click.Path(exists=True, dir_okay=False), required=True)
+    @click.option("--backup-dir", type=click.Path(file_okay=False), required=True)
+    @click.option("--confirm", required=True, metavar="PHRASE")
+    def replace_official_collection(source, backup_dir, confirm):
+        """Sauvegarde puis remplace la collection officielle en conservant les comptes."""
+        if confirm != "REMPLACER-LA-COLLECTION-OFFICIELLE":
+            raise click.ClickException("Phrase de confirmation invalide.")
+
+        database_url = current_app.config["SQLALCHEMY_DATABASE_URI"]
+        parsed = urlsplit(database_url)
+        if parsed.scheme not in {"postgresql", "postgresql+psycopg2"}:
+            raise click.ClickException("Cette commande exige PostgreSQL.")
+
+        backup_path = Path(backup_dir)
+        backup_path.mkdir(mode=0o700, parents=True, exist_ok=True)
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        dump_path = backup_path / f"racinepoir_ludotheque_prod-before-replace-{timestamp}.dump"
+        dump_env = os.environ.copy()
+        dump_env.update({
+            "PGHOST": parsed.hostname or "",
+            "PGPORT": str(parsed.port or 5432),
+            "PGUSER": unquote(parsed.username or ""),
+            "PGPASSWORD": unquote(parsed.password or ""),
+            "PGDATABASE": parsed.path.lstrip("/"),
+            "PGSSLMODE": "require",
+        })
+        try:
+            subprocess.run(
+                ["pg_dump", "--format=custom", "--file", str(dump_path)],
+                env=dump_env,
+                check=True,
+            )
+        except (OSError, subprocess.CalledProcessError) as error:
+            dump_path.unlink(missing_ok=True)
+            raise click.ClickException("La sauvegarde a échoué; aucune donnée supprimée.") from error
+        if not dump_path.is_file() or dump_path.stat().st_size == 0:
+            dump_path.unlink(missing_ok=True)
+            raise click.ClickException("La sauvegarde est vide; aucune donnée supprimée.")
+        dump_path.chmod(0o600)
+
+        mapping = {
+            "Admin": "admin",
+            "Anouk": "anouk",
+            "Anika": "anouk",
+            "Maxika": "maxika",
+            "Maxime": "admin",
+        }
+        report = replace_collection(source, mapping, "admin")
+        if report["missing_mappings"] or report["missing_users"]:
+            db.session.rollback()
+            raise click.ClickException(
+                "Prérequis incomplets après sauvegarde; aucune donnée supprimée."
+            )
+        click.echo(f"Sauvegarde : {dump_path}")
+        click.echo(f"Lignes importées : {report['rows']}")
+        click.echo(f"Jeux créés : {report['new_games']}")
+        click.echo(f"Boîtes créées : {report['new_boxes']}")
+
     @app.cli.command("preview-bgg-enrichment")
     @click.option("--output", type=click.Path(dir_okay=False), required=True)
     @click.option("--delay", type=click.FloatRange(min=0.0), default=2.0, show_default=True)

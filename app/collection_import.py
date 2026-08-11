@@ -7,7 +7,16 @@ from pathlib import Path
 from sqlalchemy import func
 
 from .extensions import db
-from .models import Box, BoxEvent, Game, User
+from .models import (
+    Box,
+    BoxEvent,
+    BoxRequest,
+    Game,
+    GameRating,
+    GameSession,
+    GameSessionParticipant,
+    User,
+)
 
 
 @dataclass(frozen=True)
@@ -221,3 +230,36 @@ def import_collection(source, user_mapping, default_holder_username, apply=False
     else:
         db.session.rollback()
     return report
+
+
+def replace_collection(source, user_mapping, default_holder_username):
+    """Replace collection data atomically while preserving users and profiles."""
+    # Validate the source and every required account before scheduling deletes.
+    preview = import_collection(
+        source,
+        user_mapping,
+        default_holder_username,
+        apply=False,
+    )
+    if preview["missing_mappings"] or preview["missing_users"]:
+        return preview
+
+    try:
+        db.session.query(GameSessionParticipant).delete()
+        db.session.query(GameSession).delete()
+        db.session.query(BoxEvent).delete()
+        db.session.query(BoxRequest).delete()
+        db.session.query(GameRating).delete()
+        db.session.query(Box).delete()
+        db.session.query(Game).delete()
+        db.session.flush()
+        db.session.expunge_all()
+        return import_collection(
+            source,
+            user_mapping,
+            default_holder_username,
+            apply=True,
+        )
+    except Exception:
+        db.session.rollback()
+        raise

@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from app.extensions import db
+from app.collection_import import replace_collection
 from app.models import Box, BoxEvent, Game
 
 
@@ -87,3 +88,43 @@ def test_collection_import_is_non_destructive_and_idempotent(app, make_user, tmp
     long_game = Game.query.filter_by(title="Long jeu").one()
     assert (long_game.min_playtime, long_game.max_playtime) == (120, None)
     assert db.session.get(Game, long_game.id) is long_game
+
+
+def test_replace_collection_preserves_users_and_replaces_games(app, make_user, tmp_path):
+    users = {
+        username: make_user(username, role="admin" if username == "admin" else "member")
+        for username in ("admin", "anouk", "maxika")
+    }
+    old_game = Game(title="Ancien jeu", normalized_title="ancien jeu")
+    db.session.add(old_game)
+    db.session.flush()
+    db.session.add(
+        Box(
+            display_name="Ancienne boîte",
+            game_id=old_game.id,
+            owner_user_id=users["admin"].id,
+            current_holder_user_id=users["admin"].id,
+            qr_code_token="old-box",
+        )
+    )
+    db.session.commit()
+
+    report = replace_collection(
+        create_source(tmp_path),
+        {
+            "Anouk": "anouk",
+            "Maxika": "maxika",
+            "Anika": "anouk",
+            "Maxime": "admin",
+        },
+        "admin",
+    )
+
+    assert report["rows"] == 4
+    assert Game.query.filter_by(title="Ancien jeu").first() is None
+    assert Box.query.filter_by(qr_code_token="old-box").first() is None
+    assert Game.query.count() == 4
+    assert Box.query.count() == 4
+    from app.models import User
+
+    assert set(users) <= {user.username for user in User.query.all()}
