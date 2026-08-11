@@ -66,9 +66,9 @@ def register_commands(app):
 
         mapping = {
             "Admin": "admin",
-            "Anouk": "anouk",
-            "Anika": "anouk",
-            "Maxika": "maxika",
+            "Anouk": "Anouk",
+            "Anika": "Anouk",
+            "Maxika": "Maxika",
             "Maxime": "admin",
         }
         report = replace_collection(source, mapping, "admin")
