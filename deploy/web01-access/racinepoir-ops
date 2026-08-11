@@ -9,6 +9,7 @@ COLLECTION_SOURCE=/var/tmp/racinepoir-official-collection.html
 PRIVATE_IMPORT_DIR=/var/lib/racinepoir-import
 PRIVATE_COLLECTION_SOURCE=$PRIVATE_IMPORT_DIR/Anouk.html
 BACKUP_DIR=/var/backups/racinepoir
+BGG_PREVIEW=$PRIVATE_IMPORT_DIR/bgg-preview.json
 
 fail() {
     printf 'Erreur: %s\n' "$*" >&2
@@ -64,6 +65,8 @@ Usage:
   sudo /usr/local/sbin/racinepoir-ops migrate
   sudo /usr/local/sbin/racinepoir-ops create-admin [options non secrètes]
   sudo /usr/local/sbin/racinepoir-ops replace-official-collection
+  sudo /usr/local/sbin/racinepoir-ops preview-bgg-enrichment
+  sudo /usr/local/sbin/racinepoir-ops apply-bgg-enrichment
 EOF
 }
 
@@ -131,6 +134,23 @@ case "$command_name" in
         fi
         /usr/bin/systemctl start "$SERVICE_NAME"
         check_health
+        ;;
+    preview-bgg-enrichment)
+        require_argument_count 1 "$#"
+        require_clean_checkout
+        /usr/bin/install --directory --owner "$APP_USER" --group "$APP_USER" \
+            --mode 0700 "$PRIVATE_IMPORT_DIR"
+        run_as_app "$APP_DIR/.venv/bin/flask" preview-bgg-enrichment \
+            --output "$BGG_PREVIEW" --delay 2
+        /usr/bin/chmod 0600 "$BGG_PREVIEW"
+        ;;
+    apply-bgg-enrichment)
+        require_argument_count 1 "$#"
+        require_clean_checkout
+        [[ -f "$BGG_PREVIEW" && ! -L "$BGG_PREVIEW" ]] || \
+            fail "aperçu BGG absent ou invalide"
+        run_as_app "$APP_DIR/.venv/bin/flask" apply-bgg-enrichment \
+            --manifest "$BGG_PREVIEW" --delay 2 --apply
         ;;
     help|-h|--help)
         usage
