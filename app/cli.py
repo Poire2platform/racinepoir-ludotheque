@@ -74,8 +74,13 @@ def register_commands(app):
         report = replace_collection(source, mapping, "admin")
         if report["missing_mappings"] or report["missing_users"]:
             db.session.rollback()
+            details = []
+            if report["missing_mappings"]:
+                details.append("correspondances : " + ", ".join(report["missing_mappings"]))
+            if report["missing_users"]:
+                details.append("comptes : " + ", ".join(report["missing_users"]))
             raise click.ClickException(
-                "Prérequis incomplets après sauvegarde; aucune donnée supprimée."
+                "Prérequis incomplets (" + "; ".join(details) + "); aucune donnée supprimée."
             )
         click.echo(f"Sauvegarde : {dump_description}")
         click.echo(f"Lignes importées : {report['rows']}")
