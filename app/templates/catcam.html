@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>CatCam</h2>
+<p>Vue en direct de l’espace extérieur clôturé des chats.</p>
+<div class="catcam-viewer">
+    <iframe
+        title="Vidéo en direct de CatCam"
+        src="{{ viewer_url }}"
+        allow="autoplay; fullscreen"
+        loading="eager"
+        referrerpolicy="same-origin"
+    ></iframe>
+</div>
+<style>
+.catcam-viewer {
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.catcam-viewer iframe {
+    border: 0;
+    display: block;
+    width: 100%;
+    height: min(72vh, 760px);
+}
+</style>
+{% endblock %}

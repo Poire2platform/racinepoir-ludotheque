@@ -481,6 +481,14 @@ def members():
     return render_template("members.html", members=members)
 
 
+@main.route("/catcam")
+def catcam():
+    return render_template(
+        "catcam.html",
+        viewer_url=current_app.config["CATCAM_VIEWER_URL"],
+    )
+
+
 @main.route("/members/<int:user_id>")
 @login_required
 def member_detail(user_id):

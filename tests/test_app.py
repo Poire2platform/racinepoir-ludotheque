@@ -1181,6 +1181,7 @@ def test_authenticated_navigation_smoke(
         "/me/owned-boxes",
         "/me/interested-boxes",
         "/members",
+        "/catcam",
         "/sessions",
         "/players",
         "/users",
@@ -1191,6 +1192,15 @@ def test_authenticated_navigation_smoke(
     for path in paths:
         response = client.get(path)
         assert response.status_code == 200, path
+
+
+def test_catcam_is_public_and_uses_same_origin_viewer(client):
+    response = client.get("/catcam")
+
+    assert response.status_code == 200
+    assert b">CatCam</a>" in response.data
+    assert b'src="/catcam-live/stream.html?src=catcam"' in response.data
+    assert b"192.168.18.49" not in response.data
 
 
 def test_mobile_navigation_structure_and_automatic_scan_process(

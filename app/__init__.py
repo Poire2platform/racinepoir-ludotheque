@@ -24,6 +24,10 @@ def create_app():
     app.config["REMEMBER_COOKIE_SECURE"] = os.getenv("REMEMBER_COOKIE_SECURE", "false").lower() == "true"
     app.config["REMEMBER_COOKIE_SAMESITE"] = os.getenv("REMEMBER_COOKIE_SAMESITE", "Lax")
     app.config["REGISTRATION_INVITE_ENABLED"] = os.getenv("REGISTRATION_INVITE_ENABLED", "false").lower() == "true"
+    app.config["CATCAM_VIEWER_URL"] = os.getenv(
+        "CATCAM_VIEWER_URL",
+        "/catcam-live/stream.html?src=catcam",
+    )
     app.config["REGISTRATION_INVITE_CODE"] = None
     app.config["REGISTRATION_INVITE_DAY"] = None
 
