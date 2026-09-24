@@ -4,568 +4,24 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{% block title %}RacinePoir{% endblock %}</title>
-<style>
-* {
-    box-sizing: border-box;
-}
-
-html {
-    min-height: 100%;
-}
-
-body {
-    min-height: 100vh;
-    margin: 0;
-    padding: 18px;
-    background: #1f2426;
-    color: #edf1ef;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 16px;
-    line-height: 1.5;
-}
-
-a {
-    color: #9fd7ff;
-}
-
-a:visited {
-    color: #c8b8ff;
-}
-
-a:focus-visible,
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-    outline: 4px solid #ffd66b;
-    outline-offset: 3px;
-}
-
-.skip-link {
-    position: fixed;
-    top: 8px;
-    left: 8px;
-    z-index: 100;
-    padding: 10px 14px;
-    background: #fff;
-    color: #111;
-    transform: translateY(-160%);
-}
-
-.skip-link:focus {
-    transform: translateY(0);
-}
-
-header,
-main {
-    width: min(1120px, 100%);
-    margin: 0 auto 14px;
-    padding: 16px;
-    background: #2b3133;
-    border: 4px double #687477;
-}
-
-main {
-    min-height: calc(100vh - 190px);
-}
-
-nav,
-form,
-table,
-section,
-div,
-ul,
-ol {
-    border: 3px double #526064;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.035);
-}
-
-nav {
-    margin-bottom: 10px;
-}
-
-.primary-nav,
-.member-nav,
-.scorebook-nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 14px;
-}
-
-.primary-nav a,
-.member-nav a,
-.scorebook-nav a {
-    display: inline-block;
-    padding: 4px 0;
-}
-
-.scorebook-nav {
-    width: fit-content;
-    max-width: 100%;
-    align-items: center;
-    border-color: #9a7a3f;
-    background: #443a25;
-}
-
-.scorebook-nav__label {
-    color: #ffe7a3;
-    font-size: 0.86rem;
-    font-weight: bold;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-}
-
-.inline-action,
-.logout-form {
-    display: inline;
-    border: 0;
-    padding: 0;
-    background: transparent;
-}
-
-.primary-action {
-    min-height: 44px;
-    padding: 10px 16px;
-    font-weight: bold;
-}
-
-.badge {
-    display: inline-block;
-    margin: 2px 3px 2px 0;
-    padding: 2px 8px;
-    border: 1px solid #8b999d;
-    border-radius: 999px;
-    background: #3b4447;
-    color: #f4f7f6;
-    font-size: 0.88rem;
-    font-weight: bold;
-    line-height: 1.4;
-}
-
-.badge--positive {
-    border-color: #75b98b;
-    background: #234b31;
-}
-
-.badge--warning {
-    border-color: #d8b25d;
-    background: #59471f;
-}
-
-.badge--danger {
-    border-color: #e18484;
-    background: #612d2d;
-}
-
-.badge--info {
-    border-color: #82b9dc;
-    background: #284a60;
-}
-
-.notice {
-    margin: 12px 0;
-    padding: 12px 14px;
-    border: 2px solid #829095;
-    background: #343c3f;
-}
-
-.notice h2,
-.notice h3,
-.notice p {
-    margin-top: 0;
-}
-
-.notice--error {
-    border-color: #e18484;
-    background: #532929;
-}
-
-.notice--success {
-    border-color: #75b98b;
-    background: #234b31;
-}
-
-.empty-state {
-    margin: 12px 0;
-    padding: 14px;
-    border: 2px dashed #829095;
-    background: #31383a;
-}
-
-.empty-state p:last-child {
-    margin-bottom: 0;
-}
-
-.view-switcher {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: center;
-    margin: 12px 0;
-    border-width: 1px;
-}
-
-.view-switcher button {
-    padding: 7px 12px;
-    border: 2px solid #829095;
-    background: #e5e9e7;
-}
-
-.view-switcher button[aria-pressed="true"] {
-    border-color: #9fd7ff;
-    background: #284a60;
-    color: #fff;
-}
-
-.game-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-    gap: 14px;
-    border: 0;
-    padding: 0;
-    background: transparent;
-}
-
-.collection-list-view {
-    border: 0;
-    padding: 0;
-    background: transparent;
-}
-
-.game-card {
-    display: flex;
-    min-width: 0;
-    flex-direction: column;
-    border: 2px solid #59676b;
-    padding: 0;
-    overflow: hidden;
-    background: #343b3d;
-}
-
-.game-card__cover,
-.game-card__placeholder {
-    width: 100%;
-    aspect-ratio: 3 / 4;
-    object-fit: contain;
-    border: 0;
-    border-bottom: 2px solid #59676b;
-    background: #202628;
-}
-
-.game-card__placeholder {
-    display: grid;
-    place-items: center;
-    color: #b9c5c8;
-    font-size: 3rem;
-    font-weight: bold;
-}
-
-.game-card__content {
-    flex: 1;
-    border: 0;
-    padding: 12px;
-    background: transparent;
-}
-
-.game-card__content h3 {
-    margin: 0 0 8px;
-}
-
-.game-card__content p {
-    margin: 4px 0;
-}
-
-[hidden] {
-    display: none !important;
-}
-
-.visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-
-.summary-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 10px;
-    border: 0;
-    padding: 0;
-    background: transparent;
-}
-
-.summary-card {
-    display: flex;
-    min-width: 0;
-    flex-direction: column;
-    gap: 7px;
-    border: 1px solid #59676b;
-    padding: 8px;
-    background: #343b3d;
-    text-decoration: none;
-}
-
-.summary-card img,
-.summary-card__placeholder {
-    display: grid;
-    width: 100%;
-    aspect-ratio: 3 / 2;
-    place-items: center;
-    object-fit: contain;
-    background: #202628;
-    color: #b9c5c8;
-    font-size: 2rem;
-    font-weight: bold;
-}
-
-.summary-empty {
-    color: #c8d0d2;
-}
-
-.inventory-heading {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px 18px;
-    align-items: center;
-    justify-content: space-between;
-    border: 0;
-    padding: 0;
-    background: transparent;
-}
-
-.inventory-heading h2 {
-    margin: 0;
-}
-
-.button-link {
-    display: inline-block;
-    padding: 8px 12px;
-    border: 2px solid #82b9dc;
-    background: #284a60;
-    color: #fff;
-    font-weight: bold;
-    text-decoration: none;
-}
-
-.inventory-tools {
-    margin: 14px 0;
-    border: 2px solid #59676b;
-    padding: 8px 10px;
-    background: #31383a;
-}
-
-.inventory-tools summary {
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.inventory-tools form {
-    margin-top: 10px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-th,
-td {
-    border: 1px solid #59676b;
-    padding: 8px;
-    vertical-align: top;
-}
-
-.table-scroll {
-    max-width: 100%;
-    overflow-x: auto;
-    overscroll-behavior-inline: contain;
-    cursor: grab;
-    touch-action: pan-x pan-y;
-    -webkit-overflow-scrolling: touch;
-}
-
-.table-scroll.is-dragging {
-    cursor: grabbing;
-    user-select: none;
-}
-
-#boxes-list-view table {
-    min-width: 720px;
-}
-
-#games-list-view table {
-    min-width: 900px;
-}
-
-.scroll-hint {
-    display: none;
-    color: #c8d0d2;
-    font-size: 0.88rem;
-}
-
-input,
-select,
-textarea,
-button {
-    max-width: 100%;
-    color: #111;
-    font: inherit;
-}
-
-input,
-select,
-textarea {
-    padding: 6px 8px;
-    border: 2px solid #829095;
-    background: #fff;
-}
-
-button,
-input[type="submit"] {
-    cursor: pointer;
-}
-
-code {
-    color: #ffe7a3;
-}
-
-pre {
-    white-space: pre-wrap;
-}
-
-.security-stat {
-    border-color: #9a7a3f;
-    background: rgba(255, 218, 139, 0.08);
-    margin: 12px 0;
-}
-
-.security-stat h4 {
-    margin-top: 0;
-}
-
-.security-stat strong {
-    color: #ffe7a3;
-}
-
-hr {
-    border: 0;
-    border-top: 3px double #687477;
-    margin: 16px 0;
-}
-
-body.anika-love {
-    background-color: #fff4f7;
-    background-image: repeating-linear-gradient(
-        -18deg,
-        rgba(255, 99, 132, 0.16) 0,
-        rgba(255, 99, 132, 0.16) 1.4em,
-        transparent 1.4em,
-        transparent 2.8em
-    );
-}
-
-body.anika-love::before {
-    content: "je t'aime je t'aime je t'aime je t'aime je t'aime je t'aime je t'aime je t'aime";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    overflow: hidden;
-    color: rgba(170, 0, 62, 0.18);
-    font-size: 24px;
-    line-height: 2.2;
-    word-spacing: 18px;
-    pointer-events: none;
-}
-
-.anika-button {
-    position: fixed;
-    left: 12px;
-    bottom: 12px;
-    z-index: 20;
-    border: 3px double #ffd1df;
-    background: #3a2c33;
-    color: #fff4f7;
-    padding: 8px 12px;
-}
-
-@media (max-width: 720px) {
-    body {
-        padding: 8px;
-        font-size: 15px;
-    }
-
-    header,
-    main {
-        padding: 10px;
-    }
-
-    table {
-        display: block;
-        overflow-x: auto;
-    }
-
-    .table-scroll table {
-        display: table;
-        overflow: visible;
-        font-size: 0.82rem;
-    }
-
-    .scroll-hint {
-        display: block;
-    }
-
-    h1 {
-        font-size: 1.55rem;
-        line-height: 1.2;
-    }
-
-    .primary-nav,
-    .member-nav,
-    .scorebook-nav {
-        gap: 4px 8px;
-    }
-
-    .primary-nav a,
-    .member-nav a,
-    .scorebook-nav a {
-        min-height: 40px;
-        padding: 8px 4px;
-    }
-
-    .scan-action .primary-action {
-        width: 100%;
-    }
-
-    .game-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 10px;
-    }
-}
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/themes/racinepoir.css') }}">
 </head>
 <body>
 <a class="skip-link" href="#main-content">Aller au contenu principal</a>
-<header>
-<h1>RacinePoir — Ludothèque</h1>
+<header class="site-header">
+<div class="site-brand">
+    <span class="site-brand__mark" aria-hidden="true">RP</span>
+    <h1>RacinePoir <span>La ludothèque</span></h1>
+</div>
 <nav class="primary-nav" aria-label="Navigation principale">
     <a href="/">Accueil</a>
     <a href="/boxes">Boîtes</a>
     <a href="/games">Jeux de référence</a>
     <a href="/catcam">CatCam</a>
     <a href="/security">Sécurité</a>
-    {% if current_user.is_authenticated %}
-        <a href="/members">Membres</a>
-    {% endif %}
-    {% if current_user.is_authenticated and current_user.role == "admin" %}
-        <a href="/users">Utilisateurs</a>
-    {% endif %}
+    {% if current_user.is_authenticated %}<a href="/members">Membres</a>{% endif %}
+    {% if current_user.is_authenticated and current_user.role == "admin" %}<a href="/users">Utilisateurs</a>{% endif %}
 </nav>
 {% if current_user.is_authenticated %}
 <nav class="scorebook-nav" aria-label="Carnet de pointage">
@@ -585,19 +41,17 @@ body.anika-love::before {
     <a href="/register">Inscription</a>
 {% endif %}
 </nav>
-<hr>
+<div class="account-status">
 {% if current_user.is_authenticated %}
-<p>
-    Connecté comme : <strong>{{ current_user.display_name }}</strong>
-</p>
-<form class="logout-form" method="post" action="/logout">
-    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-    <button type="submit">Déconnexion</button>
-</form>
+    <p>Connecté comme : <strong>{{ current_user.display_name }}</strong></p>
+    <form class="logout-form" method="post" action="/logout">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <button class="button button--quiet" type="submit">Déconnexion</button>
+    </form>
 {% else %}
-<p>Non connecté.</p>
+    <p>Non connecté.</p>
 {% endif %}
-<hr>
+</div>
 </header>
 <main id="main-content" tabindex="-1">{% block content %}{% endblock %}</main>
 <button class="anika-button" type="button" onclick="document.body.classList.toggle('anika-love')">Anika</button>
@@ -623,7 +77,6 @@ document.querySelectorAll("[data-view-switcher]").forEach((switcher) => {
 
     listButton.addEventListener("click", () => setView("list"));
     gridButton.addEventListener("click", () => setView("grid"));
-
     try {
         setView(window.localStorage.getItem(switcher.dataset.storageKey) === "grid" ? "grid" : "list");
     } catch (_error) {
@@ -644,19 +97,16 @@ document.querySelectorAll(".table-scroll").forEach((scroller) => {
         startScrollLeft = scroller.scrollLeft;
         scroller.classList.add("is-dragging");
     });
-
     window.addEventListener("mousemove", (event) => {
         if (!dragging) return;
         const distance = event.clientX - startX;
         if (Math.abs(distance) > 4) moved = true;
         scroller.scrollLeft = startScrollLeft - distance;
     });
-
     window.addEventListener("mouseup", () => {
         dragging = false;
         scroller.classList.remove("is-dragging");
     });
-
     scroller.addEventListener("click", (event) => {
         if (moved) {
             event.preventDefault();

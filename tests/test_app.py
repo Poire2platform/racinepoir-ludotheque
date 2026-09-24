@@ -1321,7 +1321,10 @@ def test_accessibility_foundations_are_present(
     assert b'autocomplete="username"' in login_response.data
     assert b'label for="login-password"' in login_response.data
     assert b'autocomplete="current-password"' in login_response.data
-    assert b":focus-visible" in login_response.data
+    assert b'css/base.css' in login_response.data
+    base_css_response = client.get("/static/css/base.css")
+    assert base_css_response.status_code == 200
+    assert b":focus-visible" in base_css_response.data
 
     owner = make_user("owner")
     make_box(owner)
