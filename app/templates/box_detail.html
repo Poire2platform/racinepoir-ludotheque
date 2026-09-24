@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ box.display_label }} — RacinePoir{% endblock %}
+{% block title %}{{ box.display_label }} — RacinePoir&amp;{% endblock %}
 {% block content %}
 <h2>{{ box.display_label }}</h2>
 <p><strong>Jeu référencé :</strong> {% if box.game %}<a href="/games/{{ box.game.id }}">{{ box.game.title }}</a>{% if box.game.is_bgg_recognized %} <strong>[BGG]</strong>{% endif %}{% else %}—{% endif %}</p>

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{% if mode == "edit" %}Modifier {{ box.display_label }}{% else %}Nouvelle boîte{% endif %} — RacinePoir{% endblock %}
+{% block title %}{% if mode == "edit" %}Modifier {{ box.display_label }}{% else %}Nouvelle boîte{% endif %} — RacinePoir&amp;{% endblock %}
 
 {% block content %}
 <h2>{% if mode == "edit" %}Modifier la boîte{% else %}Nouvelle boîte{% endif %}</h2>
