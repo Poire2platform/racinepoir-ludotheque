@@ -186,6 +186,18 @@ button:active, input[type="submit"]:active, .button:active, .button-link:active 
 }
 .security-stat { border-left-color: var(--color-accent); background: #f8edcf; }
 .security-stat strong, code { color: var(--color-primary); }
+.infra-diagram {
+    overflow: hidden;
+    border: 2px solid var(--color-mauve);
+    border-radius: var(--radius-card);
+    background: var(--color-page);
+    box-shadow: var(--shadow-card);
+}
+.infra-diagram figcaption {
+    color: var(--color-text);
+    border-top: 1px solid var(--color-mauve);
+    background: var(--color-surface);
+}
 .view-switcher {
     padding: 5px;
     border: 1px solid var(--color-border);

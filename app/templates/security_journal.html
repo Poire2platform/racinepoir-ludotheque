@@ -59,20 +59,30 @@
 </section>
 
 <section>
-    <h3>Schéma cible</h3>
-    <pre><code>Internet
-  ↓
-DNS / Cloudflare
-  ↓
-Reverse proxy HTTPS
-  ↓
-Application Flask
-  ↓
-Base de données privée</code></pre>
+    <h3>Architecture de sécurité actuelle</h3>
+    <figure class="infra-diagram">
+        <img
+            src="{{ url_for('static', filename='diagrams/security-architecture-public.svg') }}"
+            alt="Le visiteur rejoint Cloudflare en HTTPS. Un tunnel sortant transmet la requête à la zone Web protégée, puis une politique réseau limite l’accès aux données privées."
+            loading="lazy"
+            width="1120"
+            height="650"
+        >
+        <figcaption>
+            Vue publique simplifiée de l’architecture vérifiée. Les adresses,
+            ports de gestion et identifiants internes sont volontairement omis.
+        </figcaption>
+    </figure>
     <p>
         Le navigateur ne parle jamais directement à la base de données. Le public
-        arrive par HTTPS, puis le proxy transmet seulement les requêtes utiles à
-        l’application.
+        arrive par HTTPS chez Cloudflare. Un tunnel établi depuis l’intérieur
+        rejoint ensuite la zone Web; l’application n’accède aux données qu’à
+        travers une politique réseau limitée.
+    </p>
+    <p>
+        L’étape suivante prévue séparera aussi le reverse proxy, l’application
+        et la base dans trois zones distinctes. Le dessin ci-dessus décrit
+        l’état actuel, pas une cible présentée comme déjà terminée.
     </p>
     <div class="security-stat">
         <h4>Stat Simon : surface exposée</h4>

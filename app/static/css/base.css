@@ -211,6 +211,19 @@ th, td { padding: 9px; vertical-align: top; text-align: left; }
 #games-list-view table { min-width: 900px; }
 .scroll-hint { display: none; font-size: 0.88rem; }
 pre { white-space: pre-wrap; }
+.infra-diagram {
+    max-width: 100%;
+    margin: 20px 0;
+}
+.infra-diagram img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+.infra-diagram figcaption {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+}
 .anika-button {
     position: fixed;
     bottom: 12px;
