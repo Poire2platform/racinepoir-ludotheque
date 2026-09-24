@@ -1,17 +1,17 @@
 /* Swappable theme: colors, type personality, shapes, shadows and decoration. */
 :root {
-    --color-page: #f3efdf;
+    --color-page: #f3ecdf;
     --color-surface: #fffdf3;
     --color-surface-muted: #f3e7e6;
     --color-text: #34212c;
     --color-text-muted: #6c5862;
-    --color-primary: #692e48;
-    --color-primary-dark: #461c30;
-    --color-mauve: #8a627b;
-    --color-accent: #c48724;
-    --color-accent-dark: #815714;
-    --color-pistachio: #cbdc8b;
-    --color-pistachio-dark: #65753b;
+    --color-primary: #a34f2a;
+    --color-primary-dark: #642d19;
+    --color-mauve: #7f5d72;
+    --color-accent: #c48a32;
+    --color-accent-dark: #76501e;
+    --color-pistachio: #b9bda1;
+    --color-pistachio-dark: #5f6351;
     --color-danger: #9d3f43;
     --color-focus: #e2a526;
     --color-border: #d5c5bb;
@@ -20,17 +20,17 @@
     --radius-small: 8px;
     --radius-control: 11px;
     --radius-card: 18px;
-    --shadow-surface: 0 12px 30px rgb(70 28 48 / 11%);
-    --shadow-card: 0 5px 14px rgb(70 28 48 / 12%);
+    --shadow-surface: 0 12px 30px rgb(100 45 25 / 11%);
+    --shadow-card: 0 5px 14px rgb(100 45 25 / 12%);
     --shadow-button: 0 3px 0 var(--color-primary-dark);
 }
 body {
     color: var(--color-text);
     background-color: var(--color-page);
     background-image:
-        radial-gradient(circle at 12% 8%, rgb(203 220 139 / 48%) 0 5%, transparent 18%),
-        radial-gradient(circle at 92% 28%, rgb(138 98 123 / 18%) 0 7%, transparent 23%),
-        linear-gradient(135deg, transparent 0 48%, rgb(105 46 72 / 3%) 48% 52%, transparent 52% 100%);
+        radial-gradient(circle at 12% 8%, rgb(185 189 161 / 42%) 0 5%, transparent 18%),
+        radial-gradient(circle at 92% 28%, rgb(163 79 42 / 16%) 0 7%, transparent 23%),
+        linear-gradient(135deg, transparent 0 48%, rgb(127 93 114 / 4%) 48% 52%, transparent 52% 100%);
     background-size: auto, auto, 38px 38px;
 }
 a {
@@ -53,7 +53,7 @@ h2 { font-size: clamp(1.65rem, 3vw, 2.25rem); }
     background: var(--color-primary);
 }
 .site-header, main {
-    border: 1px solid rgb(105 46 72 / 16%);
+    border: 1px solid rgb(163 79 42 / 18%);
     border-radius: var(--radius-card);
     background: rgb(255 253 243 / 94%);
     box-shadow: var(--shadow-surface);
@@ -89,9 +89,9 @@ h2 { font-size: clamp(1.65rem, 3vw, 2.25rem); }
 }
 .member-nav {
     padding: 9px;
-    border: 1px solid #b9ca7d;
+    border: 1px solid #a8ad90;
     border-radius: 14px;
-    background: #edf2d2;
+    background: #e8e8d9;
 }
 .member-nav a:hover, .member-nav a:focus-visible {
     color: var(--color-primary-dark);
@@ -106,7 +106,7 @@ h2 { font-size: clamp(1.65rem, 3vw, 2.25rem); }
 .scorebook-nav__label { color: var(--color-accent-dark); }
 .scorebook-nav a:hover, .scorebook-nav a:focus-visible {
     color: var(--color-primary-dark);
-    background: #e8c269;
+    background: #dcb064;
 }
 .account-status { color: var(--color-text-muted); }
 section,
@@ -141,7 +141,7 @@ button, input[type="submit"], .button, .button-link {
 button:hover, input[type="submit"]:hover, .button:hover, .button-link:hover {
     color: var(--color-primary-dark);
     border-color: var(--color-accent-dark);
-    background: #e4ad42;
+    background: #c98a4e;
 }
 button:active, input[type="submit"]:active, .button:active, .button-link:active {
     box-shadow: 0 1px 0 var(--color-primary-dark);
@@ -177,7 +177,7 @@ button:active, input[type="submit"]:active, .button:active, .button-link:active 
     background: var(--color-surface-muted);
 }
 .notice--error { border-left-color: var(--color-danger); background: #f6ded9; }
-.notice--success { border-left-color: var(--color-pistachio-dark); background: #edf2d2; }
+.notice--success { border-left-color: var(--color-pistachio-dark); background: #e8e8d9; }
 .empty-state {
     border-style: dashed;
     color: var(--color-text-muted);
@@ -212,7 +212,7 @@ button:active, input[type="submit"]:active, .button:active, .button-link:active 
 }
 .game-card:hover, .summary-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 9px 20px rgb(70 28 48 / 18%);
+    box-shadow: 0 9px 20px rgb(100 45 25 / 18%);
 }
 .game-card__cover, .game-card__placeholder,
 .summary-card img, .summary-card__placeholder {
@@ -221,12 +221,12 @@ button:active, input[type="submit"]:active, .button:active, .button-link:active 
 }
 .game-card__placeholder, .summary-card__placeholder {
     color: var(--color-primary);
-    background-image: linear-gradient(135deg, #eef2d6, #eadde4);
+    background-image: linear-gradient(135deg, #e8e8d9, #eadde4);
 }
 .summary-card img, .summary-card__placeholder { border-radius: 11px; }
 .summary-empty, .scroll-hint { color: var(--color-text-muted); }
 .inventory-tools {
-    border: 1px solid #b9ca7d;
+    border: 1px solid #a8ad90;
     border-radius: var(--radius-small);
     background: #f1f4de;
 }
@@ -234,7 +234,7 @@ table { border: 1px solid var(--color-border); background: var(--color-surface);
 th, td { border-bottom: 1px solid #dfd3ca; }
 th { color: #fff; background: var(--color-primary); }
 tbody tr:nth-child(even) { background: #f8f1ea; }
-tbody tr:hover { background: #edf2d2; }
+tbody tr:hover { background: #e8e8d9; }
 .anika-button {
     border-color: #a66078;
     color: #fff4f7;
