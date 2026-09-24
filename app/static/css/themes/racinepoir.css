@@ -1,17 +1,17 @@
 /* Swappable theme: colors, type personality, shapes, shadows and decoration. */
 :root {
-    --color-page: #f3ecdf;
-    --color-surface: #fffdf3;
-    --color-surface-muted: #f3e7e6;
+    --color-page: #69454b;
+    --color-surface: #f0e1cb;
+    --color-surface-muted: #e8d2c5;
     --color-text: #34212c;
     --color-text-muted: #6c5862;
-    --color-primary: #a34f2a;
+    --color-primary: #9f4a25;
     --color-primary-dark: #642d19;
     --color-mauve: #7f5d72;
     --color-accent: #c48a32;
     --color-accent-dark: #76501e;
-    --color-pistachio: #b9bda1;
-    --color-pistachio-dark: #5f6351;
+    --color-pistachio: #c6d2ad;
+    --color-pistachio-dark: #58684b;
     --color-danger: #9d3f43;
     --color-focus: #e2a526;
     --color-border: #d5c5bb;
@@ -28,10 +28,11 @@ body {
     color: var(--color-text);
     background-color: var(--color-page);
     background-image:
-        radial-gradient(circle at 12% 8%, rgb(185 189 161 / 42%) 0 5%, transparent 18%),
-        radial-gradient(circle at 92% 28%, rgb(163 79 42 / 16%) 0 7%, transparent 23%),
-        linear-gradient(135deg, transparent 0 48%, rgb(127 93 114 / 4%) 48% 52%, transparent 52% 100%);
-    background-size: auto, auto, 38px 38px;
+        radial-gradient(circle at 18% 28%, rgb(245 220 190 / 16%) 0 1px, transparent 1.8px),
+        radial-gradient(circle at 74% 62%, rgb(67 31 40 / 18%) 0 1.2px, transparent 2px),
+        radial-gradient(circle at 42% 86%, rgb(214 170 145 / 11%) 0 1.5px, transparent 2.4px),
+        linear-gradient(118deg, rgb(255 226 196 / 5%), transparent 42%, rgb(72 30 40 / 9%));
+    background-size: 9px 11px, 13px 15px, 17px 19px, 100% 100%;
 }
 a {
     color: var(--color-primary);
@@ -53,9 +54,9 @@ h2 { font-size: clamp(1.65rem, 3vw, 2.25rem); }
     background: var(--color-primary);
 }
 .site-header, main {
-    border: 1px solid rgb(163 79 42 / 18%);
+    border: 1px solid rgb(159 74 37 / 18%);
     border-radius: var(--radius-card);
-    background: rgb(255 253 243 / 94%);
+    background: rgb(240 225 203 / 96%);
     box-shadow: var(--shadow-surface);
 }
 .site-header { border-top: 7px solid var(--color-primary); }
@@ -89,9 +90,9 @@ h2 { font-size: clamp(1.65rem, 3vw, 2.25rem); }
 }
 .member-nav {
     padding: 9px;
-    border: 1px solid #a8ad90;
+    border: 1px solid #a8b28e;
     border-radius: 14px;
-    background: #e8e8d9;
+    background: #dfe5cf;
 }
 .member-nav a:hover, .member-nav a:focus-visible {
     color: var(--color-primary-dark);
@@ -128,7 +129,7 @@ select, textarea {
     border: 2px solid #bba9ad;
     border-radius: var(--radius-small);
     color: var(--color-text);
-    background: #fffef9;
+    background: #f8eddd;
 }
 input:hover, select:hover, textarea:hover { border-color: var(--color-mauve); }
 button, input[type="submit"], .button, .button-link {
@@ -177,11 +178,11 @@ button:active, input[type="submit"]:active, .button:active, .button-link:active 
     background: var(--color-surface-muted);
 }
 .notice--error { border-left-color: var(--color-danger); background: #f6ded9; }
-.notice--success { border-left-color: var(--color-pistachio-dark); background: #e8e8d9; }
+.notice--success { border-left-color: var(--color-pistachio-dark); background: #dfe5cf; }
 .empty-state {
     border-style: dashed;
     color: var(--color-text-muted);
-    background: #faf6ec;
+    background: #eadcca;
 }
 .security-stat { border-left-color: var(--color-accent); background: #f8edcf; }
 .security-stat strong, code { color: var(--color-primary); }
@@ -189,7 +190,7 @@ button:active, input[type="submit"]:active, .button:active, .button-link:active 
     padding: 5px;
     border: 1px solid var(--color-border);
     border-radius: 14px;
-    background: #f2e8e5;
+    background: #e5d2ca;
 }
 .view-switcher button {
     border-color: transparent;
@@ -217,24 +218,24 @@ button:active, input[type="submit"]:active, .button:active, .button-link:active 
 .game-card__cover, .game-card__placeholder,
 .summary-card img, .summary-card__placeholder {
     border-bottom: 1px solid var(--color-border);
-    background: #eee8d5;
+    background: #e5d7c1;
 }
 .game-card__placeholder, .summary-card__placeholder {
     color: var(--color-primary);
-    background-image: linear-gradient(135deg, #e8e8d9, #eadde4);
+    background-image: linear-gradient(135deg, #dfe5cf, #dfccd5);
 }
 .summary-card img, .summary-card__placeholder { border-radius: 11px; }
 .summary-empty, .scroll-hint { color: var(--color-text-muted); }
 .inventory-tools {
-    border: 1px solid #a8ad90;
+    border: 1px solid #a8b28e;
     border-radius: var(--radius-small);
-    background: #f1f4de;
+    background: #dfe5cf;
 }
 table { border: 1px solid var(--color-border); background: var(--color-surface); }
 th, td { border-bottom: 1px solid #dfd3ca; }
 th { color: #fff; background: var(--color-primary); }
-tbody tr:nth-child(even) { background: #f8f1ea; }
-tbody tr:hover { background: #e8e8d9; }
+tbody tr:nth-child(even) { background: #eadbc8; }
+tbody tr:hover { background: #dfe5cf; }
 .anika-button {
     border-color: #a66078;
     color: #fff4f7;
