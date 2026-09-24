@@ -1316,6 +1316,7 @@ def test_accessibility_foundations_are_present(
     login_response = client.get("/login")
     assert b'href="#main-content"' in login_response.data
     assert b'id="main-content" tabindex="-1"' in login_response.data
+    assert b'rel="icon" type="image/x-icon" href="/static/favicon.ico"' in login_response.data
     assert b'label for="login-username"' in login_response.data
     assert b'id="login-username"' in login_response.data
     assert b'autocomplete="username"' in login_response.data
