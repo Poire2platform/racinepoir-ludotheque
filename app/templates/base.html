@@ -6,7 +6,7 @@
 <title>{% block title %}RacinePoir&amp;{% endblock %}</title>
 <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/themes/racinepoir.css', v='night-demon-3') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/themes/racinepoir.css', v='bloc-1') }}">
 </head>
 <body>
 <a class="skip-link" href="#main-content">Aller au contenu principal</a>
@@ -58,18 +58,23 @@
 <div class="theme-controls" aria-label="Habillage visuel">
     <button class="anika-button" type="button" aria-pressed="false">Anika</button>
     <button class="dark-button" type="button" aria-pressed="false">Dark</button>
+    <button class="bloc-button" type="button" aria-pressed="false">Bloc</button>
 </div>
 <script>
 const anikaButton = document.querySelector(".anika-button");
 const darkButton = document.querySelector(".dark-button");
+const blocButton = document.querySelector(".bloc-button");
 
 const setVisualTheme = (theme) => {
     const showAnika = theme === "anika";
     const showDark = theme === "dark";
+    const showBloc = theme === "bloc";
     document.body.classList.toggle("anika-love", showAnika);
     document.body.classList.toggle("night-demon", showDark);
+    document.body.classList.toggle("bloc-theme", showBloc);
     anikaButton.setAttribute("aria-pressed", String(showAnika));
     darkButton.setAttribute("aria-pressed", String(showDark));
+    blocButton.setAttribute("aria-pressed", String(showBloc));
     try {
         if (theme) window.localStorage.setItem("racinepoir-theme", theme);
         else window.localStorage.removeItem("racinepoir-theme");
@@ -84,9 +89,12 @@ anikaButton.addEventListener("click", () => {
 darkButton.addEventListener("click", () => {
     setVisualTheme(document.body.classList.contains("night-demon") ? null : "dark");
 });
+blocButton.addEventListener("click", () => {
+    setVisualTheme(document.body.classList.contains("bloc-theme") ? null : "bloc");
+});
 try {
     const savedTheme = window.localStorage.getItem("racinepoir-theme");
-    setVisualTheme(savedTheme === "dark" || savedTheme === "anika" ? savedTheme : null);
+    setVisualTheme(["dark", "anika", "bloc"].includes(savedTheme) ? savedTheme : null);
 } catch (_error) {
     setVisualTheme(null);
 }
