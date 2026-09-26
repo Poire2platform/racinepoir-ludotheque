@@ -461,7 +461,35 @@ body.night-demon th { color: #100d15; background: #91899d; }
 body.night-demon th,
 body.night-demon td { border-color: #352f3d; }
 body.night-demon tbody tr:nth-child(even) { background: #1e1a24; }
-body.night-demon tbody tr:hover { background: #28232f; }
+body.night-demon tbody tr:hover {
+    background:
+        linear-gradient(90deg, rgb(32 224 255 / 15%), rgb(25 88 255 / 7%) 45%, transparent 78%),
+        #28232f;
+    box-shadow: inset 3px 0 0 #f8fdff, inset 7px 0 12px rgb(43 222 255 / 42%);
+}
+body.night-demon #boxes-list-view tbody tr:nth-child(4n + 1) {
+    background:
+        linear-gradient(90deg, rgb(39 214 255 / 10%), transparent 48%),
+        #1c1923;
+}
+body.night-demon #boxes-list-view tbody tr:nth-child(4n + 1) td:first-child {
+    box-shadow: inset 2px 0 0 rgb(96 234 255 / 82%);
+}
+body.night-demon #boxes-list-view tbody tr:nth-child(4n + 1) td:first-child a,
+body.night-demon .game-card:nth-child(5n + 1) h3 a,
+body.night-demon .badge--info {
+    color: #f8fdff;
+    text-shadow: 0 0 3px #fff, 0 0 9px #36e4ff, 0 0 20px #175dff;
+}
+body.night-demon .badge--info {
+    border-color: #b9f7ff;
+    background: #1d6b91;
+    box-shadow: 0 0 4px rgb(255 255 255 / 65%), 0 0 12px rgb(54 228 255 / 58%);
+}
+body.night-demon .game-card:nth-child(5n + 1) {
+    border-color: #5b7a91;
+    box-shadow: 0 7px 18px rgb(0 0 0 / 32%), inset 0 1px 0 rgb(95 228 255 / 14%);
+}
 body.night-demon .infra-diagram { border-color: #655e71; background: #08070d; }
 body.night-demon .infra-diagram figcaption { border-color: #393341; background: #17141e; }
 @media (prefers-reduced-motion: reduce) {
