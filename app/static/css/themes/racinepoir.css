@@ -290,32 +290,35 @@ body.anika-love::before {
     pointer-events: none;
 }
 body.night-demon {
-    --color-page: #121019;
-    --color-surface: #211d2a;
-    --color-surface-muted: #2a2533;
-    --color-text: #ded9e5;
-    --color-text-muted: #aaa2b2;
-    --color-primary: #b0a7bd;
+    --color-page: #08070d;
+    --color-surface: #17141e;
+    --color-surface-muted: #211d29;
+    --color-text: #d6d0dc;
+    --color-text-muted: #9890a2;
+    --color-primary: #9d94aa;
     --color-primary-dark: #f8fdff;
-    --color-mauve: #776f84;
+    --color-mauve: #655e71;
     --color-accent: #f8fdff;
     --color-accent-dark: #63eaff;
-    --color-pistachio: #373140;
-    --color-pistachio-dark: #aaa1b6;
+    --color-pistachio: #292430;
+    --color-pistachio-dark: #91899d;
     --color-danger: #bf6177;
     --color-focus: #f8fdff;
-    --color-border: #4b4457;
+    --color-border: #393341;
     --shadow-surface: 0 14px 34px rgb(0 0 0 / 38%);
     --shadow-card: 0 7px 18px rgb(0 0 0 / 32%);
     --shadow-button: 0 3px 0 #0d0a13;
     color-scheme: dark;
-    background-color: #121019;
+    background-color: #08070d;
     background-image:
-        radial-gradient(circle at 85% 12%, rgb(43 221 255 / 13%) 0 1px, transparent 2px),
-        radial-gradient(circle at 16% 74%, rgb(35 86 255 / 13%) 0 1.2px, transparent 2.3px),
-        radial-gradient(circle at 42% 38%, rgb(225 218 234 / 8%) 0 1px, transparent 2px),
-        linear-gradient(135deg, #0e0b14, #1b1723 56%, #100e17);
-    background-size: 13px 15px, 19px 21px, 11px 13px, 100% 100%;
+        radial-gradient(ellipse at 12% 18%, rgb(91 82 106 / 24%) 0 3%, transparent 11%),
+        radial-gradient(ellipse at 76% 9%, rgb(71 64 85 / 20%) 0 4%, transparent 13%),
+        radial-gradient(ellipse at 34% 66%, rgb(83 74 97 / 22%) 0 3%, transparent 12%),
+        radial-gradient(ellipse at 91% 78%, rgb(94 84 109 / 18%) 0 3%, transparent 10%),
+        radial-gradient(circle at 85% 12%, rgb(43 221 255 / 11%) 0 1px, transparent 2px),
+        radial-gradient(circle at 16% 74%, rgb(35 86 255 / 11%) 0 1.2px, transparent 2.3px),
+        linear-gradient(137deg, #050509, #0d0a12 48%, #08070d);
+    background-size: 410px 330px, 520px 390px, 470px 420px, 560px 440px, 13px 15px, 19px 21px, 100% 100%;
 }
 body.night-demon::before {
     content: "";
@@ -336,14 +339,19 @@ body.night-demon main {
 }
 body.night-demon .site-header,
 body.night-demon main {
-    border-color: #4c4559;
-    background: rgb(30 26 39 / 96%);
+    border-color: #393341;
+    background-color: rgb(20 17 27 / 96%);
+    background-image:
+        radial-gradient(ellipse at 8% 4%, rgb(72 64 84 / 22%) 0 4%, transparent 20%),
+        radial-gradient(ellipse at 88% 22%, rgb(61 54 73 / 18%) 0 5%, transparent 24%),
+        radial-gradient(ellipse at 34% 96%, rgb(74 65 87 / 16%) 0 4%, transparent 22%),
+        linear-gradient(128deg, rgb(255 255 255 / 1.5%), transparent 34%, rgb(0 0 0 / 8%));
 }
-body.night-demon .site-header { border-top-color: #aca3ba; }
+body.night-demon .site-header { border-top-color: #8f879b; }
 body.night-demon .site-brand__mark {
-    border-color: #aaa2b7;
+    border-color: #8f879b;
     color: #f8fdff;
-    background: #2b2635;
+    background: #1c1823;
     box-shadow:
         2px 2px 0 #0d0a13,
         0 0 5px #fff,
@@ -355,11 +363,11 @@ body.night-demon h1,
 body.night-demon h2,
 body.night-demon h3,
 body.night-demon h4 {
-    color: #ded9e5;
+    color: #d6d0dc;
 }
-body.night-demon .site-brand h1 span { color: #aaa2b2; }
-body.night-demon a { color: #c7bfce; }
-body.night-demon a:visited { color: #aaa2b2; }
+body.night-demon .site-brand h1 span { color: #9890a2; }
+body.night-demon a { color: #b7afc0; }
+body.night-demon a:visited { color: #9890a2; }
 body.night-demon a:hover,
 body.night-demon .security-stat strong,
 body.night-demon code {
@@ -378,37 +386,37 @@ body.night-demon .member-nav,
 body.night-demon .scorebook-nav,
 body.night-demon .inventory-tools,
 body.night-demon .view-switcher {
-    border-color: #51495e;
-    background: #2a2533;
+    border-color: #403949;
+    background: #211d29;
 }
 body.night-demon .member-nav a:hover,
-body.night-demon .member-nav a:focus-visible { color: #f8fdff; background: #3a3346; }
+body.night-demon .member-nav a:focus-visible { color: #f8fdff; background: #2b2634; }
 body.night-demon section,
 body.night-demon main > div:not(.inventory-heading):not(.view-switcher):not(.table-scroll):not(.game-grid):not(.collection-list-view),
 body.night-demon .game-card,
 body.night-demon .summary-card,
 body.night-demon table {
-    border-color: #4b4457;
-    color: #ded9e5;
-    background: #211d2a;
+    border-color: #393341;
+    color: #d6d0dc;
+    background: #17141e;
 }
 body.night-demon input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
 body.night-demon select,
 body.night-demon textarea {
-    border-color: #655d72;
+    border-color: #504958;
     color: #eeeaf2;
-    background: #17131f;
+    background: #0d0b12;
 }
 body.night-demon input:hover,
 body.night-demon select:hover,
-body.night-demon textarea:hover { border-color: #aaa2b7; }
+body.night-demon textarea:hover { border-color: #8f879b; }
 body.night-demon button,
 body.night-demon input[type="submit"],
 body.night-demon .button,
 body.night-demon .button-link {
-    border-color: #81798e;
-    color: #17131f;
-    background: #aaa2b7;
+    border-color: #6d6579;
+    color: #100d15;
+    background: #91899d;
 }
 body.night-demon button:hover,
 body.night-demon input[type="submit"]:hover,
@@ -423,7 +431,7 @@ body.night-demon .view-switcher button[aria-pressed="true"] {
 body.night-demon .anika-button {
     border-color: #655d73;
     color: #c8c1d0;
-    background: #2a2533;
+    background: #211d29;
     box-shadow: 0 3px 0 #0d0a13;
 }
 body.night-demon .dark-button {
@@ -435,27 +443,27 @@ body.night-demon .dark-button {
 body.night-demon .notice,
 body.night-demon .empty-state,
 body.night-demon .security-stat { background: #2a2533; }
-body.night-demon .notice--error { background: #3a202b; }
-body.night-demon .notice--success { background: #29332f; }
+body.night-demon .notice--error { background: #2b1820; }
+body.night-demon .notice--success { background: #1e2824; }
 body.night-demon .game-card__cover,
 body.night-demon .game-card__placeholder,
 body.night-demon .summary-card img,
 body.night-demon .summary-card__placeholder {
-    border-color: #4b4457;
-    background-color: #181520;
+    border-color: #393341;
+    background-color: #0e0c13;
 }
 body.night-demon .game-card__placeholder,
 body.night-demon .summary-card__placeholder {
-    color: #ded9e5;
-    background-image: linear-gradient(135deg, #282330, #342d40);
+    color: #d6d0dc;
+    background-image: linear-gradient(135deg, #1b1721, #26212e);
 }
-body.night-demon th { color: #17131f; background: #aaa2b7; }
+body.night-demon th { color: #100d15; background: #91899d; }
 body.night-demon th,
-body.night-demon td { border-color: #453e50; }
-body.night-demon tbody tr:nth-child(even) { background: #28232f; }
-body.night-demon tbody tr:hover { background: #332d3e; }
-body.night-demon .infra-diagram { border-color: #776f84; background: #121019; }
-body.night-demon .infra-diagram figcaption { border-color: #4b4457; background: #211d2a; }
+body.night-demon td { border-color: #352f3d; }
+body.night-demon tbody tr:nth-child(even) { background: #1e1a24; }
+body.night-demon tbody tr:hover { background: #28232f; }
+body.night-demon .infra-diagram { border-color: #655e71; background: #08070d; }
+body.night-demon .infra-diagram figcaption { border-color: #393341; background: #17141e; }
 @media (prefers-reduced-motion: reduce) {
     .game-card, .summary-card { transition: none; }
 }
