@@ -6,7 +6,7 @@
 <title>{% block title %}RacinePoir&amp;{% endblock %}</title>
 <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/themes/racinepoir.css', v='diagram-1') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/themes/racinepoir.css', v='night-demon-1') }}">
 </head>
 <body>
 <a class="skip-link" href="#main-content">Aller au contenu principal</a>
@@ -55,8 +55,42 @@
 </div>
 </header>
 <main id="main-content" tabindex="-1">{% block content %}{% endblock %}</main>
-<button class="anika-button" type="button" onclick="document.body.classList.toggle('anika-love')">Anika</button>
+<div class="theme-controls" aria-label="Habillage visuel">
+    <button class="anika-button" type="button" aria-pressed="false">Anika</button>
+    <button class="dark-button" type="button" aria-pressed="false">Dark</button>
+</div>
 <script>
+const anikaButton = document.querySelector(".anika-button");
+const darkButton = document.querySelector(".dark-button");
+
+const setVisualTheme = (theme) => {
+    const showAnika = theme === "anika";
+    const showDark = theme === "dark";
+    document.body.classList.toggle("anika-love", showAnika);
+    document.body.classList.toggle("night-demon", showDark);
+    anikaButton.setAttribute("aria-pressed", String(showAnika));
+    darkButton.setAttribute("aria-pressed", String(showDark));
+    try {
+        if (theme) window.localStorage.setItem("racinepoir-theme", theme);
+        else window.localStorage.removeItem("racinepoir-theme");
+    } catch (_error) {
+        // Les thèmes restent utilisables sans stockage local.
+    }
+};
+
+anikaButton.addEventListener("click", () => {
+    setVisualTheme(document.body.classList.contains("anika-love") ? null : "anika");
+});
+darkButton.addEventListener("click", () => {
+    setVisualTheme(document.body.classList.contains("night-demon") ? null : "dark");
+});
+try {
+    const savedTheme = window.localStorage.getItem("racinepoir-theme");
+    setVisualTheme(savedTheme === "dark" || savedTheme === "anika" ? savedTheme : null);
+} catch (_error) {
+    setVisualTheme(null);
+}
+
 document.querySelectorAll("[data-view-switcher]").forEach((switcher) => {
     const listView = document.getElementById(switcher.dataset.listTarget);
     const gridView = document.getElementById(switcher.dataset.gridTarget);

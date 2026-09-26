@@ -224,11 +224,14 @@ pre { white-space: pre-wrap; }
     padding: 10px 12px;
     font-size: 0.9rem;
 }
-.anika-button {
+.theme-controls {
     position: fixed;
     bottom: 12px;
     left: 12px;
     z-index: 20;
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
 }
 @media (max-width: 720px) {
     body { padding: 8px; font-size: 15px; }
@@ -246,4 +249,6 @@ pre { white-space: pre-wrap; }
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
         gap: 12px;
     }
+    .theme-controls { bottom: 8px; left: 8px; gap: 6px; }
+    .theme-controls button { min-height: 40px; padding: 7px 11px; }
 }

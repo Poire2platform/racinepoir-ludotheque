@@ -254,6 +254,22 @@ tbody tr:hover { background: #dfe5cf; }
     background: #6d3048;
     box-shadow: 0 3px 0 #451d2c;
 }
+.dark-button {
+    border-color: #655d73;
+    color: #e7e1ec;
+    background: #211c2b;
+    box-shadow: 0 3px 0 #0d0a13;
+}
+.dark-button:hover,
+.dark-button[aria-pressed="true"] {
+    border-color: #f8fdff;
+    color: #101725;
+    background: #f8fdff;
+    box-shadow:
+        0 0 3px #fff,
+        0 0 12px #36e4ff,
+        0 0 26px #175dff;
+}
 body.anika-love {
     background-color: #fff4f7;
     background-image: repeating-linear-gradient(
@@ -273,6 +289,173 @@ body.anika-love::before {
     word-spacing: 18px;
     pointer-events: none;
 }
+body.night-demon {
+    --color-page: #121019;
+    --color-surface: #211d2a;
+    --color-surface-muted: #2a2533;
+    --color-text: #ded9e5;
+    --color-text-muted: #aaa2b2;
+    --color-primary: #b0a7bd;
+    --color-primary-dark: #f8fdff;
+    --color-mauve: #776f84;
+    --color-accent: #f8fdff;
+    --color-accent-dark: #63eaff;
+    --color-pistachio: #373140;
+    --color-pistachio-dark: #aaa1b6;
+    --color-danger: #bf6177;
+    --color-focus: #f8fdff;
+    --color-border: #4b4457;
+    --shadow-surface: 0 14px 34px rgb(0 0 0 / 38%);
+    --shadow-card: 0 7px 18px rgb(0 0 0 / 32%);
+    --shadow-button: 0 3px 0 #0d0a13;
+    color-scheme: dark;
+    background-color: #121019;
+    background-image:
+        radial-gradient(circle at 85% 12%, rgb(43 221 255 / 13%) 0 1px, transparent 2px),
+        radial-gradient(circle at 16% 74%, rgb(35 86 255 / 13%) 0 1.2px, transparent 2.3px),
+        radial-gradient(circle at 42% 38%, rgb(225 218 234 / 8%) 0 1px, transparent 2px),
+        linear-gradient(135deg, #0e0b14, #1b1723 56%, #100e17);
+    background-size: 13px 15px, 19px 21px, 11px 13px, 100% 100%;
+}
+body.night-demon::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 8% 12%, rgb(255 255 255 / 70%) 0 1px, rgb(46 225 255 / 32%) 2px, rgb(23 85 255 / 14%) 7px, transparent 38px),
+        radial-gradient(circle at 92% 68%, rgb(255 255 255 / 55%) 0 1px, rgb(38 218 255 / 24%) 2px, transparent 31px),
+        radial-gradient(circle at 68% 8%, rgb(34 91 255 / 11%), transparent 28%);
+    mix-blend-mode: screen;
+}
+body.night-demon .site-header,
+body.night-demon main {
+    position: relative;
+    z-index: 1;
+}
+body.night-demon .site-header,
+body.night-demon main {
+    border-color: #4c4559;
+    background: rgb(30 26 39 / 96%);
+}
+body.night-demon .site-header { border-top-color: #aca3ba; }
+body.night-demon .site-brand__mark {
+    border-color: #aaa2b7;
+    color: #f8fdff;
+    background: #2b2635;
+    box-shadow:
+        2px 2px 0 #0d0a13,
+        0 0 5px #fff,
+        0 0 14px #35e0ff,
+        0 0 30px #185cff;
+}
+body.night-demon .site-brand h1,
+body.night-demon h1,
+body.night-demon h2,
+body.night-demon h3,
+body.night-demon h4 {
+    color: #ded9e5;
+}
+body.night-demon .site-brand h1 span { color: #aaa2b2; }
+body.night-demon a { color: #c7bfce; }
+body.night-demon a:visited { color: #aaa2b2; }
+body.night-demon a:hover,
+body.night-demon .security-stat strong,
+body.night-demon code {
+    color: #f8fdff;
+    text-shadow: 0 0 3px #fff, 0 0 10px #36e4ff, 0 0 24px #175dff;
+}
+body.night-demon .primary-nav a:hover,
+body.night-demon .primary-nav a:focus-visible,
+body.night-demon .scorebook-nav a:hover,
+body.night-demon .scorebook-nav a:focus-visible {
+    color: #11101a;
+    background: #f8fdff;
+    box-shadow: 0 0 4px #fff, 0 0 13px #36e4ff, 0 0 28px #175dff;
+}
+body.night-demon .member-nav,
+body.night-demon .scorebook-nav,
+body.night-demon .inventory-tools,
+body.night-demon .view-switcher {
+    border-color: #51495e;
+    background: #2a2533;
+}
+body.night-demon .member-nav a:hover,
+body.night-demon .member-nav a:focus-visible { color: #f8fdff; background: #3a3346; }
+body.night-demon section,
+body.night-demon main > div:not(.inventory-heading):not(.view-switcher):not(.table-scroll):not(.game-grid):not(.collection-list-view),
+body.night-demon .game-card,
+body.night-demon .summary-card,
+body.night-demon table {
+    border-color: #4b4457;
+    color: #ded9e5;
+    background: #211d2a;
+}
+body.night-demon input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+body.night-demon select,
+body.night-demon textarea {
+    border-color: #655d72;
+    color: #eeeaf2;
+    background: #17131f;
+}
+body.night-demon input:hover,
+body.night-demon select:hover,
+body.night-demon textarea:hover { border-color: #aaa2b7; }
+body.night-demon button,
+body.night-demon input[type="submit"],
+body.night-demon .button,
+body.night-demon .button-link {
+    border-color: #81798e;
+    color: #17131f;
+    background: #aaa2b7;
+}
+body.night-demon button:hover,
+body.night-demon input[type="submit"]:hover,
+body.night-demon .button:hover,
+body.night-demon .button-link:hover,
+body.night-demon .view-switcher button[aria-pressed="true"] {
+    border-color: #fff;
+    color: #101725;
+    background: #f8fdff;
+    box-shadow: 0 0 4px #fff, 0 0 14px #36e4ff, 0 0 30px #175dff;
+}
+body.night-demon .anika-button {
+    border-color: #655d73;
+    color: #c8c1d0;
+    background: #2a2533;
+    box-shadow: 0 3px 0 #0d0a13;
+}
+body.night-demon .dark-button {
+    border-color: #f8fdff;
+    color: #101725;
+    background: #f8fdff;
+    box-shadow: 0 0 3px #fff, 0 0 12px #36e4ff, 0 0 26px #175dff;
+}
+body.night-demon .notice,
+body.night-demon .empty-state,
+body.night-demon .security-stat { background: #2a2533; }
+body.night-demon .notice--error { background: #3a202b; }
+body.night-demon .notice--success { background: #29332f; }
+body.night-demon .game-card__cover,
+body.night-demon .game-card__placeholder,
+body.night-demon .summary-card img,
+body.night-demon .summary-card__placeholder {
+    border-color: #4b4457;
+    background-color: #181520;
+}
+body.night-demon .game-card__placeholder,
+body.night-demon .summary-card__placeholder {
+    color: #ded9e5;
+    background-image: linear-gradient(135deg, #282330, #342d40);
+}
+body.night-demon th { color: #17131f; background: #aaa2b7; }
+body.night-demon th,
+body.night-demon td { border-color: #453e50; }
+body.night-demon tbody tr:nth-child(even) { background: #28232f; }
+body.night-demon tbody tr:hover { background: #332d3e; }
+body.night-demon .infra-diagram { border-color: #776f84; background: #121019; }
+body.night-demon .infra-diagram figcaption { border-color: #4b4457; background: #211d2a; }
 @media (prefers-reduced-motion: reduce) {
     .game-card, .summary-card { transition: none; }
 }
