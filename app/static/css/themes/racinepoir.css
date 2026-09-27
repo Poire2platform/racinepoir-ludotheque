@@ -358,6 +358,8 @@ body.night-demon::before {
     z-index: 0;
     pointer-events: none;
     background:
+        radial-gradient(ellipse at 50% 18%, rgb(41 204 255 / 14%), transparent 38%),
+        radial-gradient(ellipse at 56% 74%, rgb(29 100 255 / 12%), transparent 43%),
         radial-gradient(circle at 8% 12%, rgb(255 255 255 / 70%) 0 1px, rgb(46 225 255 / 32%) 2px, rgb(23 85 255 / 14%) 7px, transparent 38px),
         radial-gradient(circle at 92% 68%, rgb(255 255 255 / 55%) 0 1px, rgb(38 218 255 / 24%) 2px, transparent 31px),
         radial-gradient(circle at 68% 8%, rgb(34 91 255 / 11%), transparent 28%);
@@ -383,6 +385,7 @@ body.night-demon main {
         0 12px
     );
     filter:
+        drop-shadow(12px 22px 30px rgb(0 0 0 / 66%))
         drop-shadow(0 0 3px rgb(248 253 255 / 96%))
         drop-shadow(0 0 12px rgb(43 220 255 / 88%))
         drop-shadow(0 0 30px rgb(24 92 255 / 68%));
