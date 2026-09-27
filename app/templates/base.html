@@ -6,7 +6,7 @@
 <title>{% block title %}RacinePoir&amp;{% endblock %}</title>
 <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/themes/racinepoir.css', v='bloc-2') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/themes/racinepoir.css', v='theme-packaging-1') }}">
 </head>
 <body>
 <a class="skip-link" href="#main-content">Aller au contenu principal</a>
@@ -69,7 +69,7 @@ const setVisualTheme = (theme) => {
     const showAnika = theme === "anika";
     const showDark = theme === "dark";
     const showBloc = theme === "bloc";
-    document.body.classList.toggle("anika-love", showAnika);
+    document.body.classList.toggle("anika-theme", showAnika);
     document.body.classList.toggle("night-demon", showDark);
     document.body.classList.toggle("bloc-theme", showBloc);
     anikaButton.setAttribute("aria-pressed", String(showAnika));
@@ -84,19 +84,19 @@ const setVisualTheme = (theme) => {
 };
 
 anikaButton.addEventListener("click", () => {
-    setVisualTheme(document.body.classList.contains("anika-love") ? null : "anika");
+    setVisualTheme("anika");
 });
 darkButton.addEventListener("click", () => {
-    setVisualTheme(document.body.classList.contains("night-demon") ? null : "dark");
+    setVisualTheme(document.body.classList.contains("night-demon") ? "anika" : "dark");
 });
 blocButton.addEventListener("click", () => {
-    setVisualTheme(document.body.classList.contains("bloc-theme") ? null : "bloc");
+    setVisualTheme(document.body.classList.contains("bloc-theme") ? "anika" : "bloc");
 });
 try {
     const savedTheme = window.localStorage.getItem("racinepoir-theme");
-    setVisualTheme(["dark", "anika", "bloc"].includes(savedTheme) ? savedTheme : null);
+    setVisualTheme(["dark", "anika", "bloc"].includes(savedTheme) ? savedTheme : "anika");
 } catch (_error) {
-    setVisualTheme(null);
+    setVisualTheme("anika");
 }
 
 document.querySelectorAll("[data-view-switcher]").forEach((switcher) => {

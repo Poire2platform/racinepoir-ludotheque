@@ -283,24 +283,33 @@ tbody tr:hover { background: #dfe5cf; }
     background: #17625c;
     box-shadow: 0 3px 0 #103f3c;
 }
-body.anika-love {
-    background-color: #fff4f7;
-    background-image: repeating-linear-gradient(
-        -18deg, rgb(255 99 132 / 16%) 0, rgb(255 99 132 / 16%) 1.4em,
-        transparent 1.4em, transparent 2.8em
-    );
-}
-body.anika-love::before {
-    content: "je t'aime je t'aime je t'aime je t'aime je t'aime je t'aime je t'aime je t'aime";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    overflow: hidden;
-    color: rgb(170 0 62 / 18%);
-    font-size: 24px;
-    line-height: 2.2;
-    word-spacing: 18px;
-    pointer-events: none;
+/* Anika is the reference RacinePoir& design, packaged like the other themes. */
+body.anika-theme {
+    --color-page: #69454b;
+    --color-surface: #f0e1cb;
+    --color-surface-muted: #e8d2c5;
+    --color-text: #34212c;
+    --color-text-muted: #6c5862;
+    --color-primary: #9f4a25;
+    --color-primary-dark: #642d19;
+    --color-mauve: #7f5d72;
+    --color-accent: #c48a32;
+    --color-accent-dark: #76501e;
+    --color-pistachio: #c6d2ad;
+    --color-pistachio-dark: #58684b;
+    --color-danger: #9d3f43;
+    --color-focus: #e2a526;
+    --color-border: #d5c5bb;
+    --shadow-surface: 0 12px 30px rgb(100 45 25 / 11%);
+    --shadow-card: 0 5px 14px rgb(100 45 25 / 12%);
+    --shadow-button: 0 3px 0 var(--color-primary-dark);
+    background-color: #69454b;
+    background-image:
+        radial-gradient(circle at 18% 28%, rgb(245 220 190 / 16%) 0 1px, transparent 1.8px),
+        radial-gradient(circle at 74% 62%, rgb(67 31 40 / 18%) 0 1.2px, transparent 2px),
+        radial-gradient(circle at 42% 86%, rgb(214 170 145 / 11%) 0 1.5px, transparent 2.4px),
+        linear-gradient(118deg, rgb(255 226 196 / 5%), transparent 42%, rgb(72 30 40 / 9%));
+    background-size: 9px 11px, 13px 15px, 17px 19px, 100% 100%;
 }
 body.night-demon {
     --color-page: #08070d;
