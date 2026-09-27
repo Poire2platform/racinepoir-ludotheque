@@ -311,6 +311,15 @@ body.anika-theme {
         linear-gradient(118deg, rgb(255 226 196 / 5%), transparent 42%, rgb(72 30 40 / 9%));
     background-size: 9px 11px, 13px 15px, 17px 19px, 100% 100%;
 }
+body.anika-theme ::selection {
+    color: var(--color-primary-dark);
+    background: #dfe5cf;
+}
+body.anika-theme .primary-nav a:hover,
+body.anika-theme .primary-nav a:focus-visible {
+    color: var(--color-primary-dark);
+    background: #dfe5cf;
+}
 body.night-demon {
     --color-page: #08070d;
     --color-surface: #17141e;
