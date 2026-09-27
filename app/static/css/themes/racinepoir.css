@@ -370,7 +370,18 @@ body.night-demon main {
 }
 body.night-demon .site-header,
 body.night-demon main {
-    border-color: #393341;
+    border: 3px solid #2bb9cf;
+    border-radius: 0;
+    clip-path: polygon(
+        12px 0,
+        calc(100% - 12px) 0,
+        100% 12px,
+        100% calc(100% - 12px),
+        calc(100% - 12px) 100%,
+        12px 100%,
+        0 calc(100% - 12px),
+        0 12px
+    );
     background-color: rgb(20 17 27 / 96%);
     background-image:
         radial-gradient(ellipse at 8% 4%, rgb(72 64 84 / 22%) 0 4%, transparent 20%),
@@ -378,7 +389,7 @@ body.night-demon main {
         radial-gradient(ellipse at 34% 96%, rgb(74 65 87 / 16%) 0 4%, transparent 22%),
         linear-gradient(128deg, rgb(255 255 255 / 1.5%), transparent 34%, rgb(0 0 0 / 8%));
 }
-body.night-demon .site-header { border-top-color: #8f879b; }
+body.night-demon .site-header { border-top-color: #62e6f8; }
 body.night-demon .site-brand__mark {
     border-color: #8f879b;
     color: #f8fdff;
@@ -523,6 +534,21 @@ body.night-demon .game-card:nth-child(5n + 1) {
 }
 body.night-demon .infra-diagram { border-color: #655e71; background: #08070d; }
 body.night-demon .infra-diagram figcaption { border-color: #393341; background: #17141e; }
+@media (max-width: 720px) {
+    body.night-demon .site-header,
+    body.night-demon main {
+        clip-path: polygon(
+            8px 0,
+            calc(100% - 8px) 0,
+            100% 8px,
+            100% calc(100% - 8px),
+            calc(100% - 8px) 100%,
+            8px 100%,
+            0 calc(100% - 8px),
+            0 8px
+        );
+    }
+}
 body.bloc-theme {
     --color-page: #851e32;
     --color-surface: #f0ddc0;
