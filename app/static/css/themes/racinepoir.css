@@ -521,30 +521,29 @@ body.bloc-theme {
     --color-danger: #c90028;
     --color-focus: #e90031;
     --color-border: #9d5c34;
-    --shadow-surface: 8px 8px 0 rgb(58 24 31 / 28%);
-    --shadow-card: 4px 4px 0 rgb(58 24 31 / 20%);
+    --shadow-surface: 0 12px 30px rgb(83 23 39 / 19%);
+    --shadow-card: 0 5px 14px rgb(83 23 39 / 17%);
     --shadow-button: 0 3px 0 #651727;
     background-color: #851e32;
     background-image:
-        linear-gradient(90deg, transparent 0 57%, rgb(20 94 87 / 96%) 57% 100%),
-        linear-gradient(180deg, transparent 0 60%, rgb(150 82 29 / 96%) 60% 100%);
-    background-size: 100% 100%, 100% 100%;
+        radial-gradient(circle at 18% 28%, rgb(255 117 0 / 20%) 0 1px, transparent 1.8px),
+        radial-gradient(circle at 74% 62%, rgb(20 94 87 / 24%) 0 1.2px, transparent 2px),
+        radial-gradient(circle at 42% 86%, rgb(255 231 201 / 14%) 0 1.5px, transparent 2.4px),
+        linear-gradient(118deg, rgb(255 231 201 / 7%), transparent 42%, rgb(20 94 87 / 13%));
+    background-size: 9px 11px, 13px 15px, 17px 19px, 100% 100%;
 }
 body.bloc-theme .site-header,
 body.bloc-theme main {
     border-color: #5d2631;
-    border-radius: 0;
     background: rgb(240 221 192 / 96%);
     box-shadow: var(--shadow-surface);
 }
-body.bloc-theme .site-header { border-top: 8px solid #e90031; }
+body.bloc-theme .site-header { border-top-color: #e90031; }
 body.bloc-theme .site-brand__mark {
     border-color: #552b34;
-    border-radius: 0;
     color: #fff5e8;
     background: #17625c;
     box-shadow: 4px 4px 0 #c90028;
-    transform: none;
 }
 body.bloc-theme .site-brand h1 { color: #851e32; }
 body.bloc-theme .site-brand h1 span { color: #17625c; }
@@ -560,12 +559,8 @@ body.bloc-theme .scorebook-nav,
 body.bloc-theme .inventory-tools,
 body.bloc-theme .view-switcher {
     border-color: #17625c;
-    border-radius: 0;
     background: #d9d9bd;
 }
-body.bloc-theme .primary-nav a,
-body.bloc-theme .member-nav a,
-body.bloc-theme .scorebook-nav a { border-radius: 0; }
 body.bloc-theme .primary-nav a:hover,
 body.bloc-theme .primary-nav a:focus-visible,
 body.bloc-theme .member-nav a:hover,
@@ -581,7 +576,6 @@ body.bloc-theme .game-card,
 body.bloc-theme .summary-card,
 body.bloc-theme table {
     border-color: #9d5c34;
-    border-radius: 0;
     color: #35242a;
     background: #f0ddc0;
     box-shadow: var(--shadow-card);
@@ -590,7 +584,6 @@ body.bloc-theme input:not([type="hidden"]):not([type="checkbox"]):not([type="rad
 body.bloc-theme select,
 body.bloc-theme textarea {
     border-color: #552b34;
-    border-radius: 0;
     color: #35242a;
     background: #fff5e8;
 }
@@ -599,7 +592,6 @@ body.bloc-theme input[type="submit"],
 body.bloc-theme .button,
 body.bloc-theme .button-link {
     border-color: #721a2b;
-    border-radius: 0;
     color: #fff5e8;
     background: #c90028;
     box-shadow: 0 3px 0 #721a2b;
@@ -619,7 +611,7 @@ body.bloc-theme .dark-button { border-color: #552b34; color: #fff5e8; background
 body.bloc-theme .bloc-button { border-color: #103f3c; color: #fff5e8; background: #17625c; box-shadow: 0 3px 0 #103f3c; }
 body.bloc-theme .notice,
 body.bloc-theme .empty-state,
-body.bloc-theme .security-stat { border-radius: 0; background: #e8cfab; }
+body.bloc-theme .security-stat { background: #e8cfab; }
 body.bloc-theme .notice--error { background: #f0c2bb; }
 body.bloc-theme .notice--success { background: #d9d9bd; }
 body.bloc-theme .game-card__cover,
@@ -633,9 +625,8 @@ body.bloc-theme th,
 body.bloc-theme td { border-color: #c99a70; }
 body.bloc-theme tbody tr:nth-child(even) { background: #e8cfab; }
 body.bloc-theme tbody tr:hover { background: #e6b36f; }
-body.bloc-theme .badge { border-radius: 0; }
 body.bloc-theme .badge--info { border-color: #103f3c; background: #17625c; }
-body.bloc-theme .infra-diagram { border-color: #17625c; border-radius: 0; background: #851e32; }
+body.bloc-theme .infra-diagram { border-color: #17625c; background: #851e32; }
 body.bloc-theme .infra-diagram figcaption { border-color: #17625c; background: #f0ddc0; }
 @media (prefers-reduced-motion: reduce) {
     .game-card, .summary-card { transition: none; }
