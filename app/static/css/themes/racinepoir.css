@@ -313,12 +313,12 @@ body.anika-theme {
 }
 body.anika-theme ::selection {
     color: var(--color-primary-dark);
-    background: #dfe5cf;
+    background: #c6d2ad;
 }
 body.anika-theme .primary-nav a:hover,
 body.anika-theme .primary-nav a:focus-visible {
     color: var(--color-primary-dark);
-    background: #dfe5cf;
+    background: #c6d2ad;
 }
 body.night-demon {
     --color-page: #08070d;
